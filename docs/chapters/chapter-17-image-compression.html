@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; Chapter 17: Image Compression – Linear Algebra Language in the AI Age</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../htmls/lab-17-image-compression-interactive.html" rel="next">
+<link href="../htmls/lab-16-svd-matrix-microscope-interactive.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-367522ac618891c39d4b2ae87ea7600e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c5491cb7295b3d79f070a3ccf938a403.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-367522ac618891c39d4b2ae87ea7600e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter-17-image-compression.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Chapter 17: Image Compression</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Linear Algebra Language in the AI Age</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/wanghemath/Book-linear-algebra-language" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.facebook.com/sharer/sharer.php?u=|url|">
+              <i class="bi bi-facebook pe-1"></i>
+            Facebook
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../introduction-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction: Linear Algebra as a Language</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../labs-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-01-world-as-numbers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Chapter 1: The World as Numbers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-02-vectors-numbers-with-meaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Chapter 2: Vectors — Numbers with Meaning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-03-combining-ideas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Chapter 3: Combining Ideas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-04-data-as-points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Chapter 4: Data as Points</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-05-matrix-machine.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Chapter 5: The Matrix Machine</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-06-stretching-rotating-shearing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Chapter 6: Stretching, Rotating, and Shearing</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-07-solving-backwards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Chapter 7: Solving Backwards</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-08-when-information-is-lost.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Chapter 8: When Information Is Lost</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-09-length-and-distance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Chapter 9: Length and Distance</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-10-angles-and-similarity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Chapter 10: Angles and Similarity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-11-projection-best-shadow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 11: Projection — The Best Shadow</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-12-orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 12: Orthogonality</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-13-eigenvectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 13: Eigenvectors</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-14-stability-ranking-iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Chapter 14: Stability, Ranking, and Iteration</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-15-energy-landscapes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Chapter 15: Energy Landscapes</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-16-svd-matrix-microscope.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Chapter 16: SVD — The Matrix Microscope</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-17-image-compression.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Chapter 17: Image Compression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-18-pca.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Chapter 18: Principal Component Analysis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-19-fourier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Chapter 19: Fourier</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-20-haar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Chapter 20: Haar Wavelets</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-21-images-as-matrices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Chapter 21: Images as Matrices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-22-text-as-vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Chapter 22: Text as Vectors</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-23-neural-networks-as-matrix-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Chapter 23: Neural Networks as Matrix Machines</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-24-recommendation-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Chapter 24: Recommendation Systems</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-25-grammar-of-ai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Chapter 25: The Grammar of AI</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#opening-story-a-picture-made-of-too-many-numbers" id="toc-opening-story-a-picture-made-of-too-many-numbers" class="nav-link active" data-scroll-target="#opening-story-a-picture-made-of-too-many-numbers"><span class="header-section-number">17.1</span> Opening story: a picture made of too many numbers</a></li>
+  <li><a href="#learning-goals" id="toc-learning-goals" class="nav-link" data-scroll-target="#learning-goals"><span class="header-section-number">17.2</span> Learning goals</a></li>
+  <li><a href="#images-as-matrices" id="toc-images-as-matrices" class="nav-link" data-scroll-target="#images-as-matrices"><span class="header-section-number">17.3</span> 17.1 Images as matrices</a></li>
+  <li><a href="#why-images-can-be-compressed" id="toc-why-images-can-be-compressed" class="nav-link" data-scroll-target="#why-images-can-be-compressed"><span class="header-section-number">17.4</span> 17.2 Why images can be compressed</a></li>
+  <li><a href="#rank-one-image-layers" id="toc-rank-one-image-layers" class="nav-link" data-scroll-target="#rank-one-image-layers"><span class="header-section-number">17.5</span> 17.3 Rank-one image layers</a></li>
+  <li><a href="#the-rank-k-approximation" id="toc-the-rank-k-approximation" class="nav-link" data-scroll-target="#the-rank-k-approximation"><span class="header-section-number">17.6</span> 17.4 The rank-<span class="math inline">\(k\)</span> approximation</a>
+  <ul class="collapse">
+  <li><a href="#worked-example-a-small-matrix" id="toc-worked-example-a-small-matrix" class="nav-link" data-scroll-target="#worked-example-a-small-matrix"><span class="header-section-number">17.6.1</span> Worked example: a small matrix</a></li>
+  </ul></li>
+  <li><a href="#storage-cost" id="toc-storage-cost" class="nav-link" data-scroll-target="#storage-cost"><span class="header-section-number">17.7</span> 17.5 Storage cost</a></li>
+  <li><a href="#the-best-low-rank-approximation-theorem" id="toc-the-best-low-rank-approximation-theorem" class="nav-link" data-scroll-target="#the-best-low-rank-approximation-theorem"><span class="header-section-number">17.8</span> 17.6 The best low-rank approximation theorem</a></li>
+  <li><a href="#compression-as-projection" id="toc-compression-as-projection" class="nav-link" data-scroll-target="#compression-as-projection"><span class="header-section-number">17.9</span> 17.7 Compression as projection</a></li>
+  <li><a href="#denoising-by-discarding-small-layers" id="toc-denoising-by-discarding-small-layers" class="nav-link" data-scroll-target="#denoising-by-discarding-small-layers"><span class="header-section-number">17.10</span> 17.8 Denoising by discarding small layers</a></li>
+  <li><a href="#color-images" id="toc-color-images" class="nav-link" data-scroll-target="#color-images"><span class="header-section-number">17.11</span> 17.9 Color images</a></li>
+  <li><a href="#python-synthetic-image-compression" id="toc-python-synthetic-image-compression" class="nav-link" data-scroll-target="#python-synthetic-image-compression"><span class="header-section-number">17.12</span> 17.10 Python: synthetic image compression</a></li>
+  <li><a href="#worked-examples" id="toc-worked-examples" class="nav-link" data-scroll-target="#worked-examples"><span class="header-section-number">17.13</span> 17.11 Worked examples</a>
+  <ul class="collapse">
+  <li><a href="#example-1-storage-threshold" id="toc-example-1-storage-threshold" class="nav-link" data-scroll-target="#example-1-storage-threshold"><span class="header-section-number">17.13.1</span> Example 1: storage threshold</a></li>
+  <li><a href="#example-2-frobenius-error" id="toc-example-2-frobenius-error" class="nav-link" data-scroll-target="#example-2-frobenius-error"><span class="header-section-number">17.13.2</span> Example 2: Frobenius error</a></li>
+  <li><a href="#example-3-energy-captured" id="toc-example-3-energy-captured" class="nav-link" data-scroll-target="#example-3-energy-captured"><span class="header-section-number">17.13.3</span> Example 3: energy captured</a></li>
+  </ul></li>
+  <li><a href="#common-misunderstandings" id="toc-common-misunderstandings" class="nav-link" data-scroll-target="#common-misunderstandings"><span class="header-section-number">17.14</span> 17.12 Common misunderstandings</a>
+  <ul class="collapse">
+  <li><a href="#misunderstanding-1-low-rank-means-simple-looking" id="toc-misunderstanding-1-low-rank-means-simple-looking" class="nav-link" data-scroll-target="#misunderstanding-1-low-rank-means-simple-looking"><span class="header-section-number">17.14.1</span> Misunderstanding 1: low rank means simple-looking</a></li>
+  <li><a href="#misunderstanding-2-high-energy-always-means-high-visual-quality" id="toc-misunderstanding-2-high-energy-always-means-high-visual-quality" class="nav-link" data-scroll-target="#misunderstanding-2-high-energy-always-means-high-visual-quality"><span class="header-section-number">17.14.2</span> Misunderstanding 2: high energy always means high visual quality</a></li>
+  <li><a href="#misunderstanding-3-compression-and-denoising-are-the-same" id="toc-misunderstanding-3-compression-and-denoising-are-the-same" class="nav-link" data-scroll-target="#misunderstanding-3-compression-and-denoising-are-the-same"><span class="header-section-number">17.14.3</span> Misunderstanding 3: compression and denoising are the same</a></li>
+  </ul></li>
+  <li><a href="#practice-problems" id="toc-practice-problems" class="nav-link" data-scroll-target="#practice-problems"><span class="header-section-number">17.15</span> 17.13 Practice problems</a>
+  <ul class="collapse">
+  <li><a href="#problem-1" id="toc-problem-1" class="nav-link" data-scroll-target="#problem-1"><span class="header-section-number">17.15.1</span> Problem 1</a></li>
+  <li><a href="#problem-2" id="toc-problem-2" class="nav-link" data-scroll-target="#problem-2"><span class="header-section-number">17.15.2</span> Problem 2</a></li>
+  <li><a href="#problem-3" id="toc-problem-3" class="nav-link" data-scroll-target="#problem-3"><span class="header-section-number">17.15.3</span> Problem 3</a></li>
+  <li><a href="#problem-4" id="toc-problem-4" class="nav-link" data-scroll-target="#problem-4"><span class="header-section-number">17.15.4</span> Problem 4</a></li>
+  <li><a href="#problem-5" id="toc-problem-5" class="nav-link" data-scroll-target="#problem-5"><span class="header-section-number">17.15.5</span> Problem 5</a></li>
+  </ul></li>
+  <li><a href="#challenge-problems" id="toc-challenge-problems" class="nav-link" data-scroll-target="#challenge-problems"><span class="header-section-number">17.16</span> 17.14 Challenge problems</a>
+  <ul class="collapse">
+  <li><a href="#challenge-1-visual-quality-versus-error" id="toc-challenge-1-visual-quality-versus-error" class="nav-link" data-scroll-target="#challenge-1-visual-quality-versus-error"><span class="header-section-number">17.16.1</span> Challenge 1: visual quality versus error</a></li>
+  <li><a href="#challenge-2-denoising-threshold" id="toc-challenge-2-denoising-threshold" class="nav-link" data-scroll-target="#challenge-2-denoising-threshold"><span class="header-section-number">17.16.2</span> Challenge 2: denoising threshold</a></li>
+  <li><a href="#challenge-3-color-compression" id="toc-challenge-3-color-compression" class="nav-link" data-scroll-target="#challenge-3-color-compression"><span class="header-section-number">17.16.3</span> Challenge 3: color compression</a></li>
+  <li><a href="#challenge-4-adversarial-image" id="toc-challenge-4-adversarial-image" class="nav-link" data-scroll-target="#challenge-4-adversarial-image"><span class="header-section-number">17.16.4</span> Challenge 4: adversarial image</a></li>
+  </ul></li>
+  <li><a href="#ai-companion-activities" id="toc-ai-companion-activities" class="nav-link" data-scroll-target="#ai-companion-activities"><span class="header-section-number">17.17</span> 17.15 AI companion activities</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary"><span class="header-section-number">17.18</span> Chapter summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/edit/main/chapters/chapter-17-image-compression.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Chapter 17: Image Compression</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">How a picture becomes a few important matrix layers</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="opening-story-a-picture-made-of-too-many-numbers" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="opening-story-a-picture-made-of-too-many-numbers"><span class="header-section-number">17.1</span> Opening story: a picture made of too many numbers</h2>
+<p>A photograph looks like one object.</p>
+<p>To a computer, it is not one object. It is a table of numbers.</p>
+<p>A grayscale image with <span class="math inline">\(1000\)</span> rows and <span class="math inline">\(1000\)</span> columns is a matrix with</p>
+<p><span class="math display">\[
+1000 \times 1000 = 1{,}000{,}000
+\]</span></p>
+<p>entries. A color image has three such matrices, one for red, one for green, and one for blue.</p>
+<p>That sounds enormous. But pictures are not usually random. A sky changes slowly from one pixel to the next. A face has broad regions of light and shadow. A handwritten digit has a background, a stroke, and a boundary. A medical image may contain smooth tissue regions and a few important edges.</p>
+<p>So an image may contain many numbers but fewer meaningful patterns.</p>
+<p>This chapter asks a practical question:</p>
+<blockquote class="blockquote">
+<p>Can we keep the visible structure of an image while storing many fewer numbers?</p>
+</blockquote>
+<p>The answer is yes, and the tool is the singular value decomposition.</p>
+<p>In Chapter 16, the SVD showed us that every matrix can be decomposed into ordered rank-one layers:</p>
+<p><span class="math display">\[
+A = \sigma_1 u_1v_1^T + \sigma_2u_2v_2^T + \cdots + \sigma_r u_rv_r^T.
+\]</span></p>
+<p>For images, each rank-one matrix <span class="math inline">\(u_iv_i^T\)</span> is a simple visual layer, and the singular value <span class="math inline">\(\sigma_i\)</span> tells us how important that layer is.</p>
+<p>The central message of this chapter is:</p>
+<blockquote class="blockquote">
+<p><strong>Image compression is controlled information loss.</strong> We intentionally discard small layers while keeping the strongest visible structure.</p>
+</blockquote>
+<p>This is not only a trick for pictures. It is one of the main ideas behind modern data compression, denoising, dimensionality reduction, recommendation systems, and machine learning.</p>
+</section>
+<section id="learning-goals" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="learning-goals"><span class="header-section-number">17.2</span> Learning goals</h2>
+<p>By the end of this chapter, you should be able to:</p>
+<ol type="1">
+<li>Interpret a grayscale image as a matrix and a color image as three matrices.</li>
+<li>Explain why many images have approximate low-rank structure.</li>
+<li>Use the SVD to build the rank-<span class="math inline">\(k\)</span> approximation <span class="math inline">\(A_k\)</span>.</li>
+<li>Interpret singular values as ordered importance levels.</li>
+<li>Compare image quality, reconstruction error, and storage cost as <span class="math inline">\(k\)</span> changes.</li>
+<li>Explain why the truncated SVD gives the best rank-<span class="math inline">\(k\)</span> approximation.</li>
+<li>Use Python to compress, denoise, and visualize images.</li>
+<li>Connect image compression to PCA, denoising, latent structure, and AI.</li>
+</ol>
+</section>
+<section id="images-as-matrices" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="images-as-matrices"><span class="header-section-number">17.3</span> 17.1 Images as matrices</h2>
+<p>A grayscale image is a matrix.</p>
+<p>Each matrix entry stores the brightness of one pixel. For example,</p>
+<p><span class="math display">\[
+A =
+\begin{bmatrix}
+0 &amp; 0 &amp; 0 &amp; 0\\
+0 &amp; 1 &amp; 1 &amp; 0\\
+0 &amp; 1 &amp; 1 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{bmatrix}
+\]</span></p>
+<p>represents a tiny bright square on a dark background.</p>
+<p>In many image files, pixel brightness may be stored between <span class="math inline">\(0\)</span> and <span class="math inline">\(255\)</span>. In mathematical and Python examples, it is often more convenient to scale brightness into the interval <span class="math inline">\([0,1]\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Matrix view of a grayscale image
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(A \in \mathbb{R}^{m\times n}\)</span> is a grayscale image, then:</p>
+<ul>
+<li><span class="math inline">\(m\)</span> is the number of rows of pixels,</li>
+<li><span class="math inline">\(n\)</span> is the number of columns of pixels,</li>
+<li><span class="math inline">\(A_{ij}\)</span> is the brightness at row <span class="math inline">\(i\)</span> and column <span class="math inline">\(j\)</span>.</li>
+</ul>
+</div>
+</div>
+<p>A color image is usually stored as three matrices:</p>
+<p><span class="math display">\[
+A^{(R)}, \qquad A^{(G)}, \qquad A^{(B)}.
+\]</span></p>
+<p>The first stores red intensity, the second stores green intensity, and the third stores blue intensity. In this chapter, we focus mostly on grayscale images because the essential linear algebra is already visible there.</p>
+</section>
+<section id="why-images-can-be-compressed" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="why-images-can-be-compressed"><span class="header-section-number">17.4</span> 17.2 Why images can be compressed</h2>
+<p>A completely random matrix is hard to compress. Every pixel is unrelated to every other pixel. If we discard information, the image quickly becomes meaningless.</p>
+<p>Natural images are different. They contain structure:</p>
+<ul>
+<li>neighboring pixels are often similar;</li>
+<li>large regions may be smooth;</li>
+<li>edges and boundaries often form coherent curves;</li>
+<li>many visual patterns repeat;</li>
+<li>noise is often weaker than the main signal.</li>
+</ul>
+<p>This structure means the image matrix may be well approximated by a low-rank matrix.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Approximate low rank
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An image matrix <span class="math inline">\(A\)</span> may have high rank exactly, but still be <strong>approximately low rank</strong> if most of its visible structure can be captured by a small number of SVD layers.</p>
+</div>
+</div>
+<p>This distinction is essential.</p>
+<p>Exact rank asks: <em>How many layers are needed to reproduce every pixel perfectly?</em></p>
+<p>Approximate rank asks: <em>How many layers are needed to reproduce the important visual structure?</em></p>
+<p>For compression, approximate rank is often more important than exact rank.</p>
+</section>
+<section id="rank-one-image-layers" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="rank-one-image-layers"><span class="header-section-number">17.5</span> 17.3 Rank-one image layers</h2>
+<p>A rank-one matrix has the form</p>
+<p><span class="math display">\[
+uv^T.
+\]</span></p>
+<p>Here <span class="math inline">\(u\in \mathbb{R}^m\)</span> is a column pattern and <span class="math inline">\(v\in \mathbb{R}^n\)</span> is a row pattern. The entry in row <span class="math inline">\(i\)</span> and column <span class="math inline">\(j\)</span> is</p>
+<p><span class="math display">\[
+(uv^T)_{ij} = u_i v_j.
+\]</span></p>
+<p>This means a rank-one image is built by multiplying a vertical pattern by a horizontal pattern.</p>
+<p>That may sound too simple to make a real image. But the SVD says that a complicated image can be built as a sum of simple rank-one image layers:</p>
+<p><span class="math display">\[
+A = \sigma_1u_1v_1^T + \sigma_2u_2v_2^T + \cdots + \sigma_ru_rv_r^T.
+\]</span></p>
+<p>Each layer is simple. Together, they can create complex structure.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Visual interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A rank-one layer is like a transparent sheet placed over the image. The first sheet carries the strongest broad pattern. Later sheets add smaller corrections, details, edges, texture, and sometimes noise.</p>
+</div>
+</div>
+</section>
+<section id="the-rank-k-approximation" class="level2" data-number="17.6">
+<h2 data-number="17.6" class="anchored" data-anchor-id="the-rank-k-approximation"><span class="header-section-number">17.6</span> 17.4 The rank-<span class="math inline">\(k\)</span> approximation</h2>
+<p>The rank-<span class="math inline">\(k\)</span> truncated SVD of <span class="math inline">\(A\)</span> is</p>
+<p><span class="math display">\[
+A_k = \sigma_1u_1v_1^T + \sigma_2u_2v_2^T + \cdots + \sigma_ku_kv_k^T.
+\]</span></p>
+<p>Instead of keeping all <span class="math inline">\(r\)</span> layers, we keep only the first <span class="math inline">\(k\)</span> layers.</p>
+<p>If <span class="math inline">\(k=1\)</span>, the approximation is very simple.</p>
+<p>If <span class="math inline">\(k\)</span> is larger, the approximation becomes more detailed.</p>
+<p>If <span class="math inline">\(k=r\)</span>, then <span class="math inline">\(A_k=A\)</span> exactly.</p>
+<p>The compression idea is:</p>
+<blockquote class="blockquote">
+<p>Choose <span class="math inline">\(k\)</span> much smaller than <span class="math inline">\(r\)</span>, but large enough that <span class="math inline">\(A_k\)</span> still looks like the original image.</p>
+</blockquote>
+<section id="worked-example-a-small-matrix" class="level3" data-number="17.6.1">
+<h3 data-number="17.6.1" class="anchored" data-anchor-id="worked-example-a-small-matrix"><span class="header-section-number">17.6.1</span> Worked example: a small matrix</h3>
+<p>Suppose an image matrix has singular values</p>
+<p><span class="math display">\[
+10, \quad 4, \quad 1, \quad 0.2, \quad 0.05.
+\]</span></p>
+<p>The first singular value is much larger than the later ones. The first few layers likely capture most of the image energy.</p>
+<p>The total squared energy is</p>
+<p><span class="math display">\[
+10^2 + 4^2 + 1^2 + 0.2^2 + 0.05^2.
+\]</span></p>
+<p>If we keep only the first two layers, the captured energy ratio is</p>
+<p><span class="math display">\[
+\frac{10^2+4^2}{10^2+4^2+1^2+0.2^2+0.05^2}.
+\]</span></p>
+<p>This tells us how much of the squared Frobenius norm is retained.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Energy ratio
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The energy captured by the first <span class="math inline">\(k\)</span> singular values is</p>
+<p><span class="math display">\[
+\frac{\sigma_1^2+\cdots+\sigma_k^2}{\sigma_1^2+\cdots+\sigma_r^2}.
+\]</span></p>
+<p>This is a useful numerical guide, but visual quality also depends on where the missing information appears.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="storage-cost" class="level2" data-number="17.7">
+<h2 data-number="17.7" class="anchored" data-anchor-id="storage-cost"><span class="header-section-number">17.7</span> 17.5 Storage cost</h2>
+<p>Suppose <span class="math inline">\(A\in\mathbb{R}^{m\times n}\)</span>.</p>
+<p>The full image stores</p>
+<p><span class="math display">\[
+mn
+\]</span></p>
+<p>numbers.</p>
+<p>The rank-<span class="math inline">\(k\)</span> SVD approximation stores:</p>
+<ul>
+<li><span class="math inline">\(k\)</span> left singular vectors of length <span class="math inline">\(m\)</span>: <span class="math inline">\(mk\)</span> numbers;</li>
+<li><span class="math inline">\(k\)</span> right singular vectors of length <span class="math inline">\(n\)</span>: <span class="math inline">\(nk\)</span> numbers;</li>
+<li><span class="math inline">\(k\)</span> singular values: <span class="math inline">\(k\)</span> numbers.</li>
+</ul>
+<p>So the compressed representation stores approximately</p>
+<p><span class="math display">\[
+k(m+n+1)
+\]</span></p>
+<p>numbers.</p>
+<p>Compression is worthwhile when</p>
+<p><span class="math display">\[
+k(m+n+1) &lt; mn.
+\]</span></p>
+<p>For a <span class="math inline">\(1000\times 1000\)</span> grayscale image, the full image stores <span class="math inline">\(1{,}000{,}000\)</span> numbers. A rank-<span class="math inline">\(50\)</span> approximation stores</p>
+<p><span class="math display">\[
+50(1000+1000+1)=100{,}050
+\]</span></p>
+<p>numbers, about one tenth as many.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Compression is not free
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Smaller <span class="math inline">\(k\)</span> means fewer numbers, but also more information loss. The goal is not to make <span class="math inline">\(k\)</span> as small as possible. The goal is to choose <span class="math inline">\(k\)</span> so that the lost information is acceptable.</p>
+</div>
+</div>
+</section>
+<section id="the-best-low-rank-approximation-theorem" class="level2" data-number="17.8">
+<h2 data-number="17.8" class="anchored" data-anchor-id="the-best-low-rank-approximation-theorem"><span class="header-section-number">17.8</span> 17.6 The best low-rank approximation theorem</h2>
+<p>The truncated SVD is not just a reasonable method. It is the best possible method for low-rank approximation under common error measures.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Eckart–Young theorem
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let</p>
+<p><span class="math display">\[
+A = U\Sigma V^T
+\]</span></p>
+<p>be the SVD of <span class="math inline">\(A\)</span>, with singular values</p>
+<p><span class="math display">\[
+\sigma_1\geq \sigma_2\geq \cdots \geq \sigma_r &gt;0.
+\]</span></p>
+<p>Among all matrices <span class="math inline">\(B\)</span> with rank at most <span class="math inline">\(k\)</span>, the truncated SVD approximation</p>
+<p><span class="math display">\[
+A_k = \sum_{i=1}^k \sigma_i u_i v_i^T
+\]</span></p>
+<p>minimizes both</p>
+<p><span class="math display">\[
+\|A-B\|_F
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+\|A-B\|_2.
+\]</span></p>
+</div>
+</div>
+<p>The theorem says:</p>
+<blockquote class="blockquote">
+<p>If you are allowed to keep only <span class="math inline">\(k\)</span> matrix layers, the SVD tells you the best <span class="math inline">\(k\)</span> layers to keep.</p>
+</blockquote>
+<p>The Frobenius error has a simple formula:</p>
+<p><span class="math display">\[
+\|A-A_k\|_F^2 = \sigma_{k+1}^2+\sigma_{k+2}^2+\cdots+\sigma_r^2.
+\]</span></p>
+<p>So the discarded singular values measure the lost energy.</p>
+<div class="proof" data-collapse="true">
+<p><span class="proof-title"><em>Proof</em> (Proof idea). </span>The full proof is deeper than what we need here, but the main intuition is clear.</p>
+<p>The SVD writes the matrix in orthogonal rank-one directions. Because these directions are orthogonal under the Frobenius inner product, the squared error behaves like a Pythagorean sum. Keeping the largest <span class="math inline">\(k\)</span> singular values removes the least possible squared energy.</p>
+<p>This is the same principle behind projection: to approximate a vector using a subspace, keep the components in the most important orthogonal directions and discard the rest.</p>
+</div>
+</section>
+<section id="compression-as-projection" class="level2" data-number="17.9">
+<h2 data-number="17.9" class="anchored" data-anchor-id="compression-as-projection"><span class="header-section-number">17.9</span> 17.7 Compression as projection</h2>
+<p>There is a close connection between image compression and projection.</p>
+<p>When we compute <span class="math inline">\(A_k\)</span>, we are projecting the matrix <span class="math inline">\(A\)</span> onto the set of matrices built from the first <span class="math inline">\(k\)</span> singular directions:</p>
+<p><span class="math display">\[
+A_k = U_kU_k^T A V_kV_k^T.
+\]</span></p>
+<p>This formula says:</p>
+<ol type="1">
+<li>keep only the important left-side image patterns;</li>
+<li>keep only the important right-side image patterns;</li>
+<li>remove everything outside those patterns.</li>
+</ol>
+<p>The SVD does not merely reduce numbers. It chooses a coordinate system adapted to the image.</p>
+</section>
+<section id="denoising-by-discarding-small-layers" class="level2" data-number="17.10">
+<h2 data-number="17.10" class="anchored" data-anchor-id="denoising-by-discarding-small-layers"><span class="header-section-number">17.10</span> 17.8 Denoising by discarding small layers</h2>
+<p>Suppose an observed image is</p>
+<p><span class="math display">\[
+A_{\text{noisy}} = A_{\text{true}} + N,
+\]</span></p>
+<p>where <span class="math inline">\(N\)</span> is noise.</p>
+<p>If the true image has strong organized structure and the noise is spread across many weak directions, then the largest singular values may mostly represent the true image, while smaller singular values may represent noise.</p>
+<p>A truncated SVD can therefore denoise the image:</p>
+<p><span class="math display">\[
+A_{\text{denoised}} = (A_{\text{noisy}})_k.
+\]</span></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Denoising requires judgment
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Small singular values often contain noise, but they can also contain fine details. If <span class="math inline">\(k\)</span> is too small, denoising becomes oversmoothing.</p>
+</div>
+</div>
+</section>
+<section id="color-images" class="level2" data-number="17.11">
+<h2 data-number="17.11" class="anchored" data-anchor-id="color-images"><span class="header-section-number">17.11</span> 17.9 Color images</h2>
+<p>For color images, we can apply SVD separately to the red, green, and blue channels:</p>
+<p><span class="math display">\[
+A^{(R)} \approx A^{(R)}_k, \qquad
+A^{(G)} \approx A^{(G)}_k, \qquad
+A^{(B)} \approx A^{(B)}_k.
+\]</span></p>
+<p>Then we combine the three approximated channels back into a color image.</p>
+<p>This method is simple and instructive. More advanced image-compression methods, such as JPEG, use different bases and additional encoding ideas, but the central principle is similar:</p>
+<blockquote class="blockquote">
+<p>transform the image into meaningful coordinates, keep the important coefficients, and discard or compress the smaller ones.</p>
+</blockquote>
+</section>
+<section id="python-synthetic-image-compression" class="level2" data-number="17.12">
+<h2 data-number="17.12" class="anchored" data-anchor-id="python-synthetic-image-compression"><span class="header-section-number">17.12</span> 17.10 Python: synthetic image compression</h2>
+<div id="5ff1c36d" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a synthetic grayscale image</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">120</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, n)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, n)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>circle <span class="op">=</span> (X<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> Y<span class="op">**</span><span class="dv">2</span> <span class="op">&lt;</span> <span class="fl">0.45</span><span class="op">**</span><span class="dv">2</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>gradient <span class="op">=</span> <span class="fl">0.35</span> <span class="op">*</span> (X <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>stripe <span class="op">=</span> <span class="fl">0.25</span> <span class="op">*</span> np.sin(<span class="dv">8</span><span class="op">*</span>np.pi<span class="op">*</span>X) <span class="op">*</span> (np.<span class="bu">abs</span>(Y) <span class="op">&lt;</span> <span class="fl">0.25</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.clip(circle <span class="op">+</span> gradient <span class="op">+</span> stripe, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">5</span>,<span class="dv">5</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>plt.imshow(A, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Synthetic image as a matrix"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="chapter-17-image-compression_files/figure-html/cell-2-output-1.png" width="389" height="409" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Compute the SVD:</p>
+<div id="2bde3743" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>U, s, Vt <span class="op">=</span> np.linalg.svd(A, full_matrices<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">4</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>plt.plot(s, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Singular values"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Index"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Singular value"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="chapter-17-image-compression_files/figure-html/cell-3-output-1.png" width="510" height="376" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Build rank-<span class="math inline">\(k\)</span> approximations:</p>
+<div id="beacc566" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rank_k_approx(U, s, Vt, k):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (U[:, :k] <span class="op">*</span> s[:k]) <span class="op">@</span> Vt[:k, :]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ks <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, k <span class="kw">in</span> <span class="bu">enumerate</span>(ks, <span class="dv">1</span>):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    Ak <span class="op">=</span> rank_k_approx(U, s, Vt, k)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    plt.subplot(<span class="dv">2</span>, <span class="dv">3</span>, i)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    plt.imshow(Ak, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="ss">f"rank </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="chapter-17-image-compression_files/figure-html/cell-4-output-1.png" width="1125" height="762" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Compute storage and energy:</p>
+<div id="5bd8f76d" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m, n <span class="op">=</span> A.shape</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>full_storage <span class="op">=</span> m<span class="op">*</span>n</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>]:</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    compressed_storage <span class="op">=</span> k<span class="op">*</span>(m<span class="op">+</span>n<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    energy <span class="op">=</span> np.<span class="bu">sum</span>(s[:k]<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> np.<span class="bu">sum</span>(s<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"k=</span><span class="sc">{</span>k<span class="sc">:2d}</span><span class="ss">: storage ratio=</span><span class="sc">{</span>compressed_storage<span class="op">/</span>full_storage<span class="sc">:.3f}</span><span class="ss">, energy=</span><span class="sc">{</span>energy<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>k= 1: storage ratio=0.017, energy=0.889
+k= 3: storage ratio=0.050, energy=0.971
+k= 5: storage ratio=0.084, energy=0.985
+k=10: storage ratio=0.167, energy=0.996
+k=20: storage ratio=0.335, energy=1.000
+k=40: storage ratio=0.669, energy=1.000</code></pre>
+</div>
+</div>
+</section>
+<section id="worked-examples" class="level2" data-number="17.13">
+<h2 data-number="17.13" class="anchored" data-anchor-id="worked-examples"><span class="header-section-number">17.13</span> 17.11 Worked examples</h2>
+<section id="example-1-storage-threshold" class="level3" data-number="17.13.1">
+<h3 data-number="17.13.1" class="anchored" data-anchor-id="example-1-storage-threshold"><span class="header-section-number">17.13.1</span> Example 1: storage threshold</h3>
+<p>A grayscale image has size <span class="math inline">\(800\times 600\)</span>. For what values of <span class="math inline">\(k\)</span> does rank-<span class="math inline">\(k\)</span> SVD storage use fewer numbers than the original image?</p>
+<p>The full image stores</p>
+<p><span class="math display">\[
+800\cdot 600 = 480{,}000
+\]</span></p>
+<p>numbers.</p>
+<p>The rank-<span class="math inline">\(k\)</span> approximation stores</p>
+<p><span class="math display">\[
+k(800+600+1)=1401k
+\]</span></p>
+<p>numbers.</p>
+<p>We need</p>
+<p><span class="math display">\[
+1401k &lt; 480{,}000.
+\]</span></p>
+<p>Thus</p>
+<p><span class="math display">\[
+k &lt; \frac{480{,}000}{1401}\approx 342.6.
+\]</span></p>
+<p>So <span class="math inline">\(k\leq 342\)</span> gives storage savings.</p>
+</section>
+<section id="example-2-frobenius-error" class="level3" data-number="17.13.2">
+<h3 data-number="17.13.2" class="anchored" data-anchor-id="example-2-frobenius-error"><span class="header-section-number">17.13.2</span> Example 2: Frobenius error</h3>
+<p>Suppose the singular values of an image matrix are</p>
+<p><span class="math display">\[
+9, \quad 6, \quad 3, \quad 1, \quad 1.
+\]</span></p>
+<p>The squared error of the rank-<span class="math inline">\(2\)</span> approximation is</p>
+<p><span class="math display">\[
+3^2+1^2+1^2 = 11.
+\]</span></p>
+<p>So</p>
+<p><span class="math display">\[
+\|A-A_2\|_F = \sqrt{11}.
+\]</span></p>
+</section>
+<section id="example-3-energy-captured" class="level3" data-number="17.13.3">
+<h3 data-number="17.13.3" class="anchored" data-anchor-id="example-3-energy-captured"><span class="header-section-number">17.13.3</span> Example 3: energy captured</h3>
+<p>The energy captured by the rank-<span class="math inline">\(2\)</span> approximation is</p>
+<p><span class="math display">\[
+\frac{9^2+6^2}{9^2+6^2+3^2+1^2+1^2}
+= \frac{117}{128}\approx 0.914.
+\]</span></p>
+<p>So the first two layers capture about <span class="math inline">\(91.4\%\)</span> of the squared energy.</p>
+</section>
+</section>
+<section id="common-misunderstandings" class="level2" data-number="17.14">
+<h2 data-number="17.14" class="anchored" data-anchor-id="common-misunderstandings"><span class="header-section-number">17.14</span> 17.12 Common misunderstandings</h2>
+<section id="misunderstanding-1-low-rank-means-simple-looking" class="level3" data-number="17.14.1">
+<h3 data-number="17.14.1" class="anchored" data-anchor-id="misunderstanding-1-low-rank-means-simple-looking"><span class="header-section-number">17.14.1</span> Misunderstanding 1: low rank means simple-looking</h3>
+<p>A rank-one image is simple. But a low-rank image with <span class="math inline">\(k=30\)</span> or <span class="math inline">\(k=50\)</span> can look visually rich. Low-rank does not mean boring. It means the image can be built from a relatively small number of organized layers.</p>
+</section>
+<section id="misunderstanding-2-high-energy-always-means-high-visual-quality" class="level3" data-number="17.14.2">
+<h3 data-number="17.14.2" class="anchored" data-anchor-id="misunderstanding-2-high-energy-always-means-high-visual-quality"><span class="header-section-number">17.14.2</span> Misunderstanding 2: high energy always means high visual quality</h3>
+<p>Energy is useful, but human perception is not exactly Frobenius norm. A small error near an important edge may be more visible than a larger error in a smooth background.</p>
+</section>
+<section id="misunderstanding-3-compression-and-denoising-are-the-same" class="level3" data-number="17.14.3">
+<h3 data-number="17.14.3" class="anchored" data-anchor-id="misunderstanding-3-compression-and-denoising-are-the-same"><span class="header-section-number">17.14.3</span> Misunderstanding 3: compression and denoising are the same</h3>
+<p>They are related but not identical. Compression aims to store fewer numbers. Denoising aims to remove unwanted variation. SVD truncation can do both, but the best <span class="math inline">\(k\)</span> for compression may differ from the best <span class="math inline">\(k\)</span> for denoising.</p>
+</section>
+</section>
+<section id="practice-problems" class="level2" data-number="17.15">
+<h2 data-number="17.15" class="anchored" data-anchor-id="practice-problems"><span class="header-section-number">17.15</span> 17.13 Practice problems</h2>
+<section id="problem-1" class="level3" data-number="17.15.1">
+<h3 data-number="17.15.1" class="anchored" data-anchor-id="problem-1"><span class="header-section-number">17.15.1</span> Problem 1</h3>
+<p>A <span class="math inline">\(500\times 500\)</span> grayscale image is approximated using rank <span class="math inline">\(k=20\)</span>. How many numbers are stored in the SVD representation? What fraction of the original storage is this?</p>
+<div class="proof solution" data-collapse="true">
+<p><span class="proof-title"><em>Solution</em>. </span>The full image stores</p>
+<p><span class="math display">\[
+500\cdot 500 = 250{,}000
+\]</span></p>
+<p>numbers.</p>
+<p>The rank-<span class="math inline">\(20\)</span> SVD approximation stores</p>
+<p><span class="math display">\[
+20(500+500+1)=20{,}020
+\]</span></p>
+<p>numbers.</p>
+<p>The storage fraction is</p>
+<p><span class="math display">\[
+\frac{20{,}020}{250{,}000}\approx 0.0801.
+\]</span></p>
+<p>So it uses about <span class="math inline">\(8.0\%\)</span> of the original storage.</p>
+</div>
+</section>
+<section id="problem-2" class="level3" data-number="17.15.2">
+<h3 data-number="17.15.2" class="anchored" data-anchor-id="problem-2"><span class="header-section-number">17.15.2</span> Problem 2</h3>
+<p>Suppose the singular values of an image matrix are</p>
+<p><span class="math display">\[
+12, 5, 2, 1, 0.5.
+\]</span></p>
+<p>Find the Frobenius error of the rank-<span class="math inline">\(2\)</span> approximation.</p>
+<div class="proof solution" data-collapse="true">
+<p><span class="proof-title"><em>Solution</em>. </span>The discarded singular values are <span class="math inline">\(2,1,0.5\)</span>. Therefore</p>
+<p><span class="math display">\[
+\|A-A_2\|_F^2 = 2^2+1^2+0.5^2 = 5.25.
+\]</span></p>
+<p>So</p>
+<p><span class="math display">\[
+\|A-A_2\|_F = \sqrt{5.25}\approx 2.291.
+\]</span></p>
+</div>
+</section>
+<section id="problem-3" class="level3" data-number="17.15.3">
+<h3 data-number="17.15.3" class="anchored" data-anchor-id="problem-3"><span class="header-section-number">17.15.3</span> Problem 3</h3>
+<p>Explain why keeping the first <span class="math inline">\(k\)</span> singular values is better than keeping <span class="math inline">\(k\)</span> randomly chosen singular values.</p>
+<div class="proof solution" data-collapse="true">
+<p><span class="proof-title"><em>Solution</em>. </span>The singular values are ordered from largest to smallest. The largest singular values carry the most Frobenius energy. By the Eckart–Young theorem, keeping the first <span class="math inline">\(k\)</span> singular values gives the best rank-<span class="math inline">\(k\)</span> approximation. Randomly chosen singular values may discard large important layers and keep smaller less important layers.</p>
+</div>
+</section>
+<section id="problem-4" class="level3" data-number="17.15.4">
+<h3 data-number="17.15.4" class="anchored" data-anchor-id="problem-4"><span class="header-section-number">17.15.4</span> Problem 4</h3>
+<p>Why might a rank-<span class="math inline">\(20\)</span> approximation look good for one image but poor for another image of the same size?</p>
+<div class="proof solution" data-collapse="true">
+<p><span class="proof-title"><em>Solution</em>. </span>Different images have different singular value patterns. If the singular values decay quickly, a small <span class="math inline">\(k\)</span> captures most structure. If they decay slowly, important information is spread across many layers, so a larger <span class="math inline">\(k\)</span> is needed. Smooth images often compress better than highly textured or random images.</p>
+</div>
+</section>
+<section id="problem-5" class="level3" data-number="17.15.5">
+<h3 data-number="17.15.5" class="anchored" data-anchor-id="problem-5"><span class="header-section-number">17.15.5</span> Problem 5</h3>
+<p>Let <span class="math inline">\(A\in\mathbb{R}^{m\times n}\)</span>. Show that the rank-<span class="math inline">\(k\)</span> SVD storage is smaller than full storage exactly when</p>
+<p><span class="math display">\[
+k &lt; \frac{mn}{m+n+1}.
+\]</span></p>
+<div class="proof solution" data-collapse="true">
+<p><span class="proof-title"><em>Solution</em>. </span>Full storage is <span class="math inline">\(mn\)</span>. Rank-<span class="math inline">\(k\)</span> SVD storage is <span class="math inline">\(k(m+n+1)\)</span>. Compression requires</p>
+<p><span class="math display">\[
+k(m+n+1)&lt;mn.
+\]</span></p>
+<p>Dividing by <span class="math inline">\(m+n+1&gt;0\)</span> gives</p>
+<p><span class="math display">\[
+k&lt;\frac{mn}{m+n+1}.
+\]</span></p>
+</div>
+</section>
+</section>
+<section id="challenge-problems" class="level2" data-number="17.16">
+<h2 data-number="17.16" class="anchored" data-anchor-id="challenge-problems"><span class="header-section-number">17.16</span> 17.14 Challenge problems</h2>
+<section id="challenge-1-visual-quality-versus-error" class="level3" data-number="17.16.1">
+<h3 data-number="17.16.1" class="anchored" data-anchor-id="challenge-1-visual-quality-versus-error"><span class="header-section-number">17.16.1</span> Challenge 1: visual quality versus error</h3>
+<p>Find or create two different images with the same Frobenius reconstruction error after rank-<span class="math inline">\(k\)</span> approximation. Do they look equally good? Explain why or why not.</p>
+</section>
+<section id="challenge-2-denoising-threshold" class="level3" data-number="17.16.2">
+<h3 data-number="17.16.2" class="anchored" data-anchor-id="challenge-2-denoising-threshold"><span class="header-section-number">17.16.2</span> Challenge 2: denoising threshold</h3>
+<p>Add Gaussian noise to a simple image. Try several values of <span class="math inline">\(k\)</span>. Find a value of <span class="math inline">\(k\)</span> that removes noise while preserving the main structure. Explain how you chose it.</p>
+</section>
+<section id="challenge-3-color-compression" class="level3" data-number="17.16.3">
+<h3 data-number="17.16.3" class="anchored" data-anchor-id="challenge-3-color-compression"><span class="header-section-number">17.16.3</span> Challenge 3: color compression</h3>
+<p>Apply SVD compression separately to the red, green, and blue channels of a color image. Compare the result with grayscale compression.</p>
+</section>
+<section id="challenge-4-adversarial-image" class="level3" data-number="17.16.4">
+<h3 data-number="17.16.4" class="anchored" data-anchor-id="challenge-4-adversarial-image"><span class="header-section-number">17.16.4</span> Challenge 4: adversarial image</h3>
+<p>Create an image that is difficult to compress with low-rank SVD. What visual features make it difficult?</p>
+</section>
+</section>
+<section id="ai-companion-activities" class="level2" data-number="17.17">
+<h2 data-number="17.17" class="anchored" data-anchor-id="ai-companion-activities"><span class="header-section-number">17.17</span> 17.15 AI companion activities</h2>
+<p>Use an AI assistant as a mathematical conversation partner.</p>
+<ol type="1">
+<li>Ask it to explain the difference between exact rank and approximate rank using an image example.</li>
+<li>Ask it to create three examples of images whose singular values decay quickly, moderately, and slowly.</li>
+<li>Ask it to compare SVD image compression with JPEG compression at a conceptual level.</li>
+<li>Ask it to generate Python code that compresses an RGB image channel-by-channel.</li>
+<li>Ask it to explain why the Frobenius error is determined by discarded singular values.</li>
+<li>Ask it to critique your choice of <span class="math inline">\(k\)</span> for an image-compression experiment.</li>
+</ol>
+</section>
+<section id="chapter-summary" class="level2" data-number="17.18">
+<h2 data-number="17.18" class="anchored" data-anchor-id="chapter-summary"><span class="header-section-number">17.18</span> Chapter summary</h2>
+<p>A digital image is a matrix of pixel values. The SVD decomposes that matrix into ordered rank-one layers:</p>
+<p><span class="math display">\[
+A = \sum_{i=1}^r \sigma_i u_i v_i^T.
+\]</span></p>
+<p>The rank-<span class="math inline">\(k\)</span> approximation keeps only the first <span class="math inline">\(k\)</span> layers:</p>
+<p><span class="math display">\[
+A_k = \sum_{i=1}^k \sigma_i u_i v_i^T.
+\]</span></p>
+<p>This creates compression because <span class="math inline">\(A_k\)</span> can be stored using about</p>
+<p><span class="math display">\[
+k(m+n+1)
+\]</span></p>
+<p>numbers instead of <span class="math inline">\(mn\)</span> numbers.</p>
+<p>The singular values measure importance. The discarded singular values measure error:</p>
+<p><span class="math display">\[
+\|A-A_k\|_F^2 = \sum_{i=k+1}^r \sigma_i^2.
+\]</span></p>
+<p>The deeper lesson is that compression is not merely about making files smaller. It is about discovering structure, choosing what matters, and understanding what is lost.</p>
+<p>In the next chapter, we will see the same idea from the perspective of data clouds: PCA uses SVD to find the most important directions of variation in data.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/wanghemath\.github\.io\/Book-linear-algebra-language\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../htmls/lab-16-svd-matrix-microscope-interactive.html" class="pagination-link" aria-label="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../htmls/lab-17-image-compression-interactive.html" class="pagination-link" aria-label="">
+        <span class="nav-page-text"></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Chapter 17: Image Compression"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "How a picture becomes a few important matrix layers"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span> </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Opening story: a picture made of too many numbers</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>A photograph looks like one object.</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>To a computer, it is not one object. It is a table of numbers.</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>A grayscale image with $1000$ rows and $1000$ columns is a matrix with</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>1000 \times 1000 = 1{,}000{,}000</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>entries. A color image has three such matrices, one for red, one for green, and one for blue.</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>That sounds enormous. But pictures are not usually random. A sky changes slowly from one pixel to the next. A face has broad regions of light and shadow. A handwritten digit has a background, a stroke, and a boundary. A medical image may contain smooth tissue regions and a few important edges.</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>So an image may contain many numbers but fewer meaningful patterns.</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>This chapter asks a practical question:</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Can we keep the visible structure of an image while storing many fewer numbers?</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>The answer is yes, and the tool is the singular value decomposition.</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>In Chapter 16, the SVD showed us that every matrix can be decomposed into ordered rank-one layers:</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>A = \sigma_1 u_1v_1^T + \sigma_2u_2v_2^T + \cdots + \sigma_r u_rv_r^T.</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>For images, each rank-one matrix $u_iv_i^T$ is a simple visual layer, and the singular value $\sigma_i$ tells us how important that layer is.</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>The central message of this chapter is:</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Image compression is controlled information loss.** We intentionally discard small layers while keeping the strongest visible structure.</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>This is not only a trick for pictures. It is one of the main ideas behind modern data compression, denoising, dimensionality reduction, recommendation systems, and machine learning.</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning goals</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>By the end of this chapter, you should be able to:</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Interpret a grayscale image as a matrix and a color image as three matrices.</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Explain why many images have approximate low-rank structure.</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Use the SVD to build the rank-$k$ approximation $A_k$.</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Interpret singular values as ordered importance levels.</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Compare image quality, reconstruction error, and storage cost as $k$ changes.</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Explain why the truncated SVD gives the best rank-$k$ approximation.</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>Use Python to compress, denoise, and visualize images.</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>Connect image compression to PCA, denoising, latent structure, and AI.</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.1 Images as matrices</span></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>A grayscale image is a matrix.</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>Each matrix entry stores the brightness of one pixel. For example,</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>A =</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; 0 &amp; 0<span class="sc">\\</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>0 &amp; 1 &amp; 1 &amp; 0<span class="sc">\\</span></span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>0 &amp; 1 &amp; 1 &amp; 0<span class="sc">\\</span></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; 0 &amp; 0</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>represents a tiny bright square on a dark background.</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>In many image files, pixel brightness may be stored between $0$ and $255$. In mathematical and Python examples, it is often more convenient to scale brightness into the interval $<span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$.</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>:::{.callout-note}</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## Matrix view of a grayscale image</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>If $A \in \mathbb{R}^{m\times n}$ is a grayscale image, then:</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$m$ is the number of rows of pixels,</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$n$ is the number of columns of pixels,</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$A_{ij}$ is the brightness at row $i$ and column $j$.</span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>A color image is usually stored as three matrices:</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>A^{(R)}, \qquad A^{(G)}, \qquad A^{(B)}.</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>The first stores red intensity, the second stores green intensity, and the third stores blue intensity. In this chapter, we focus mostly on grayscale images because the essential linear algebra is already visible there.</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.2 Why images can be compressed</span></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>A completely random matrix is hard to compress. Every pixel is unrelated to every other pixel. If we discard information, the image quickly becomes meaningless.</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>Natural images are different. They contain structure:</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>neighboring pixels are often similar;</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>large regions may be smooth;</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>edges and boundaries often form coherent curves;</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>many visual patterns repeat;</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>noise is often weaker than the main signal.</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>This structure means the image matrix may be well approximated by a low-rank matrix.</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>:::{.callout-important}</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## Approximate low rank</span></span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>An image matrix $A$ may have high rank exactly, but still be **approximately low rank** if most of its visible structure can be captured by a small number of SVD layers.</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>This distinction is essential.</span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>Exact rank asks: *How many layers are needed to reproduce every pixel perfectly?*</span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>Approximate rank asks: *How many layers are needed to reproduce the important visual structure?*</span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>For compression, approximate rank is often more important than exact rank.</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.3 Rank-one image layers</span></span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>A rank-one matrix has the form</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>uv^T.</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>Here $u\in \mathbb{R}^m$ is a column pattern and $v\in \mathbb{R}^n$ is a row pattern. The entry in row $i$ and column $j$ is</span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>(uv^T)_{ij} = u_i v_j.</span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>This means a rank-one image is built by multiplying a vertical pattern by a horizontal pattern.</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>That may sound too simple to make a real image. But the SVD says that a complicated image can be built as a sum of simple rank-one image layers:</span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>A = \sigma_1u_1v_1^T + \sigma_2u_2v_2^T + \cdots + \sigma_ru_rv_r^T.</span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>Each layer is simple. Together, they can create complex structure.</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>:::{.callout-note}</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visual interpretation</span></span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>A rank-one layer is like a transparent sheet placed over the image. The first sheet carries the strongest broad pattern. Later sheets add smaller corrections, details, edges, texture, and sometimes noise.</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.4 The rank-$k$ approximation</span></span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>The rank-$k$ truncated SVD of $A$ is</span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>A_k = \sigma_1u_1v_1^T + \sigma_2u_2v_2^T + \cdots + \sigma_ku_kv_k^T.</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>Instead of keeping all $r$ layers, we keep only the first $k$ layers.</span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>If $k=1$, the approximation is very simple.</span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a>If $k$ is larger, the approximation becomes more detailed.</span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a>If $k=r$, then $A_k=A$ exactly.</span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a>The compression idea is:</span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Choose $k$ much smaller than $r$, but large enough that $A_k$ still looks like the original image.</span></span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Worked example: a small matrix</span></span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a>Suppose an image matrix has singular values</span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a>10, \quad 4, \quad 1, \quad 0.2, \quad 0.05.</span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a>The first singular value is much larger than the later ones. The first few layers likely capture most of the image energy.</span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a>The total squared energy is</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a>10^2 + 4^2 + 1^2 + 0.2^2 + 0.05^2.</span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a>If we keep only the first two layers, the captured energy ratio is</span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a>\frac{10^2+4^2}{10^2+4^2+1^2+0.2^2+0.05^2}.</span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a>This tells us how much of the squared Frobenius norm is retained.</span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a>:::{.callout-tip}</span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Energy ratio</span></span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a>The energy captured by the first $k$ singular values is</span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a>\frac{\sigma_1^2+\cdots+\sigma_k^2}{\sigma_1^2+\cdots+\sigma_r^2}.</span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a>This is a useful numerical guide, but visual quality also depends on where the missing information appears.</span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.5 Storage cost</span></span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a>Suppose $A\in\mathbb{R}^{m\times n}$.</span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a>The full image stores</span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a>mn</span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a>numbers.</span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-225"><a href="#cb6-225" aria-hidden="true" tabindex="-1"></a>The rank-$k$ SVD approximation stores:</span>
+<span id="cb6-226"><a href="#cb6-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-227"><a href="#cb6-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$k$ left singular vectors of length $m$: $mk$ numbers;</span>
+<span id="cb6-228"><a href="#cb6-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$k$ right singular vectors of length $n$: $nk$ numbers;</span>
+<span id="cb6-229"><a href="#cb6-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$k$ singular values: $k$ numbers.</span>
+<span id="cb6-230"><a href="#cb6-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-231"><a href="#cb6-231" aria-hidden="true" tabindex="-1"></a>So the compressed representation stores approximately</span>
+<span id="cb6-232"><a href="#cb6-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-233"><a href="#cb6-233" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-234"><a href="#cb6-234" aria-hidden="true" tabindex="-1"></a>k(m+n+1)</span>
+<span id="cb6-235"><a href="#cb6-235" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-236"><a href="#cb6-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-237"><a href="#cb6-237" aria-hidden="true" tabindex="-1"></a>numbers.</span>
+<span id="cb6-238"><a href="#cb6-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-239"><a href="#cb6-239" aria-hidden="true" tabindex="-1"></a>Compression is worthwhile when</span>
+<span id="cb6-240"><a href="#cb6-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-241"><a href="#cb6-241" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-242"><a href="#cb6-242" aria-hidden="true" tabindex="-1"></a>k(m+n+1) &lt; mn.</span>
+<span id="cb6-243"><a href="#cb6-243" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-244"><a href="#cb6-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-245"><a href="#cb6-245" aria-hidden="true" tabindex="-1"></a>For a $1000\times 1000$ grayscale image, the full image stores $1{,}000{,}000$ numbers. A rank-$50$ approximation stores</span>
+<span id="cb6-246"><a href="#cb6-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-247"><a href="#cb6-247" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-248"><a href="#cb6-248" aria-hidden="true" tabindex="-1"></a>50(1000+1000+1)=100{,}050</span>
+<span id="cb6-249"><a href="#cb6-249" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-250"><a href="#cb6-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-251"><a href="#cb6-251" aria-hidden="true" tabindex="-1"></a>numbers, about one tenth as many.</span>
+<span id="cb6-252"><a href="#cb6-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-253"><a href="#cb6-253" aria-hidden="true" tabindex="-1"></a>:::{.callout-warning}</span>
+<span id="cb6-254"><a href="#cb6-254" aria-hidden="true" tabindex="-1"></a><span class="fu">## Compression is not free</span></span>
+<span id="cb6-255"><a href="#cb6-255" aria-hidden="true" tabindex="-1"></a>Smaller $k$ means fewer numbers, but also more information loss. The goal is not to make $k$ as small as possible. The goal is to choose $k$ so that the lost information is acceptable.</span>
+<span id="cb6-256"><a href="#cb6-256" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-257"><a href="#cb6-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-258"><a href="#cb6-258" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.6 The best low-rank approximation theorem</span></span>
+<span id="cb6-259"><a href="#cb6-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-260"><a href="#cb6-260" aria-hidden="true" tabindex="-1"></a>The truncated SVD is not just a reasonable method. It is the best possible method for low-rank approximation under common error measures.</span>
+<span id="cb6-261"><a href="#cb6-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-262"><a href="#cb6-262" aria-hidden="true" tabindex="-1"></a>:::{.callout-important}</span>
+<span id="cb6-263"><a href="#cb6-263" aria-hidden="true" tabindex="-1"></a><span class="fu">## Eckart--Young theorem</span></span>
+<span id="cb6-264"><a href="#cb6-264" aria-hidden="true" tabindex="-1"></a>Let</span>
+<span id="cb6-265"><a href="#cb6-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-266"><a href="#cb6-266" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-267"><a href="#cb6-267" aria-hidden="true" tabindex="-1"></a>A = U\Sigma V^T</span>
+<span id="cb6-268"><a href="#cb6-268" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-269"><a href="#cb6-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-270"><a href="#cb6-270" aria-hidden="true" tabindex="-1"></a>be the SVD of $A$, with singular values</span>
+<span id="cb6-271"><a href="#cb6-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-272"><a href="#cb6-272" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-273"><a href="#cb6-273" aria-hidden="true" tabindex="-1"></a>\sigma_1\geq \sigma_2\geq \cdots \geq \sigma_r &gt;0.</span>
+<span id="cb6-274"><a href="#cb6-274" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-275"><a href="#cb6-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-276"><a href="#cb6-276" aria-hidden="true" tabindex="-1"></a>Among all matrices $B$ with rank at most $k$, the truncated SVD approximation</span>
+<span id="cb6-277"><a href="#cb6-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-278"><a href="#cb6-278" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-279"><a href="#cb6-279" aria-hidden="true" tabindex="-1"></a>A_k = \sum_{i=1}^k \sigma_i u_i v_i^T</span>
+<span id="cb6-280"><a href="#cb6-280" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-281"><a href="#cb6-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-282"><a href="#cb6-282" aria-hidden="true" tabindex="-1"></a>minimizes both</span>
+<span id="cb6-283"><a href="#cb6-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-284"><a href="#cb6-284" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-285"><a href="#cb6-285" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-B<span class="sc">\|</span>_F</span>
+<span id="cb6-286"><a href="#cb6-286" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-287"><a href="#cb6-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-288"><a href="#cb6-288" aria-hidden="true" tabindex="-1"></a>and</span>
+<span id="cb6-289"><a href="#cb6-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-290"><a href="#cb6-290" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-291"><a href="#cb6-291" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-B<span class="sc">\|</span>_2.</span>
+<span id="cb6-292"><a href="#cb6-292" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-293"><a href="#cb6-293" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-294"><a href="#cb6-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-295"><a href="#cb6-295" aria-hidden="true" tabindex="-1"></a>The theorem says:</span>
+<span id="cb6-296"><a href="#cb6-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-297"><a href="#cb6-297" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; If you are allowed to keep only $k$ matrix layers, the SVD tells you the best $k$ layers to keep.</span></span>
+<span id="cb6-298"><a href="#cb6-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-299"><a href="#cb6-299" aria-hidden="true" tabindex="-1"></a>The Frobenius error has a simple formula:</span>
+<span id="cb6-300"><a href="#cb6-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-301"><a href="#cb6-301" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-302"><a href="#cb6-302" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-A_k<span class="sc">\|</span>_F^2 = \sigma_{k+1}^2+\sigma_{k+2}^2+\cdots+\sigma_r^2.</span>
+<span id="cb6-303"><a href="#cb6-303" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-304"><a href="#cb6-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-305"><a href="#cb6-305" aria-hidden="true" tabindex="-1"></a>So the discarded singular values measure the lost energy.</span>
+<span id="cb6-306"><a href="#cb6-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-307"><a href="#cb6-307" aria-hidden="true" tabindex="-1"></a>:::{.proof collapse="true"}</span>
+<span id="cb6-308"><a href="#cb6-308" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proof idea</span></span>
+<span id="cb6-309"><a href="#cb6-309" aria-hidden="true" tabindex="-1"></a>The full proof is deeper than what we need here, but the main intuition is clear.</span>
+<span id="cb6-310"><a href="#cb6-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-311"><a href="#cb6-311" aria-hidden="true" tabindex="-1"></a>The SVD writes the matrix in orthogonal rank-one directions. Because these directions are orthogonal under the Frobenius inner product, the squared error behaves like a Pythagorean sum. Keeping the largest $k$ singular values removes the least possible squared energy.</span>
+<span id="cb6-312"><a href="#cb6-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-313"><a href="#cb6-313" aria-hidden="true" tabindex="-1"></a>This is the same principle behind projection: to approximate a vector using a subspace, keep the components in the most important orthogonal directions and discard the rest.</span>
+<span id="cb6-314"><a href="#cb6-314" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-315"><a href="#cb6-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-316"><a href="#cb6-316" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.7 Compression as projection</span></span>
+<span id="cb6-317"><a href="#cb6-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-318"><a href="#cb6-318" aria-hidden="true" tabindex="-1"></a>There is a close connection between image compression and projection.</span>
+<span id="cb6-319"><a href="#cb6-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-320"><a href="#cb6-320" aria-hidden="true" tabindex="-1"></a>When we compute $A_k$, we are projecting the matrix $A$ onto the set of matrices built from the first $k$ singular directions:</span>
+<span id="cb6-321"><a href="#cb6-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-322"><a href="#cb6-322" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-323"><a href="#cb6-323" aria-hidden="true" tabindex="-1"></a>A_k = U_kU_k^T A V_kV_k^T.</span>
+<span id="cb6-324"><a href="#cb6-324" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-325"><a href="#cb6-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-326"><a href="#cb6-326" aria-hidden="true" tabindex="-1"></a>This formula says:</span>
+<span id="cb6-327"><a href="#cb6-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-328"><a href="#cb6-328" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>keep only the important left-side image patterns;</span>
+<span id="cb6-329"><a href="#cb6-329" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>keep only the important right-side image patterns;</span>
+<span id="cb6-330"><a href="#cb6-330" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>remove everything outside those patterns.</span>
+<span id="cb6-331"><a href="#cb6-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-332"><a href="#cb6-332" aria-hidden="true" tabindex="-1"></a>The SVD does not merely reduce numbers. It chooses a coordinate system adapted to the image.</span>
+<span id="cb6-333"><a href="#cb6-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-334"><a href="#cb6-334" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.8 Denoising by discarding small layers</span></span>
+<span id="cb6-335"><a href="#cb6-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-336"><a href="#cb6-336" aria-hidden="true" tabindex="-1"></a>Suppose an observed image is</span>
+<span id="cb6-337"><a href="#cb6-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-338"><a href="#cb6-338" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-339"><a href="#cb6-339" aria-hidden="true" tabindex="-1"></a>A_{\text{noisy}} = A_{\text{true}} + N,</span>
+<span id="cb6-340"><a href="#cb6-340" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-341"><a href="#cb6-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-342"><a href="#cb6-342" aria-hidden="true" tabindex="-1"></a>where $N$ is noise.</span>
+<span id="cb6-343"><a href="#cb6-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-344"><a href="#cb6-344" aria-hidden="true" tabindex="-1"></a>If the true image has strong organized structure and the noise is spread across many weak directions, then the largest singular values may mostly represent the true image, while smaller singular values may represent noise.</span>
+<span id="cb6-345"><a href="#cb6-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-346"><a href="#cb6-346" aria-hidden="true" tabindex="-1"></a>A truncated SVD can therefore denoise the image:</span>
+<span id="cb6-347"><a href="#cb6-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-348"><a href="#cb6-348" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-349"><a href="#cb6-349" aria-hidden="true" tabindex="-1"></a>A_{\text{denoised}} = (A_{\text{noisy}})_k.</span>
+<span id="cb6-350"><a href="#cb6-350" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-351"><a href="#cb6-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-352"><a href="#cb6-352" aria-hidden="true" tabindex="-1"></a>:::{.callout-warning}</span>
+<span id="cb6-353"><a href="#cb6-353" aria-hidden="true" tabindex="-1"></a><span class="fu">## Denoising requires judgment</span></span>
+<span id="cb6-354"><a href="#cb6-354" aria-hidden="true" tabindex="-1"></a>Small singular values often contain noise, but they can also contain fine details. If $k$ is too small, denoising becomes oversmoothing.</span>
+<span id="cb6-355"><a href="#cb6-355" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-356"><a href="#cb6-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-357"><a href="#cb6-357" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.9 Color images</span></span>
+<span id="cb6-358"><a href="#cb6-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-359"><a href="#cb6-359" aria-hidden="true" tabindex="-1"></a>For color images, we can apply SVD separately to the red, green, and blue channels:</span>
+<span id="cb6-360"><a href="#cb6-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-361"><a href="#cb6-361" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-362"><a href="#cb6-362" aria-hidden="true" tabindex="-1"></a>A^{(R)} \approx A^{(R)}_k, \qquad</span>
+<span id="cb6-363"><a href="#cb6-363" aria-hidden="true" tabindex="-1"></a>A^{(G)} \approx A^{(G)}_k, \qquad</span>
+<span id="cb6-364"><a href="#cb6-364" aria-hidden="true" tabindex="-1"></a>A^{(B)} \approx A^{(B)}_k.</span>
+<span id="cb6-365"><a href="#cb6-365" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-366"><a href="#cb6-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-367"><a href="#cb6-367" aria-hidden="true" tabindex="-1"></a>Then we combine the three approximated channels back into a color image.</span>
+<span id="cb6-368"><a href="#cb6-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-369"><a href="#cb6-369" aria-hidden="true" tabindex="-1"></a>This method is simple and instructive. More advanced image-compression methods, such as JPEG, use different bases and additional encoding ideas, but the central principle is similar:</span>
+<span id="cb6-370"><a href="#cb6-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-371"><a href="#cb6-371" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; transform the image into meaningful coordinates, keep the important coefficients, and discard or compress the smaller ones.</span></span>
+<span id="cb6-372"><a href="#cb6-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-373"><a href="#cb6-373" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.10 Python: synthetic image compression</span></span>
+<span id="cb6-374"><a href="#cb6-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-377"><a href="#cb6-377" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-378"><a href="#cb6-378" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-379"><a href="#cb6-379" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb6-380"><a href="#cb6-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-381"><a href="#cb6-381" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a synthetic grayscale image</span></span>
+<span id="cb6-382"><a href="#cb6-382" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">120</span></span>
+<span id="cb6-383"><a href="#cb6-383" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, n)</span>
+<span id="cb6-384"><a href="#cb6-384" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, n)</span>
+<span id="cb6-385"><a href="#cb6-385" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb6-386"><a href="#cb6-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-387"><a href="#cb6-387" aria-hidden="true" tabindex="-1"></a>circle <span class="op">=</span> (X<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> Y<span class="op">**</span><span class="dv">2</span> <span class="op">&lt;</span> <span class="fl">0.45</span><span class="op">**</span><span class="dv">2</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb6-388"><a href="#cb6-388" aria-hidden="true" tabindex="-1"></a>gradient <span class="op">=</span> <span class="fl">0.35</span> <span class="op">*</span> (X <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb6-389"><a href="#cb6-389" aria-hidden="true" tabindex="-1"></a>stripe <span class="op">=</span> <span class="fl">0.25</span> <span class="op">*</span> np.sin(<span class="dv">8</span><span class="op">*</span>np.pi<span class="op">*</span>X) <span class="op">*</span> (np.<span class="bu">abs</span>(Y) <span class="op">&lt;</span> <span class="fl">0.25</span>)</span>
+<span id="cb6-390"><a href="#cb6-390" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.clip(circle <span class="op">+</span> gradient <span class="op">+</span> stripe, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-391"><a href="#cb6-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-392"><a href="#cb6-392" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">5</span>,<span class="dv">5</span>))</span>
+<span id="cb6-393"><a href="#cb6-393" aria-hidden="true" tabindex="-1"></a>plt.imshow(A, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb6-394"><a href="#cb6-394" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb6-395"><a href="#cb6-395" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Synthetic image as a matrix"</span>)</span>
+<span id="cb6-396"><a href="#cb6-396" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-397"><a href="#cb6-397" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-398"><a href="#cb6-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-399"><a href="#cb6-399" aria-hidden="true" tabindex="-1"></a>Compute the SVD:</span>
+<span id="cb6-400"><a href="#cb6-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-403"><a href="#cb6-403" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-404"><a href="#cb6-404" aria-hidden="true" tabindex="-1"></a>U, s, Vt <span class="op">=</span> np.linalg.svd(A, full_matrices<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-405"><a href="#cb6-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-406"><a href="#cb6-406" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">4</span>))</span>
+<span id="cb6-407"><a href="#cb6-407" aria-hidden="true" tabindex="-1"></a>plt.plot(s, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb6-408"><a href="#cb6-408" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Singular values"</span>)</span>
+<span id="cb6-409"><a href="#cb6-409" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Index"</span>)</span>
+<span id="cb6-410"><a href="#cb6-410" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Singular value"</span>)</span>
+<span id="cb6-411"><a href="#cb6-411" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb6-412"><a href="#cb6-412" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-413"><a href="#cb6-413" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-414"><a href="#cb6-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-415"><a href="#cb6-415" aria-hidden="true" tabindex="-1"></a>Build rank-$k$ approximations:</span>
+<span id="cb6-416"><a href="#cb6-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-419"><a href="#cb6-419" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-420"><a href="#cb6-420" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rank_k_approx(U, s, Vt, k):</span>
+<span id="cb6-421"><a href="#cb6-421" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (U[:, :k] <span class="op">*</span> s[:k]) <span class="op">@</span> Vt[:k, :]</span>
+<span id="cb6-422"><a href="#cb6-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-423"><a href="#cb6-423" aria-hidden="true" tabindex="-1"></a>ks <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>]</span>
+<span id="cb6-424"><a href="#cb6-424" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb6-425"><a href="#cb6-425" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, k <span class="kw">in</span> <span class="bu">enumerate</span>(ks, <span class="dv">1</span>):</span>
+<span id="cb6-426"><a href="#cb6-426" aria-hidden="true" tabindex="-1"></a>    Ak <span class="op">=</span> rank_k_approx(U, s, Vt, k)</span>
+<span id="cb6-427"><a href="#cb6-427" aria-hidden="true" tabindex="-1"></a>    plt.subplot(<span class="dv">2</span>, <span class="dv">3</span>, i)</span>
+<span id="cb6-428"><a href="#cb6-428" aria-hidden="true" tabindex="-1"></a>    plt.imshow(Ak, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb6-429"><a href="#cb6-429" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb6-430"><a href="#cb6-430" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="ss">f"rank </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-431"><a href="#cb6-431" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb6-432"><a href="#cb6-432" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-433"><a href="#cb6-433" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-434"><a href="#cb6-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-435"><a href="#cb6-435" aria-hidden="true" tabindex="-1"></a>Compute storage and energy:</span>
+<span id="cb6-436"><a href="#cb6-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-439"><a href="#cb6-439" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-440"><a href="#cb6-440" aria-hidden="true" tabindex="-1"></a>m, n <span class="op">=</span> A.shape</span>
+<span id="cb6-441"><a href="#cb6-441" aria-hidden="true" tabindex="-1"></a>full_storage <span class="op">=</span> m<span class="op">*</span>n</span>
+<span id="cb6-442"><a href="#cb6-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-443"><a href="#cb6-443" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>]:</span>
+<span id="cb6-444"><a href="#cb6-444" aria-hidden="true" tabindex="-1"></a>    compressed_storage <span class="op">=</span> k<span class="op">*</span>(m<span class="op">+</span>n<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb6-445"><a href="#cb6-445" aria-hidden="true" tabindex="-1"></a>    energy <span class="op">=</span> np.<span class="bu">sum</span>(s[:k]<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> np.<span class="bu">sum</span>(s<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb6-446"><a href="#cb6-446" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"k=</span><span class="sc">{</span>k<span class="sc">:2d}</span><span class="ss">: storage ratio=</span><span class="sc">{</span>compressed_storage<span class="op">/</span>full_storage<span class="sc">:.3f}</span><span class="ss">, energy=</span><span class="sc">{</span>energy<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb6-447"><a href="#cb6-447" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-448"><a href="#cb6-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-449"><a href="#cb6-449" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.11 Worked examples</span></span>
+<span id="cb6-450"><a href="#cb6-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-451"><a href="#cb6-451" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example 1: storage threshold</span></span>
+<span id="cb6-452"><a href="#cb6-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-453"><a href="#cb6-453" aria-hidden="true" tabindex="-1"></a>A grayscale image has size $800\times 600$. For what values of $k$ does rank-$k$ SVD storage use fewer numbers than the original image?</span>
+<span id="cb6-454"><a href="#cb6-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-455"><a href="#cb6-455" aria-hidden="true" tabindex="-1"></a>The full image stores</span>
+<span id="cb6-456"><a href="#cb6-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-457"><a href="#cb6-457" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-458"><a href="#cb6-458" aria-hidden="true" tabindex="-1"></a>800\cdot 600 = 480{,}000</span>
+<span id="cb6-459"><a href="#cb6-459" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-460"><a href="#cb6-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-461"><a href="#cb6-461" aria-hidden="true" tabindex="-1"></a>numbers.</span>
+<span id="cb6-462"><a href="#cb6-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-463"><a href="#cb6-463" aria-hidden="true" tabindex="-1"></a>The rank-$k$ approximation stores</span>
+<span id="cb6-464"><a href="#cb6-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-465"><a href="#cb6-465" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-466"><a href="#cb6-466" aria-hidden="true" tabindex="-1"></a>k(800+600+1)=1401k</span>
+<span id="cb6-467"><a href="#cb6-467" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-468"><a href="#cb6-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-469"><a href="#cb6-469" aria-hidden="true" tabindex="-1"></a>numbers.</span>
+<span id="cb6-470"><a href="#cb6-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-471"><a href="#cb6-471" aria-hidden="true" tabindex="-1"></a>We need</span>
+<span id="cb6-472"><a href="#cb6-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-473"><a href="#cb6-473" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-474"><a href="#cb6-474" aria-hidden="true" tabindex="-1"></a>1401k &lt; 480{,}000.</span>
+<span id="cb6-475"><a href="#cb6-475" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-476"><a href="#cb6-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-477"><a href="#cb6-477" aria-hidden="true" tabindex="-1"></a>Thus</span>
+<span id="cb6-478"><a href="#cb6-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-479"><a href="#cb6-479" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-480"><a href="#cb6-480" aria-hidden="true" tabindex="-1"></a>k &lt; \frac{480{,}000}{1401}\approx 342.6.</span>
+<span id="cb6-481"><a href="#cb6-481" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-482"><a href="#cb6-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-483"><a href="#cb6-483" aria-hidden="true" tabindex="-1"></a>So $k\leq 342$ gives storage savings.</span>
+<span id="cb6-484"><a href="#cb6-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-485"><a href="#cb6-485" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example 2: Frobenius error</span></span>
+<span id="cb6-486"><a href="#cb6-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-487"><a href="#cb6-487" aria-hidden="true" tabindex="-1"></a>Suppose the singular values of an image matrix are</span>
+<span id="cb6-488"><a href="#cb6-488" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-489"><a href="#cb6-489" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-490"><a href="#cb6-490" aria-hidden="true" tabindex="-1"></a>9, \quad 6, \quad 3, \quad 1, \quad 1.</span>
+<span id="cb6-491"><a href="#cb6-491" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-492"><a href="#cb6-492" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-493"><a href="#cb6-493" aria-hidden="true" tabindex="-1"></a>The squared error of the rank-$2$ approximation is</span>
+<span id="cb6-494"><a href="#cb6-494" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-495"><a href="#cb6-495" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-496"><a href="#cb6-496" aria-hidden="true" tabindex="-1"></a>3^2+1^2+1^2 = 11.</span>
+<span id="cb6-497"><a href="#cb6-497" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-498"><a href="#cb6-498" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-499"><a href="#cb6-499" aria-hidden="true" tabindex="-1"></a>So</span>
+<span id="cb6-500"><a href="#cb6-500" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-501"><a href="#cb6-501" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-502"><a href="#cb6-502" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-A_2<span class="sc">\|</span>_F = \sqrt{11}.</span>
+<span id="cb6-503"><a href="#cb6-503" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-504"><a href="#cb6-504" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-505"><a href="#cb6-505" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example 3: energy captured</span></span>
+<span id="cb6-506"><a href="#cb6-506" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-507"><a href="#cb6-507" aria-hidden="true" tabindex="-1"></a>The energy captured by the rank-$2$ approximation is</span>
+<span id="cb6-508"><a href="#cb6-508" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-509"><a href="#cb6-509" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-510"><a href="#cb6-510" aria-hidden="true" tabindex="-1"></a>\frac{9^2+6^2}{9^2+6^2+3^2+1^2+1^2}</span>
+<span id="cb6-511"><a href="#cb6-511" aria-hidden="true" tabindex="-1"></a>= \frac{117}{128}\approx 0.914.</span>
+<span id="cb6-512"><a href="#cb6-512" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-513"><a href="#cb6-513" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-514"><a href="#cb6-514" aria-hidden="true" tabindex="-1"></a>So the first two layers capture about $91.4\%$ of the squared energy.</span>
+<span id="cb6-515"><a href="#cb6-515" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-516"><a href="#cb6-516" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.12 Common misunderstandings</span></span>
+<span id="cb6-517"><a href="#cb6-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-518"><a href="#cb6-518" aria-hidden="true" tabindex="-1"></a><span class="fu">### Misunderstanding 1: low rank means simple-looking</span></span>
+<span id="cb6-519"><a href="#cb6-519" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-520"><a href="#cb6-520" aria-hidden="true" tabindex="-1"></a>A rank-one image is simple. But a low-rank image with $k=30$ or $k=50$ can look visually rich. Low-rank does not mean boring. It means the image can be built from a relatively small number of organized layers.</span>
+<span id="cb6-521"><a href="#cb6-521" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-522"><a href="#cb6-522" aria-hidden="true" tabindex="-1"></a><span class="fu">### Misunderstanding 2: high energy always means high visual quality</span></span>
+<span id="cb6-523"><a href="#cb6-523" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-524"><a href="#cb6-524" aria-hidden="true" tabindex="-1"></a>Energy is useful, but human perception is not exactly Frobenius norm. A small error near an important edge may be more visible than a larger error in a smooth background.</span>
+<span id="cb6-525"><a href="#cb6-525" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-526"><a href="#cb6-526" aria-hidden="true" tabindex="-1"></a><span class="fu">### Misunderstanding 3: compression and denoising are the same</span></span>
+<span id="cb6-527"><a href="#cb6-527" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-528"><a href="#cb6-528" aria-hidden="true" tabindex="-1"></a>They are related but not identical. Compression aims to store fewer numbers. Denoising aims to remove unwanted variation. SVD truncation can do both, but the best $k$ for compression may differ from the best $k$ for denoising.</span>
+<span id="cb6-529"><a href="#cb6-529" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-530"><a href="#cb6-530" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.13 Practice problems</span></span>
+<span id="cb6-531"><a href="#cb6-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-532"><a href="#cb6-532" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 1</span></span>
+<span id="cb6-533"><a href="#cb6-533" aria-hidden="true" tabindex="-1"></a>A $500\times 500$ grayscale image is approximated using rank $k=20$. How many numbers are stored in the SVD representation? What fraction of the original storage is this?</span>
+<span id="cb6-534"><a href="#cb6-534" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-535"><a href="#cb6-535" aria-hidden="true" tabindex="-1"></a>:::{.solution collapse="true"}</span>
+<span id="cb6-536"><a href="#cb6-536" aria-hidden="true" tabindex="-1"></a>The full image stores</span>
+<span id="cb6-537"><a href="#cb6-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-538"><a href="#cb6-538" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-539"><a href="#cb6-539" aria-hidden="true" tabindex="-1"></a>500\cdot 500 = 250{,}000</span>
+<span id="cb6-540"><a href="#cb6-540" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-541"><a href="#cb6-541" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-542"><a href="#cb6-542" aria-hidden="true" tabindex="-1"></a>numbers.</span>
+<span id="cb6-543"><a href="#cb6-543" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-544"><a href="#cb6-544" aria-hidden="true" tabindex="-1"></a>The rank-$20$ SVD approximation stores</span>
+<span id="cb6-545"><a href="#cb6-545" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-546"><a href="#cb6-546" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-547"><a href="#cb6-547" aria-hidden="true" tabindex="-1"></a>20(500+500+1)=20{,}020</span>
+<span id="cb6-548"><a href="#cb6-548" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-549"><a href="#cb6-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-550"><a href="#cb6-550" aria-hidden="true" tabindex="-1"></a>numbers.</span>
+<span id="cb6-551"><a href="#cb6-551" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-552"><a href="#cb6-552" aria-hidden="true" tabindex="-1"></a>The storage fraction is</span>
+<span id="cb6-553"><a href="#cb6-553" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-554"><a href="#cb6-554" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-555"><a href="#cb6-555" aria-hidden="true" tabindex="-1"></a>\frac{20{,}020}{250{,}000}\approx 0.0801.</span>
+<span id="cb6-556"><a href="#cb6-556" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-557"><a href="#cb6-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-558"><a href="#cb6-558" aria-hidden="true" tabindex="-1"></a>So it uses about $8.0\%$ of the original storage.</span>
+<span id="cb6-559"><a href="#cb6-559" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-560"><a href="#cb6-560" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-561"><a href="#cb6-561" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 2</span></span>
+<span id="cb6-562"><a href="#cb6-562" aria-hidden="true" tabindex="-1"></a>Suppose the singular values of an image matrix are</span>
+<span id="cb6-563"><a href="#cb6-563" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-564"><a href="#cb6-564" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-565"><a href="#cb6-565" aria-hidden="true" tabindex="-1"></a>12, 5, 2, 1, 0.5.</span>
+<span id="cb6-566"><a href="#cb6-566" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-567"><a href="#cb6-567" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-568"><a href="#cb6-568" aria-hidden="true" tabindex="-1"></a>Find the Frobenius error of the rank-$2$ approximation.</span>
+<span id="cb6-569"><a href="#cb6-569" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-570"><a href="#cb6-570" aria-hidden="true" tabindex="-1"></a>:::{.solution collapse="true"}</span>
+<span id="cb6-571"><a href="#cb6-571" aria-hidden="true" tabindex="-1"></a>The discarded singular values are $2,1,0.5$. Therefore</span>
+<span id="cb6-572"><a href="#cb6-572" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-573"><a href="#cb6-573" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-574"><a href="#cb6-574" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-A_2<span class="sc">\|</span>_F^2 = 2^2+1^2+0.5^2 = 5.25.</span>
+<span id="cb6-575"><a href="#cb6-575" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-576"><a href="#cb6-576" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-577"><a href="#cb6-577" aria-hidden="true" tabindex="-1"></a>So</span>
+<span id="cb6-578"><a href="#cb6-578" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-579"><a href="#cb6-579" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-580"><a href="#cb6-580" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-A_2<span class="sc">\|</span>_F = \sqrt{5.25}\approx 2.291.</span>
+<span id="cb6-581"><a href="#cb6-581" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-582"><a href="#cb6-582" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-583"><a href="#cb6-583" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-584"><a href="#cb6-584" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 3</span></span>
+<span id="cb6-585"><a href="#cb6-585" aria-hidden="true" tabindex="-1"></a>Explain why keeping the first $k$ singular values is better than keeping $k$ randomly chosen singular values.</span>
+<span id="cb6-586"><a href="#cb6-586" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-587"><a href="#cb6-587" aria-hidden="true" tabindex="-1"></a>:::{.solution collapse="true"}</span>
+<span id="cb6-588"><a href="#cb6-588" aria-hidden="true" tabindex="-1"></a>The singular values are ordered from largest to smallest. The largest singular values carry the most Frobenius energy. By the Eckart--Young theorem, keeping the first $k$ singular values gives the best rank-$k$ approximation. Randomly chosen singular values may discard large important layers and keep smaller less important layers.</span>
+<span id="cb6-589"><a href="#cb6-589" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-590"><a href="#cb6-590" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-591"><a href="#cb6-591" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 4</span></span>
+<span id="cb6-592"><a href="#cb6-592" aria-hidden="true" tabindex="-1"></a>Why might a rank-$20$ approximation look good for one image but poor for another image of the same size?</span>
+<span id="cb6-593"><a href="#cb6-593" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-594"><a href="#cb6-594" aria-hidden="true" tabindex="-1"></a>:::{.solution collapse="true"}</span>
+<span id="cb6-595"><a href="#cb6-595" aria-hidden="true" tabindex="-1"></a>Different images have different singular value patterns. If the singular values decay quickly, a small $k$ captures most structure. If they decay slowly, important information is spread across many layers, so a larger $k$ is needed. Smooth images often compress better than highly textured or random images.</span>
+<span id="cb6-596"><a href="#cb6-596" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-597"><a href="#cb6-597" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-598"><a href="#cb6-598" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 5</span></span>
+<span id="cb6-599"><a href="#cb6-599" aria-hidden="true" tabindex="-1"></a>Let $A\in\mathbb{R}^{m\times n}$. Show that the rank-$k$ SVD storage is smaller than full storage exactly when</span>
+<span id="cb6-600"><a href="#cb6-600" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-601"><a href="#cb6-601" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-602"><a href="#cb6-602" aria-hidden="true" tabindex="-1"></a>k &lt; \frac{mn}{m+n+1}.</span>
+<span id="cb6-603"><a href="#cb6-603" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-604"><a href="#cb6-604" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-605"><a href="#cb6-605" aria-hidden="true" tabindex="-1"></a>:::{.solution collapse="true"}</span>
+<span id="cb6-606"><a href="#cb6-606" aria-hidden="true" tabindex="-1"></a>Full storage is $mn$. Rank-$k$ SVD storage is $k(m+n+1)$. Compression requires</span>
+<span id="cb6-607"><a href="#cb6-607" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-608"><a href="#cb6-608" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-609"><a href="#cb6-609" aria-hidden="true" tabindex="-1"></a>k(m+n+1)<span class="dt">&lt;</span><span class="kw">mn.</span></span>
+<span id="cb6-610"><a href="#cb6-610" aria-hidden="true" tabindex="-1"></a><span class="er">$$</span></span>
+<span id="cb6-611"><a href="#cb6-611" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-612"><a href="#cb6-612" aria-hidden="true" tabindex="-1"></a><span class="ot">Dividing by </span><span class="er">$</span><span class="ot">m</span><span class="er">+</span><span class="ot">n</span><span class="er">+1</span><span class="dt">&gt;</span>0$ gives</span>
+<span id="cb6-613"><a href="#cb6-613" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-614"><a href="#cb6-614" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-615"><a href="#cb6-615" aria-hidden="true" tabindex="-1"></a>k&lt;\frac{mn}{m+n+1}.</span>
+<span id="cb6-616"><a href="#cb6-616" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-617"><a href="#cb6-617" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-618"><a href="#cb6-618" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-619"><a href="#cb6-619" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.14 Challenge problems</span></span>
+<span id="cb6-620"><a href="#cb6-620" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-621"><a href="#cb6-621" aria-hidden="true" tabindex="-1"></a><span class="fu">### Challenge 1: visual quality versus error</span></span>
+<span id="cb6-622"><a href="#cb6-622" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-623"><a href="#cb6-623" aria-hidden="true" tabindex="-1"></a>Find or create two different images with the same Frobenius reconstruction error after rank-$k$ approximation. Do they look equally good? Explain why or why not.</span>
+<span id="cb6-624"><a href="#cb6-624" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-625"><a href="#cb6-625" aria-hidden="true" tabindex="-1"></a><span class="fu">### Challenge 2: denoising threshold</span></span>
+<span id="cb6-626"><a href="#cb6-626" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-627"><a href="#cb6-627" aria-hidden="true" tabindex="-1"></a>Add Gaussian noise to a simple image. Try several values of $k$. Find a value of $k$ that removes noise while preserving the main structure. Explain how you chose it.</span>
+<span id="cb6-628"><a href="#cb6-628" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-629"><a href="#cb6-629" aria-hidden="true" tabindex="-1"></a><span class="fu">### Challenge 3: color compression</span></span>
+<span id="cb6-630"><a href="#cb6-630" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-631"><a href="#cb6-631" aria-hidden="true" tabindex="-1"></a>Apply SVD compression separately to the red, green, and blue channels of a color image. Compare the result with grayscale compression.</span>
+<span id="cb6-632"><a href="#cb6-632" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-633"><a href="#cb6-633" aria-hidden="true" tabindex="-1"></a><span class="fu">### Challenge 4: adversarial image</span></span>
+<span id="cb6-634"><a href="#cb6-634" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-635"><a href="#cb6-635" aria-hidden="true" tabindex="-1"></a>Create an image that is difficult to compress with low-rank SVD. What visual features make it difficult?</span>
+<span id="cb6-636"><a href="#cb6-636" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-637"><a href="#cb6-637" aria-hidden="true" tabindex="-1"></a><span class="fu">## 17.15 AI companion activities</span></span>
+<span id="cb6-638"><a href="#cb6-638" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-639"><a href="#cb6-639" aria-hidden="true" tabindex="-1"></a>Use an AI assistant as a mathematical conversation partner.</span>
+<span id="cb6-640"><a href="#cb6-640" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-641"><a href="#cb6-641" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Ask it to explain the difference between exact rank and approximate rank using an image example.</span>
+<span id="cb6-642"><a href="#cb6-642" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Ask it to create three examples of images whose singular values decay quickly, moderately, and slowly.</span>
+<span id="cb6-643"><a href="#cb6-643" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Ask it to compare SVD image compression with JPEG compression at a conceptual level.</span>
+<span id="cb6-644"><a href="#cb6-644" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Ask it to generate Python code that compresses an RGB image channel-by-channel.</span>
+<span id="cb6-645"><a href="#cb6-645" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Ask it to explain why the Frobenius error is determined by discarded singular values.</span>
+<span id="cb6-646"><a href="#cb6-646" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Ask it to critique your choice of $k$ for an image-compression experiment.</span>
+<span id="cb6-647"><a href="#cb6-647" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-648"><a href="#cb6-648" aria-hidden="true" tabindex="-1"></a><span class="fu">## Chapter summary</span></span>
+<span id="cb6-649"><a href="#cb6-649" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-650"><a href="#cb6-650" aria-hidden="true" tabindex="-1"></a>A digital image is a matrix of pixel values. The SVD decomposes that matrix into ordered rank-one layers:</span>
+<span id="cb6-651"><a href="#cb6-651" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-652"><a href="#cb6-652" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-653"><a href="#cb6-653" aria-hidden="true" tabindex="-1"></a>A = \sum_{i=1}^r \sigma_i u_i v_i^T.</span>
+<span id="cb6-654"><a href="#cb6-654" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-655"><a href="#cb6-655" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-656"><a href="#cb6-656" aria-hidden="true" tabindex="-1"></a>The rank-$k$ approximation keeps only the first $k$ layers:</span>
+<span id="cb6-657"><a href="#cb6-657" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-658"><a href="#cb6-658" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-659"><a href="#cb6-659" aria-hidden="true" tabindex="-1"></a>A_k = \sum_{i=1}^k \sigma_i u_i v_i^T.</span>
+<span id="cb6-660"><a href="#cb6-660" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-661"><a href="#cb6-661" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-662"><a href="#cb6-662" aria-hidden="true" tabindex="-1"></a>This creates compression because $A_k$ can be stored using about</span>
+<span id="cb6-663"><a href="#cb6-663" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-664"><a href="#cb6-664" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-665"><a href="#cb6-665" aria-hidden="true" tabindex="-1"></a>k(m+n+1)</span>
+<span id="cb6-666"><a href="#cb6-666" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-667"><a href="#cb6-667" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-668"><a href="#cb6-668" aria-hidden="true" tabindex="-1"></a>numbers instead of $mn$ numbers.</span>
+<span id="cb6-669"><a href="#cb6-669" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-670"><a href="#cb6-670" aria-hidden="true" tabindex="-1"></a>The singular values measure importance. The discarded singular values measure error:</span>
+<span id="cb6-671"><a href="#cb6-671" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-672"><a href="#cb6-672" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-673"><a href="#cb6-673" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A-A_k<span class="sc">\|</span>_F^2 = \sum_{i=k+1}^r \sigma_i^2.</span>
+<span id="cb6-674"><a href="#cb6-674" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-675"><a href="#cb6-675" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-676"><a href="#cb6-676" aria-hidden="true" tabindex="-1"></a>The deeper lesson is that compression is not merely about making files smaller. It is about discovering structure, choosing what matters, and understanding what is lost.</span>
+<span id="cb6-677"><a href="#cb6-677" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-678"><a href="#cb6-678" aria-hidden="true" tabindex="-1"></a>In the next chapter, we will see the same idea from the perspective of data clouds: PCA uses SVD to find the most important directions of variation in data.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/edit/main/chapters/chapter-17-image-compression.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer><script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

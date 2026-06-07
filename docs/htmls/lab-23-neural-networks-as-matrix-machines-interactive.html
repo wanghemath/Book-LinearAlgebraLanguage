@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 23: Neural Networks as Matrix Machines</title>
+<style>
+:root{--bg:#f7f7fb;--card:#ffffff;--ink:#1f2937;--muted:#6b7280;--accent:#4f46e5;--accent2:#0891b2;--soft:#eef2ff;--line:#d1d5db;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55} header{padding:48px 20px;background:linear-gradient(135deg,#eef2ff,#ecfeff);border-bottom:1px solid var(--line)} .wrap{max-width:1100px;margin:0 auto} h1{font-size:clamp(2rem,4vw,3.5rem);line-height:1.05;margin:0 0 12px} h2{margin-top:0} .subtitle{font-size:1.2rem;color:var(--muted);max-width:800px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(15,23,42,.06)} main{padding:28px 20px 60px}.pill{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;border-radius:999px;padding:6px 12px;margin-bottom:12px} label{display:block;font-size:.9rem;color:var(--muted);margin-top:10px} input[type=range]{width:100%} canvas{width:100%;height:320px;border:1px solid var(--line);border-radius:14px;background:white} .num{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f3f4f6;border-radius:8px;padding:10px;white-space:pre-wrap}.small{font-size:.9rem;color:var(--muted)} button{border:0;border-radius:10px;background:var(--accent);color:white;padding:10px 14px;font-weight:700;cursor:pointer} button.secondary{background:var(--accent2)} table{width:100%;border-collapse:collapse} td,th{border-bottom:1px solid var(--line);padding:7px;text-align:left}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f9fafb;padding:10px;border-radius:10px;overflow:auto}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:800px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="pill">Interactive Chapter 23 Lab</div><h1>Neural Networks as Matrix Machines</h1><p class="subtitle">Explore neurons, layers, activations, forward propagation, hidden representations, softmax, and learning using live controls and visual computation.</p></div></header>
+<main class="wrap">
+<section class="card"><h2>Central formula</h2><p>A neural network layer computes</p><div class="formula">h = σ(Wx + b)</div><p>The matrix <b>W</b> mixes features, the bias <b>b</b> shifts thresholds, and the activation <b>σ</b> bends the computation.</p></section>
+
+<section class="grid">
+<div class="card"><h2>1. One ReLU neuron</h2><p class="small">Move the inputs and weights. The neuron computes z = w·x + b and h = max(0,z).</p>
+<label>x₁ <span id="x1v"></span></label><input id="x1" type="range" min="-5" max="5" step="0.1" value="2">
+<label>x₂ <span id="x2v"></span></label><input id="x2" type="range" min="-5" max="5" step="0.1" value="3">
+<label>w₁ <span id="w1v"></span></label><input id="w1" type="range" min="-3" max="3" step="0.1" value="0.5">
+<label>w₂ <span id="w2v"></span></label><input id="w2" type="range" min="-3" max="3" step="0.1" value="-1">
+<label>b <span id="bv"></span></label><input id="bias" type="range" min="-5" max="5" step="0.1" value="1">
+<div class="num" id="neuronOut"></div></div>
+
+<div class="card"><h2>2. Activation functions</h2><p class="small">Compare ReLU, sigmoid, and tanh.</p><canvas id="actCanvas" width="700" height="420"></canvas></div>
+</section>
+
+<section class="grid">
+<div class="card"><h2>3. One layer as many neurons</h2><p class="small">This layer maps R² to R³.</p>
+<label>Input x₁ <span id="lx1v"></span></label><input id="lx1" type="range" min="-4" max="4" step="0.1" value="1.5">
+<label>Input x₂ <span id="lx2v"></span></label><input id="lx2" type="range" min="-4" max="4" step="0.1" value="2">
+<div class="formula">W = [[1,0],[0,1],[1,-1]], b = [0,0,1]</div><div class="num" id="layerOut"></div></div>
+<div class="card"><h2>4. Decision boundary</h2><p class="small">A ReLU neuron changes behavior across the line w·x+b=0.</p><canvas id="boundaryCanvas" width="700" height="420"></canvas></div>
+</section>
+
+<section class="grid">
+<div class="card"><h2>5. Softmax classifier</h2><p class="small">Adjust raw scores and see probabilities.</p>
+<label>score A <span id="s0v"></span></label><input id="s0" type="range" min="-4" max="6" step="0.1" value="1.2">
+<label>score B <span id="s1v"></span></label><input id="s1" type="range" min="-4" max="6" step="0.1" value="3.5">
+<label>score C <span id="s2v"></span></label><input id="s2" type="range" min="-4" max="6" step="0.1" value="0.7">
+<canvas id="softCanvas" width="700" height="300"></canvas><div class="num" id="softOut"></div></div>
+
+<div class="card"><h2>6. XOR needs hidden features</h2><p class="small">The XOR pattern cannot be separated by one line in input space. A hidden layer can make the structure easier.</p><canvas id="xorCanvas" width="700" height="420"></canvas><button onclick="toggleXor()">Toggle input/hidden view</button><div class="num" id="xorOut"></div></div>
+</section>
+
+<section class="grid">
+<div class="card"><h2>7. Gradient descent</h2><p class="small">Train a line y = wx+b on synthetic data. Click several times.</p><button onclick="resetTrain()" class="secondary">Reset</button> <button onclick="trainSteps(20)">Train 20 steps</button> <button onclick="trainSteps(200)">Train 200 steps</button><canvas id="trainCanvas" width="700" height="420"></canvas><div class="num" id="trainOut"></div></div>
+<div class="card"><h2>8. Parameter counter</h2><p class="small">For a dense layer from n inputs to m outputs, parameters = mn + m.</p>
+<label>input dimension n <span id="nv"></span></label><input id="nDim" type="range" min="1" max="1000" step="1" value="784">
+<label>output neurons m <span id="mv"></span></label><input id="mDim" type="range" min="1" max="500" step="1" value="128">
+<div class="num" id="paramOut"></div></div>
+</section>
+
+<section class="card"><h2>Reflection</h2><p>Write a short answer: In what sense is a neural network a matrix machine, and in what sense is it more than a matrix machine?</p></section>
+</main>
+<script>
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id).value)}
+function drawAxes(ctx,w,h,xmin=-5,xmax=5,ymin=-5,ymax=5){ctx.clearRect(0,0,w,h);ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1;for(let i=Math.ceil(xmin);i<=xmax;i++){let x=(i-xmin)/(xmax-xmin)*w;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let j=Math.ceil(ymin);j<=ymax;j++){let y=h-(j-ymin)/(ymax-ymin)*h;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.strokeStyle='#9ca3af';let x0=(0-xmin)/(xmax-xmin)*w;let y0=h-(0-ymin)/(ymax-ymin)*h;ctx.beginPath();ctx.moveTo(x0,0);ctx.lineTo(x0,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,y0);ctx.lineTo(w,y0);ctx.stroke();return [(x,y)=>[(x-xmin)/(xmax-xmin)*w,h-(y-ymin)/(ymax-ymin)*h]]}
+function updateNeuron(){let x1=val('x1'),x2=val('x2'),w1=val('w1'),w2=val('w2'),b=val('bias');['x1','x2','w1','w2'].forEach(id=>$(id+'v').textContent=val(id).toFixed(1));$('bv').textContent=b.toFixed(1);let z=w1*x1+w2*x2+b,h=Math.max(0,z);$('neuronOut').textContent=`x = [${x1.toFixed(2)}, ${x2.toFixed(2)}]\nw = [${w1.toFixed(2)}, ${w2.toFixed(2)}]\nz = w·x + b = ${z.toFixed(3)}\nReLU(z) = ${h.toFixed(3)}`;drawBoundary()}
+function drawActivations(){let c=$('actCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#e5e7eb';for(let i=0;i<11;i++){let x=i/10*W;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}function px(z){return (z+6)/12*W}function py(a){return H-(a+1.2)/7.5*H}function plot(fn,color){ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=500;i++){let z=-6+12*i/500;let x=px(z),y=py(fn(z));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()}ctx.strokeStyle='#9ca3af';ctx.beginPath();ctx.moveTo(px(0),0);ctx.lineTo(px(0),H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,py(0));ctx.lineTo(W,py(0));ctx.stroke();plot(z=>Math.max(0,z),'#4f46e5');plot(z=>1/(1+Math.exp(-z)),'#0891b2');plot(z=>Math.tanh(z),'#dc2626');ctx.fillStyle='#111827';ctx.font='16px sans-serif';ctx.fillText('ReLU',20,30);ctx.fillText('sigmoid',20,55);ctx.fillText('tanh',20,80)}
+function updateLayer(){let x1=val('lx1'),x2=val('lx2');$('lx1v').textContent=x1.toFixed(1);$('lx2v').textContent=x2.toFixed(1);let z=[x1,x2,x1-x2+1];let h=z.map(a=>Math.max(0,a));$('layerOut').textContent=`z = W x + b = [${z.map(a=>a.toFixed(2)).join(', ')}]\nh = ReLU(z) = [${h.map(a=>a.toFixed(2)).join(', ')}]`}
+function drawBoundary(){let c=$('boundaryCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;let xmin=-4,xmax=4,ymin=-4,ymax=4;ctx.clearRect(0,0,W,H);let w1=val('w1'),w2=val('w2'),b=val('bias');for(let i=0;i<W;i+=8){for(let j=0;j<H;j+=8){let x=xmin+i/W*(xmax-xmin),y=ymax-j/H*(ymax-ymin);let z=w1*x+w2*y+b;let a=Math.max(0,z);let shade=Math.min(255,240-Math.floor(a*25));ctx.fillStyle=`rgb(${shade},${shade},255)`;ctx.fillRect(i,j,8,8)}}drawAxes(ctx,W,H,xmin,xmax,ymin,ymax);if(Math.abs(w2)>1e-6){ctx.strokeStyle='#111827';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=200;i++){let x=xmin+(xmax-xmin)*i/200;let y=-(w1*x+b)/w2;let px=(x-xmin)/(xmax-xmin)*W,py=H-(y-ymin)/(ymax-ymin)*H;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke()}}
+function updateSoft(){let s=[val('s0'),val('s1'),val('s2')];s.forEach((v,i)=>$('s'+i+'v').textContent=v.toFixed(1));let m=Math.max(...s),e=s.map(x=>Math.exp(x-m)),sum=e.reduce((a,b)=>a+b,0),p=e.map(x=>x/sum);$('softOut').textContent=`probabilities = [${p.map(x=>x.toFixed(3)).join(', ')}]\npredicted class = ${['A','B','C'][p.indexOf(Math.max(...p))]}`;let c=$('softCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;ctx.clearRect(0,0,W,H);['A','B','C'].forEach((lab,i)=>{let bh=p[i]*(H-60),x=80+i*180;ctx.fillStyle=['#4f46e5','#0891b2','#dc2626'][i];ctx.fillRect(x,H-35-bh,90,bh);ctx.fillStyle='#111827';ctx.font='18px sans-serif';ctx.fillText(lab,x+35,H-10);ctx.fillText(p[i].toFixed(2),x+25,H-45-bh)})}
+let xorHidden=false;function toggleXor(){xorHidden=!xorHidden;drawXor()}function drawXor(){let c=$('xorCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;ctx.clearRect(0,0,W,H);let pts=[[0,0,0],[0,1,1],[1,0,1],[1,1,0]];let transformed=pts.map(p=>{let h1=Math.max(0,p[0]+p[1]);let h2=Math.max(0,p[0]+p[1]-1);return [h1,h2,p[2]]});let data=xorHidden?transformed:pts;let xmin=-.3,xmax=xorHidden?2.3:1.3,ymin=-.3,ymax=xorHidden?1.3:1.3;drawAxes(ctx,W,H,xmin,xmax,ymin,ymax);for(let p of data){let x=(p[0]-xmin)/(xmax-xmin)*W,y=H-(p[1]-ymin)/(ymax-ymin)*H;ctx.beginPath();ctx.arc(x,y,18,0,Math.PI*2);ctx.fillStyle=p[2]?'#4f46e5':'#f97316';ctx.fill();ctx.strokeStyle='#111827';ctx.stroke()}$('xorOut').textContent=xorHidden?'Hidden view: h₁=ReLU(x₁+x₂), h₂=ReLU(x₁+x₂-1)':'Input view: XOR is not linearly separable.'}
+let tx,ty,tw,tb,loss;function resetTrain(){tx=[];ty=[];for(let i=0;i<60;i++){let x=-3+6*i/59;tx.push(x);ty.push(1.6*x-0.5+(Math.random()-0.5)*1.4)}tw=0;tb=0;loss=0;drawTrain()}function trainSteps(k){let eta=.03;for(let step=0;step<k;step++){let gw=0,gb=0,L=0;for(let i=0;i<tx.length;i++){let pred=tw*tx[i]+tb,err=pred-ty[i];L+=err*err;gw+=2*err*tx[i]/tx.length;gb+=2*err/tx.length}tw-=eta*gw;tb-=eta*gb;loss=L/tx.length}drawTrain()}function drawTrain(){let c=$('trainCanvas'),ctx=c.getContext('2d'),W=c.width,H=c.height;let xmin=-3.5,xmax=3.5,ymin=-7,ymax=6;drawAxes(ctx,W,H,xmin,xmax,ymin,ymax);ctx.fillStyle='#4f46e5';for(let i=0;i<tx.length;i++){let x=(tx[i]-xmin)/(xmax-xmin)*W,y=H-(ty[i]-ymin)/(ymax-ymin)*H;ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()}ctx.strokeStyle='#dc2626';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=100;i++){let x=xmin+(xmax-xmin)*i/100,y=tw*x+tb;let px=(x-xmin)/(xmax-xmin)*W,py=H-(y-ymin)/(ymax-ymin)*H;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke();$('trainOut').textContent=`w = ${tw.toFixed(3)}, b = ${tb.toFixed(3)}\ncurrent loss ≈ ${loss.toFixed(3)}`}
+function updateParams(){let n=parseInt($('nDim').value),m=parseInt($('mDim').value);$('nv').textContent=n;$('mv').textContent=m;$('paramOut').textContent=`W shape: ${m} × ${n}\nb shape: ${m}\nweights: ${(m*n).toLocaleString()}\nbiases: ${m.toLocaleString()}\ntotal parameters: ${(m*n+m).toLocaleString()}`}
+['x1','x2','w1','w2','bias'].forEach(id=>$(id).addEventListener('input',updateNeuron));['lx1','lx2'].forEach(id=>$(id).addEventListener('input',updateLayer));['s0','s1','s2'].forEach(id=>$(id).addEventListener('input',updateSoft));['nDim','mDim'].forEach(id=>$(id).addEventListener('input',updateParams));
+drawActivations();updateNeuron();updateLayer();updateSoft();drawXor();resetTrain();updateParams();
+</script>
+</body>
+</html>

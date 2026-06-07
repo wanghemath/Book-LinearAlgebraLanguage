@@ -1,0 +1,1006 @@
+---
+title: "Chapter 8: When Information Is Lost"
+subtitle: "Rank, null space, column space, and the geometry of collapse"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+jupyter: python3
+---
+ 
+
+## Opening story: the shadow of a machine
+
+Stand outside on a sunny afternoon.
+
+You are a three-dimensional object, but your shadow is a two-dimensional shape on the ground. The shadow contains information: it may show your height approximately, your outline, and the direction of the sun. But it also destroys information: it does not show your eye color, the depth of your body, or the full three-dimensional structure that produced it.
+
+A shadow is not just a picture. It is a **mapping** from one world to another.
+
+Linear algebra gives us a precise language for this kind of situation. A matrix can stretch, rotate, shear, or reflect. But sometimes a matrix also **collapses**. It can send a plane onto a line, a space onto a plane, or many different inputs to the same output.
+
+For example,
+
+$$
+P=
+\begin{bmatrix}
+1 & 0\\
+0 & 0
+\end{bmatrix}
+$$
+
+sends
+
+$$
+\begin{bmatrix}x\\y\end{bmatrix}
+\mapsto
+\begin{bmatrix}x\\0\end{bmatrix}.
+$$
+
+It keeps the horizontal coordinate and erases the vertical coordinate. The two different points
+
+$$
+\begin{bmatrix}3\\2\end{bmatrix}
+\quad \text{and} \quad
+\begin{bmatrix}3\\100\end{bmatrix}
+$$
+
+both become
+
+$$
+\begin{bmatrix}3\\0\end{bmatrix}.
+$$
+
+The matrix has forgotten something. Once the vertical coordinate is erased, there is no way to recover it from the output alone.
+
+This chapter asks one of the most important questions in linear algebra:
+
+> When a matrix acts on data, what information survives, and what information disappears?
+
+The answer is organized around four connected ideas:
+
+- the **column space**: all outputs the matrix can reach;
+- the **null space**: all inputs the matrix sends to zero;
+- the **rank**: how many independent output directions survive;
+- **invertibility**: whether the matrix machine can be reversed perfectly.
+
+These are not abstract vocabulary words. They are the diagnostic tools we use to understand every linear system, every data transformation, every feature map, and every compression method that appears later in the book.
+
+## Learning goals
+
+By the end of this chapter, you should be able to:
+
+1. Explain information loss as a many-inputs-to-one-output phenomenon.
+2. Interpret the column space as the set of reachable outputs of a matrix machine.
+3. Interpret the null space as the set of invisible input directions.
+4. Compute and interpret rank as the number of independent directions that survive.
+5. Use rank to understand whether $Ax=b$ has no solution, one solution, or infinitely many solutions.
+6. Explain the connection between rank, nullity, and dimension.
+7. Recognize invertible matrices as information-preserving transformations.
+8. Use Python to explore rank, null space, column space, and numerical instability.
+
+## 8.1 Information loss means different inputs become indistinguishable
+
+A matrix machine takes an input vector $x$ and produces an output vector $Ax$.
+
+If every different input produces a different output, the machine preserves enough information to distinguish inputs.
+
+If two different inputs produce the same output, then the machine loses information.
+
+Suppose
+
+$$
+Ax_1=Ax_2
+$$
+
+for two different vectors $x_1 \neq x_2$. Subtracting the two equations gives
+
+$$
+A(x_1-x_2)=0.
+$$
+
+This is the key observation:
+
+> A matrix loses information exactly when there is a nonzero direction that it sends to zero.
+
+The vector $x_1-x_2$ is a direction of ambiguity. Moving along this direction changes the input but does not change the output.
+
+### Example: collapse onto the horizontal axis
+
+Let
+
+$$
+P=
+\begin{bmatrix}
+1 & 0\\
+0 & 0
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+P\begin{bmatrix}x\\y\end{bmatrix}
+=
+\begin{bmatrix}x\\0\end{bmatrix}.
+$$
+
+The vector
+
+$$
+\begin{bmatrix}0\\1\end{bmatrix}
+$$
+
+is sent to zero:
+
+$$
+P\begin{bmatrix}0\\1\end{bmatrix}
+=
+\begin{bmatrix}0\\0\end{bmatrix}.
+$$
+
+So the vertical direction is invisible to $P$. If you move straight up or down before applying $P$, the output does not change.
+
+::: {.callout-note}
+## Core intuition
+
+A matrix loses information when it has an invisible direction: a nonzero vector $v$ such that $Av=0$.
+:::
+
+## 8.2 The column space: what outputs are reachable?
+
+For an $m \times n$ matrix
+
+$$
+A=
+\begin{bmatrix}
+| & | & & |\\
+a_1 & a_2 & \cdots & a_n\\
+| & | & & |
+\end{bmatrix},
+$$
+
+the product $Ax$ can be written as a linear combination of the columns of $A$:
+
+$$
+Ax=x_1a_1+x_2a_2+\cdots+x_na_n.
+$$
+
+Therefore the possible outputs of $A$ are exactly all linear combinations of its columns.
+
+::: {.callout-important}
+## Definition: column space
+
+The **column space** of $A$, written $\operatorname{Col}(A)$, is the set of all vectors that can be written as $Ax$:
+
+$$
+\operatorname{Col}(A)=\{Ax: x\in \mathbb{R}^n\}.
+$$
+
+Equivalently, it is the span of the columns of $A$.
+:::
+
+The column space answers the question:
+
+> Which output vectors $b$ are reachable by solving $Ax=b$?
+
+If $b \in \operatorname{Col}(A)$, then $Ax=b$ is consistent.
+
+If $b \notin \operatorname{Col}(A)$, then $Ax=b$ has no solution.
+
+### Example: a matrix whose outputs lie on a line
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+1 & 2\\
+2 & 4
+\end{bmatrix}.
+$$
+
+The columns are
+
+$$
+a_1=\begin{bmatrix}1\\2\end{bmatrix},
+\qquad
+ a_2=\begin{bmatrix}2\\4\end{bmatrix}=2a_1.
+$$
+
+The second column brings no new direction. Every output is a multiple of
+
+$$
+\begin{bmatrix}1\\2\end{bmatrix}.
+$$
+
+So
+
+$$
+\operatorname{Col}(A)=\operatorname{span}\left\{
+\begin{bmatrix}1\\2\end{bmatrix}
+\right\}.
+$$
+
+This matrix maps the entire plane into one line. It cannot reach most points in $\mathbb{R}^2$.
+
+For instance,
+
+$$
+\begin{bmatrix}3\\6\end{bmatrix}
+$$
+
+is reachable, but
+
+$$
+\begin{bmatrix}3\\5\end{bmatrix}
+$$
+
+is not.
+
+## 8.3 The null space: what inputs disappear?
+
+The column space tells us what outputs are reachable.
+
+The null space tells us what inputs become invisible.
+
+::: {.callout-important}
+## Definition: null space
+
+The **null space** of $A$, written $\operatorname{Null}(A)$, is the set of all input vectors sent to zero:
+
+$$
+\operatorname{Null}(A)=\{x\in\mathbb{R}^n: Ax=0\}.
+$$
+:::
+
+The null space answers the question:
+
+> What changes can be made to the input without changing the output?
+
+If $v \in \operatorname{Null}(A)$, then
+
+$$
+A(x+v)=Ax+Av=Ax.
+$$
+
+So $x$ and $x+v$ are indistinguishable after applying $A$.
+
+### Example: the null space of a collapsing matrix
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+1 & 2\\
+2 & 4
+\end{bmatrix}.
+$$
+
+To find the null space, solve
+
+$$
+A\begin{bmatrix}x\\y\end{bmatrix}=0.
+$$
+
+This gives
+
+$$
+x+2y=0,
+\qquad
+2x+4y=0.
+$$
+
+The second equation is just twice the first. So
+
+$$
+x=-2y.
+$$
+
+Let $y=t$. Then
+
+$$
+\begin{bmatrix}x\\y\end{bmatrix}
+=
+\begin{bmatrix}-2t\\t\end{bmatrix}
+=t\begin{bmatrix}-2\\1\end{bmatrix}.
+$$
+
+Therefore
+
+$$
+\operatorname{Null}(A)=\operatorname{span}\left\{
+\begin{bmatrix}-2\\1\end{bmatrix}
+\right\}.
+$$
+
+Moving in the direction $(-2,1)$ changes the input, but the output does not change.
+
+## 8.4 Rank: how many directions survive?
+
+The **rank** of a matrix is the dimension of its column space.
+
+::: {.callout-important}
+## Definition: rank
+
+The **rank** of a matrix $A$, written $\operatorname{rank}(A)$, is the number of independent directions in its column space:
+
+$$
+\operatorname{rank}(A)=\dim(\operatorname{Col}(A)).
+$$
+:::
+
+Rank measures how much output freedom the matrix has.
+
+- Rank $0$: everything collapses to zero.
+- Rank $1$: all outputs lie on a line.
+- Rank $2$: outputs fill a plane.
+- Rank $r$: outputs live in an $r$-dimensional subspace.
+
+A matrix with low rank is not necessarily unimportant. Low-rank structure is one of the major themes of modern data science. Images, recommendation systems, text embeddings, and principal component analysis all use the idea that complicated data can often be approximated by a small number of important directions.
+
+### Example: three matrices, three ranks
+
+$$
+A_0=
+\begin{bmatrix}
+0 & 0\\
+0 & 0
+\end{bmatrix},
+\qquad
+A_1=
+\begin{bmatrix}
+1 & 2\\
+2 & 4
+\end{bmatrix},
+\qquad
+A_2=
+\begin{bmatrix}
+1 & 2\\
+3 & 4
+\end{bmatrix}.
+$$
+
+- $A_0$ has rank $0$ because all outputs are zero.
+- $A_1$ has rank $1$ because its columns lie on one line.
+- $A_2$ has rank $2$ because its two columns are independent.
+
+Geometrically:
+
+- $A_0$ collapses the plane to a point.
+- $A_1$ collapses the plane to a line.
+- $A_2$ transforms the plane into the whole plane.
+
+## 8.5 The rank-nullity theorem
+
+A matrix $A$ with $n$ input coordinates takes vectors from $\mathbb{R}^n$.
+
+Some input directions survive as independent output directions. Their number is the rank.
+
+Some input directions disappear into zero. Their number is the nullity.
+
+::: {.callout-important}
+## Definition: nullity
+
+The **nullity** of $A$ is the dimension of its null space:
+
+$$
+\operatorname{nullity}(A)=\dim(\operatorname{Null}(A)).
+$$
+:::
+
+The rank-nullity theorem says that these two numbers exactly account for all input directions.
+
+::: {.callout-tip}
+## Theorem: rank-nullity
+
+If $A$ is an $m\times n$ matrix, then
+
+$$
+\operatorname{rank}(A)+\operatorname{nullity}(A)=n.
+$$
+
+In words:
+
+$$
+\text{directions that survive} + \text{directions that disappear}
+= \text{input dimension}.
+$$
+:::
+
+### Why the theorem makes sense
+
+Every input direction must do one of two things:
+
+1. contribute to a real output direction, or
+2. become invisible inside the null space.
+
+The theorem says that no input direction is unaccounted for.
+
+This is one of the great bookkeeping principles of linear algebra.
+
+### Example
+
+For
+
+$$
+A=
+\begin{bmatrix}
+1 & 2\\
+2 & 4
+\end{bmatrix},
+$$
+
+the input dimension is $n=2$.
+
+We found:
+
+$$
+\operatorname{rank}(A)=1,
+\qquad
+\operatorname{nullity}(A)=1.
+$$
+
+So
+
+$$
+1+1=2.
+$$
+
+One direction survives; one direction disappears.
+
+## 8.6 Rank and the solution set of $Ax=b$
+
+The equation
+
+$$
+Ax=b
+$$
+
+is asking whether $b$ is reachable by the matrix machine.
+
+There are three main cases.
+
+### Case 1: no solution
+
+If $b$ is not in the column space of $A$, then $Ax=b$ has no solution.
+
+The target is outside the reachable output world.
+
+### Case 2: exactly one solution
+
+If $b$ is in the column space and the null space contains only the zero vector, then $Ax=b$ has exactly one solution.
+
+There is no invisible direction along which we can move.
+
+### Case 3: infinitely many solutions
+
+If $b$ is in the column space and the null space contains a nonzero vector, then $Ax=b$ has infinitely many solutions.
+
+If $x_p$ is one solution and $v\in\operatorname{Null}(A)$, then
+
+$$
+A(x_p+v)=Ax_p+Av=b+0=b.
+$$
+
+So every vector of the form
+
+$$
+x=x_p+v,
+\qquad v\in\operatorname{Null}(A),
+$$
+
+is also a solution.
+
+::: {.callout-note}
+## Solution structure
+
+If $Ax=b$ is consistent, then its full solution set is
+
+$$
+\text{one particular solution} + \text{the null space}.
+$$
+
+That is,
+
+$$
+\{x:Ax=b\}=x_p+\operatorname{Null}(A).
+$$
+:::
+
+This formula is one of the most important ideas in linear algebra.
+
+## 8.7 Invertibility: when nothing is lost
+
+A square matrix $A$ is invertible if the machine $x\mapsto Ax$ can be reversed.
+
+That means that for every output $b$, there is exactly one input $x$ such that
+
+$$
+Ax=b.
+$$
+
+For an $n\times n$ matrix, the following statements are equivalent:
+
+::: {.callout-tip}
+## The invertible matrix theorem, first version
+
+For an $n\times n$ matrix $A$, the following are equivalent:
+
+1. $A$ is invertible.
+2. $Ax=b$ has exactly one solution for every $b\in\mathbb{R}^n$.
+3. $Ax=0$ has only the trivial solution $x=0$.
+4. $\operatorname{Null}(A)=\{0\}$.
+5. The columns of $A$ are linearly independent.
+6. The columns of $A$ span $\mathbb{R}^n$.
+7. $\operatorname{rank}(A)=n$.
+8. $\det(A)\neq 0$.
+:::
+
+This theorem is not just a list. It says that many different languages describe the same event:
+
+- algebra says the inverse exists;
+- geometry says no direction collapses;
+- systems say every target has one solution;
+- columns say the output space is fully reachable;
+- determinants say volume is not crushed to zero.
+
+## 8.8 Rank in rectangular matrices
+
+Not all matrix machines have the same input and output dimension.
+
+An $m\times n$ matrix maps
+
+$$
+\mathbb{R}^n \to \mathbb{R}^m.
+$$
+
+The rank can never exceed the number of input dimensions or the number of output dimensions:
+
+$$
+\operatorname{rank}(A)\leq \min(m,n).
+$$
+
+### Tall matrices
+
+A tall matrix has more rows than columns, such as a $5\times 2$ matrix. It maps a low-dimensional input into a higher-dimensional output space.
+
+Even if the two input directions survive, the column space can have dimension at most $2$. So the outputs lie in a plane inside $\mathbb{R}^5$.
+
+This is common in data fitting: a few parameters are used to predict many observations.
+
+### Wide matrices
+
+A wide matrix has more columns than rows, such as a $2\times 5$ matrix. It maps a higher-dimensional input into a lower-dimensional output space.
+
+Since the output dimension is only $2$, the rank is at most $2$. If the input dimension is $5$, then rank-nullity gives
+
+$$
+\operatorname{nullity}(A)\geq 3.
+$$
+
+So a wide matrix must lose information. There are always invisible directions.
+
+This is common in underdetermined systems: many different inputs can produce the same measurement.
+
+## 8.9 Data, compression, and information loss
+
+In data science, losing information is not always bad.
+
+Sometimes we lose information accidentally because a matrix is singular or a measurement system is incomplete.
+
+But sometimes we lose information deliberately.
+
+Compression is controlled information loss. A grayscale image with thousands of pixel values may be approximated using a much smaller number of patterns. A recommendation system may approximate a huge user-item matrix with a low-rank model. A machine learning model may map high-dimensional data into a smaller embedding space.
+
+The key question becomes:
+
+> Which information is noise, and which information is signal?
+
+This is why rank is so important. Rank counts exact dimensions, but later we will study **effective rank**, where some directions are strong and others are weak. This leads to singular values, image compression, principal component analysis, and modern embeddings.
+
+## 8.10 Python: exploring rank and null space
+
+```{python}
+import numpy as np
+
+A = np.array([[1, 2],
+              [2, 4]], dtype=float)
+
+print("A =")
+print(A)
+print("rank(A) =", np.linalg.matrix_rank(A))
+```
+
+The columns are dependent, so the rank is $1$.
+
+Now compare with a full-rank matrix.
+
+```{python}
+B = np.array([[1, 2],
+              [3, 4]], dtype=float)
+
+print("B =")
+print(B)
+print("rank(B) =", np.linalg.matrix_rank(B))
+print("det(B) =", np.linalg.det(B))
+```
+
+Since $\det(B)\neq 0$, the matrix is invertible and has rank $2$.
+
+### Solving a reachable and unreachable system
+
+```{python}
+A = np.array([[1, 2],
+              [2, 4]], dtype=float)
+
+b_reachable = np.array([3, 6], dtype=float)
+b_unreachable = np.array([3, 5], dtype=float)
+
+for b in [b_reachable, b_unreachable]:
+    x_lstsq, residuals, rank, s = np.linalg.lstsq(A, b, rcond=None)
+    print("b =", b)
+    print("least-squares solution:", x_lstsq)
+    print("Ax =", A @ x_lstsq)
+    print("residual norm =", np.linalg.norm(A @ x_lstsq - b))
+    print()
+```
+
+For the reachable vector, the residual is essentially zero. For the unreachable vector, the residual is nonzero because $b$ is outside the column space.
+
+### Computing a null vector with SVD
+
+```{python}
+U, s, Vt = np.linalg.svd(A)
+print("singular values:", s)
+print("V^T =")
+print(Vt)
+
+null_vector = Vt[-1]
+print("candidate null vector:", null_vector)
+print("A @ null_vector =", A @ null_vector)
+```
+
+The smallest singular value is zero, and the corresponding right singular vector gives a null direction.
+
+## 8.11 Worked examples
+
+### Worked example 1: classify a transformation
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+2 & 4\\
+1 & 2
+\end{bmatrix}.
+$$
+
+Find the rank and null space.
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+The second column is twice the first:
+
+$$
+\begin{bmatrix}4\\2\end{bmatrix}
+=2\begin{bmatrix}2\\1\end{bmatrix}.
+$$
+
+So the column space is one-dimensional and
+
+$$
+\operatorname{rank}(A)=1.
+$$
+
+To find the null space, solve
+
+$$
+2x+4y=0,
+\qquad
+x+2y=0.
+$$
+
+Both equations say
+
+$$
+x=-2y.
+$$
+
+Thus
+
+$$
+\operatorname{Null}(A)
+=
+\operatorname{span}\left\{
+\begin{bmatrix}-2\\1\end{bmatrix}
+\right\}.
+$$
+:::
+
+### Worked example 2: decide if a system is consistent
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+1 & 2\\
+2 & 4
+\end{bmatrix},
+\qquad
+b=
+\begin{bmatrix}4\\8\end{bmatrix}.
+$$
+
+Is $Ax=b$ consistent?
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+The column space of $A$ is
+
+$$
+\operatorname{span}\left\{
+\begin{bmatrix}1\\2\end{bmatrix}
+\right\}.
+$$
+
+Since
+
+$$
+\begin{bmatrix}4\\8\end{bmatrix}
+=4\begin{bmatrix}1\\2\end{bmatrix},
+$$
+
+we have $b\in\operatorname{Col}(A)$. Therefore $Ax=b$ is consistent.
+
+Because the null space is nontrivial, there are infinitely many solutions.
+:::
+
+### Worked example 3: interpret a wide matrix
+
+Suppose $A$ is a $3\times 7$ matrix.
+
+Can $A$ be one-to-one?
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+No. The input dimension is $7$, but the output dimension is $3$. The rank is at most $3$.
+
+By rank-nullity,
+
+$$
+\operatorname{nullity}(A)=7-\operatorname{rank}(A)\geq 7-3=4.
+$$
+
+So the null space contains nonzero vectors. Therefore some input directions disappear, and the map cannot be one-to-one.
+:::
+
+## 8.12 Practice problems
+
+### Problem 1
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+1 & 3\\
+2 & 6
+\end{bmatrix}.
+$$
+
+Find $\operatorname{rank}(A)$ and a basis for $\operatorname{Null}(A)$.
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+The second column is $3$ times the first, so the rank is $1$.
+
+Solve
+
+$$
+x+3y=0.
+$$
+
+Then $x=-3y$. Let $y=t$. Thus
+
+$$
+\begin{bmatrix}x\\y\end{bmatrix}
+=t\begin{bmatrix}-3\\1\end{bmatrix}.
+$$
+
+So
+
+$$
+\operatorname{Null}(A)=\operatorname{span}\left\{
+\begin{bmatrix}-3\\1\end{bmatrix}
+\right\}.
+$$
+:::
+
+### Problem 2
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+1 & 0 & 2\\
+0 & 1 & -1
+\end{bmatrix}.
+$$
+
+What are the rank and nullity of $A$?
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+The first two columns are the standard basis vectors in $\mathbb{R}^2$, so the column space is all of $\mathbb{R}^2$.
+
+Thus
+
+$$
+\operatorname{rank}(A)=2.
+$$
+
+The input dimension is $3$, so rank-nullity gives
+
+$$
+\operatorname{nullity}(A)=3-2=1.
+$$
+:::
+
+### Problem 3
+
+For the matrix in Problem 2, find a basis for the null space.
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+Solve
+
+$$
+\begin{bmatrix}
+1 & 0 & 2\\
+0 & 1 & -1
+\end{bmatrix}
+\begin{bmatrix}x\\y\\z\end{bmatrix}
+=0.
+$$
+
+This gives
+
+$$
+x+2z=0,
+\qquad
+ y-z=0.
+$$
+
+Thus
+
+$$
+x=-2z,
+\qquad
+ y=z.
+$$
+
+Let $z=t$. Then
+
+$$
+\begin{bmatrix}x\\y\\z\end{bmatrix}
+=t\begin{bmatrix}-2\\1\\1\end{bmatrix}.
+$$
+
+So the null space is spanned by
+
+$$
+\begin{bmatrix}-2\\1\\1\end{bmatrix}.
+$$
+:::
+
+### Problem 4
+
+Suppose $A$ is a $6\times 4$ matrix with rank $4$. What is the nullity of $A$? Is $A$ one-to-one?
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+The input dimension is $4$. By rank-nullity,
+
+$$
+\operatorname{nullity}(A)=4-4=0.
+$$
+
+So the null space is only $\{0\}$. Therefore $A$ is one-to-one.
+:::
+
+### Problem 5
+
+Suppose $A$ is a $4\times 6$ matrix. Explain why $A$ must lose information.
+
+::: {.callout-solution collapse="true"}
+## Solution
+
+The input dimension is $6$, but the output dimension is $4$. Therefore
+
+$$
+\operatorname{rank}(A)\leq 4.
+$$
+
+By rank-nullity,
+
+$$
+\operatorname{nullity}(A)=6-\operatorname{rank}(A)\geq 2.
+$$
+
+So the null space has at least two dimensions. Hence nonzero input directions are sent to zero, and information is lost.
+:::
+
+## 8.13 Challenge questions
+
+1. Can a $3\times 5$ matrix have rank $5$? Explain.
+2. Can a $5\times 3$ matrix have nullity $0$? Explain.
+3. Give an example of a nonzero matrix with rank $0$, or explain why none exists.
+4. Construct a $2\times 2$ matrix that collapses the plane onto the line $y=x$.
+5. Explain why compression often requires information loss, but not all information loss is useful compression.
+
+## 8.14 AI companion activities
+
+Use an AI assistant as a mathematical conversation partner, not as a replacement for your own reasoning.
+
+### Prompt 1: explain the invisible direction
+
+Ask:
+
+> Explain the null space of a matrix as the set of invisible directions. Give a geometric example in $\mathbb{R}^2$ and a data example involving measurements.
+
+Then check whether the explanation correctly distinguishes the input space from the output space.
+
+### Prompt 2: build examples by rank
+
+Ask:
+
+> Create one $2\times 2$ matrix of rank $0$, one of rank $1$, and one of rank $2$. For each matrix, describe the column space, null space, and geometric action.
+
+Then verify the ranks using Python.
+
+### Prompt 3: connect rank-nullity to data
+
+Ask:
+
+> Explain the rank-nullity theorem using the metaphor of a measurement system that records fewer features than the original object has.
+
+Then rewrite the explanation in your own words.
+
+## Chapter summary
+
+A matrix is not only a machine for transforming vectors. It is also a machine that may preserve or destroy information.
+
+The central ideas are:
+
+- The **column space** is the set of reachable outputs.
+- The **null space** is the set of invisible inputs.
+- The **rank** is the number of independent output directions that survive.
+- The **nullity** is the number of independent input directions that disappear.
+- Rank-nullity says
+
+$$
+\operatorname{rank}(A)+\operatorname{nullity}(A)=\text{input dimension}.
+$$
+
+- A square matrix is invertible exactly when no nonzero direction disappears.
+
+This chapter prepares us for the next part of the story. Once we understand when information is lost, we can ask a deeper question:
+
+> How should we measure what is lost, and how close can we get when exact recovery is impossible?
+
+That question leads naturally to length, distance, angles, projections, least squares, and the geometry of approximation.

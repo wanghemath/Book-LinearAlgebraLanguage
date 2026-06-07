@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 03 — Combining Ideas</title>
+<style>
+:root{
+  --bg:#f7fafc; --paper:#ffffff; --ink:#14213d; --muted:#516070;
+  --accent:#2563eb; --accent2:#7c3aed; --soft:#eaf1ff; --line:#d9e2ec;
+  --good:#0f766e; --warn:#b45309;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;background:linear-gradient(180deg,#eef5ff 0%,var(--bg) 30%);color:var(--ink);line-height:1.6}
+header{padding:56px 20px 32px;text-align:center;background:radial-gradient(circle at top left,#dbeafe,transparent 38%),radial-gradient(circle at top right,#ede9fe,transparent 36%)}
+header h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 10px;font-weight:850;letter-spacing:-0.04em}
+header p{max-width:850px;margin:0 auto;color:var(--muted);font-size:1.15rem}
+nav{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+nav a{color:var(--ink);text-decoration:none;padding:7px 12px;border-radius:999px;font-size:.92rem;border:1px solid transparent}
+nav a:hover{border-color:var(--accent);background:var(--soft)}
+main{max-width:1120px;margin:0 auto;padding:28px 18px 60px}
+section{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:26px;margin:22px 0;box-shadow:0 12px 32px rgba(20,33,61,.06)}
+h2{font-size:1.75rem;margin:0 0 12px;letter-spacing:-.025em}
+h3{margin-top:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.card{background:#fbfdff;border:1px solid var(--line);border-radius:18px;padding:18px}.formula{background:#0f172a;color:#e2e8f0;padding:18px;border-radius:16px;overflow-x:auto;font-family:Georgia,serif;font-size:1.08rem}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:16px 0}.control{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}.control label{font-weight:700;display:flex;justify-content:space-between;font-size:.93rem}.control input[type=range]{width:100%}canvas{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:16px}.pill{display:inline-block;background:var(--soft);color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:4px 10px;font-size:.86rem;font-weight:700}.note{background:#fffbeb;border-left:5px solid #f59e0b;padding:14px 16px;border-radius:12px}.question{background:#f0fdf4;border-left:5px solid #10b981;padding:14px 16px;border-radius:12px}button{border:0;background:var(--accent);color:white;border-radius:999px;padding:10px 16px;font-weight:750;cursor:pointer}button.secondary{background:var(--accent2)}button:hover{filter:brightness(.95)}textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit}.output{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;white-space:pre-wrap}.small{color:var(--muted);font-size:.93rem}.columns{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}@media(max-width:850px){.columns{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="pill">Interactive Linear Algebra Lab</div>
+  <h1>Lab 03 — Combining Ideas</h1>
+  <p>Explore linear combinations as recipes, movement instructions, mixtures, column combinations, signals, images, and high-dimensional structures.</p>
+</header>
+<nav>
+  <a href="#recipe">Recipe</a><a href="#geometry">Geometry</a><a href="#span">Span</a><a href="#target">Target</a><a href="#convex">Convex</a><a href="#signal">Signals</a><a href="#image">Images</a><a href="#highd">High-D</a>
+</nav>
+<main>
+<section id="recipe">
+<h2>1. Linear combinations are recipes</h2>
+<p>A linear combination has the form</p>
+<div class="formula">c₁v₁ + c₂v₂ + ⋯ + cₖvₖ</div>
+<p>The vectors are ingredients. The coefficients are recipe amounts. Change the coefficients below and watch the result.</p>
+<div class="columns">
+<div>
+<div class="controls">
+<div class="control"><label>v₁ x <span id="v1xVal"></span></label><input id="v1x" type="range" min="-5" max="5" step="0.1" value="2"></div>
+<div class="control"><label>v₁ y <span id="v1yVal"></span></label><input id="v1y" type="range" min="-5" max="5" step="0.1" value="1"></div>
+<div class="control"><label>v₂ x <span id="v2xVal"></span></label><input id="v2x" type="range" min="-5" max="5" step="0.1" value="1"></div>
+<div class="control"><label>v₂ y <span id="v2yVal"></span></label><input id="v2y" type="range" min="-5" max="5" step="0.1" value="3"></div>
+<div class="control"><label>c₁ <span id="c1Val"></span></label><input id="c1" type="range" min="-4" max="4" step="0.1" value="2"></div>
+<div class="control"><label>c₂ <span id="c2Val"></span></label><input id="c2" type="range" min="-4" max="4" step="0.1" value="1"></div>
+</div>
+<div class="output" id="recipeOut"></div>
+</div>
+<canvas id="comboCanvas" width="640" height="640"></canvas>
+</div>
+<div class="question"><strong>Think:</strong> What does a negative coefficient do? What does a coefficient between 0 and 1 do?</div>
+</section>
+
+<section id="geometry">
+<h2>2. Movement interpretation</h2>
+<p>Use two movement directions. First walk along <strong>c₁v₁</strong>, then along <strong>c₂v₂</strong>. The final arrow is the linear combination.</p>
+<div class="note">Linear combinations are not only arithmetic. They are instructions for building a point from directions.</div>
+</section>
+
+<section id="span">
+<h2>3. Span: everything the vectors can build</h2>
+<p>The span of two vectors is the set of all possible linear combinations. The canvas samples many coefficient pairs.</p>
+<div class="columns">
+<div>
+<div class="controls">
+<div class="control"><label>span v₁ x <span id="sv1xVal"></span></label><input id="sv1x" type="range" min="-4" max="4" step="0.1" value="2"></div>
+<div class="control"><label>span v₁ y <span id="sv1yVal"></span></label><input id="sv1y" type="range" min="-4" max="4" step="0.1" value="1"></div>
+<div class="control"><label>span v₂ x <span id="sv2xVal"></span></label><input id="sv2x" type="range" min="-4" max="4" step="0.1" value="-1"></div>
+<div class="control"><label>span v₂ y <span id="sv2yVal"></span></label><input id="sv2y" type="range" min="-4" max="4" step="0.1" value="2"></div>
+</div>
+<button onclick="setDependent()">Make dependent vectors</button>
+<button class="secondary" onclick="setIndependent()">Make independent vectors</button>
+<div class="output" id="spanOut"></div>
+</div>
+<canvas id="spanCanvas" width="640" height="640"></canvas>
+</div>
+</section>
+
+<section id="target">
+<h2>4. Can we build the target?</h2>
+<p>Given two building blocks in the plane, can we find coefficients that reach a target vector?</p>
+<div class="grid">
+<div class="card">
+<h3>Choose a target</h3>
+<div class="controls">
+<div class="control"><label>target x <span id="txVal"></span></label><input id="tx" type="range" min="-8" max="8" step="0.1" value="4"></div>
+<div class="control"><label>target y <span id="tyVal"></span></label><input id="ty" type="range" min="-8" max="8" step="0.1" value="3"></div>
+</div>
+<button onclick="solveTarget()">Solve coefficients</button>
+<div class="output" id="targetOut"></div>
+</div>
+<div class="card">
+<h3>Column view</h3>
+<p>If A has columns v₁ and v₂, then Ac is a linear combination of the columns.</p>
+<div class="formula">Ac = c₁v₁ + c₂v₂</div>
+<p class="small">Use the vectors from Section 1 as columns.</p>
+</div>
+</div>
+</section>
+
+<section id="convex">
+<h2>5. Convex combinations: mixtures</h2>
+<p>A convex combination of two points has form (1−t)u + tv with 0 ≤ t ≤ 1.</p>
+<div class="columns">
+<div>
+<div class="controls">
+<div class="control"><label>t <span id="tVal"></span></label><input id="t" type="range" min="0" max="1" step="0.01" value="0.35"></div>
+</div>
+<div class="output" id="convexOut"></div>
+</div>
+<canvas id="convexCanvas" width="640" height="420"></canvas>
+</div>
+<div class="question"><strong>Think:</strong> Why do convex combinations stay between the ingredients?</div>
+</section>
+
+<section id="signal">
+<h2>6. Signals as combinations of waves</h2>
+<p>A sound-like signal can be created by combining simple waves.</p>
+<div class="controls">
+<div class="control"><label>wave 1 coefficient <span id="a1Val"></span></label><input id="a1" type="range" min="-2" max="2" step="0.05" value="1"></div>
+<div class="control"><label>wave 2 coefficient <span id="a2Val"></span></label><input id="a2" type="range" min="-2" max="2" step="0.05" value="0.6"></div>
+<div class="control"><label>wave 3 coefficient <span id="a3Val"></span></label><input id="a3" type="range" min="-2" max="2" step="0.05" value="0.25"></div>
+</div>
+<canvas id="signalCanvas" width="900" height="360"></canvas>
+</section>
+
+<section id="image">
+<h2>7. Images as high-dimensional vectors</h2>
+<p>Each small image below is a grid of numbers. The blended image is a linear combination of image vectors.</p>
+<div class="controls"><div class="control"><label>blend weight α <span id="alphaVal"></span></label><input id="alpha" type="range" min="0" max="1" step="0.01" value="0.5"></div></div>
+<canvas id="imageCanvas" width="900" height="320"></canvas>
+<p class="small">The formula is α Image A + (1−α) Image B.</p>
+</section>
+
+<section id="highd">
+<h2>8. High-dimensional recipes</h2>
+<p>Generate random building blocks in a high-dimensional space. Even when the ambient dimension is large, using only k building blocks creates at most a k-dimensional span.</p>
+<div class="controls">
+<div class="control"><label>ambient dimension d <span id="dVal"></span></label><input id="d" type="range" min="5" max="200" step="1" value="80"></div>
+<div class="control"><label>number of building blocks k <span id="kVal"></span></label><input id="k" type="range" min="1" max="10" step="1" value="3"></div>
+<div class="control"><label>number of recipes m <span id="mVal"></span></label><input id="m" type="range" min="10" max="500" step="10" value="200"></div>
+</div>
+<button onclick="highDExperiment()">Run experiment</button>
+<div class="output" id="highdOut"></div>
+<div class="question"><strong>Key idea:</strong> The space where vectors live can be huge, but the span created by a few building blocks can be small.</div>
+</section>
+
+<section>
+<h2>9. Reflection</h2>
+<p>Write a short paragraph explaining the difference between a linear combination and a span.</p>
+<textarea placeholder="A linear combination is... The span is..."></textarea>
+</section>
+</main>
+<script>
+const ids=['v1x','v1y','v2x','v2y','c1','c2','sv1x','sv1y','sv2x','sv2y','tx','ty','t','a1','a2','a3','alpha','d','k','m'];
+ids.forEach(id=>document.getElementById(id).addEventListener('input', updateAll));
+function val(id){return parseFloat(document.getElementById(id).value)}
+function show(id){const e=document.getElementById(id); const s=document.getElementById(id+'Val'); if(s) s.textContent=e.value}
+function world(ctx,x,y,scale=40,cx=320,cy=320){return [cx+x*scale, cy-y*scale]}
+function clear(ctx){ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height); ctx.fillStyle='#fff';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height)}
+function grid(ctx,scale=40,cx=320,cy=320){ctx.strokeStyle='#edf2f7';ctx.lineWidth=1; for(let i=-10;i<=10;i++){let [x1,y1]=world(ctx,i,-10,scale,cx,cy),[x2,y2]=world(ctx,i,10,scale,cx,cy);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke(); [x1,y1]=world(ctx,-10,i,scale,cx,cy);[x2,y2]=world(ctx,10,i,scale,cx,cy);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()} ctx.strokeStyle='#334155';ctx.lineWidth=1.5;let a=world(ctx,-10,0,scale,cx,cy),b=world(ctx,10,0,scale,cx,cy);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();a=world(ctx,0,-10,scale,cx,cy);b=world(ctx,0,10,scale,cx,cy);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+function arrow(ctx,x1,y1,x2,y2,color,label,scale=40,cx=320,cy=320){let p=world(ctx,x1,y1,scale,cx,cy),q=world(ctx,x2,y2,scale,cx,cy);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();let ang=Math.atan2(q[1]-p[1],q[0]-p[0]);let len=12;ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(q[0]-len*Math.cos(ang-Math.PI/6),q[1]-len*Math.sin(ang-Math.PI/6));ctx.lineTo(q[0]-len*Math.cos(ang+Math.PI/6),q[1]-len*Math.sin(ang+Math.PI/6));ctx.closePath();ctx.fill();ctx.font='14px system-ui';ctx.fillText(label,q[0]+6,q[1]-6)}
+function updateCombo(){['v1x','v1y','v2x','v2y','c1','c2'].forEach(show);let v1=[val('v1x'),val('v1y')],v2=[val('v2x'),val('v2y')],c1=val('c1'),c2=val('c2');let r=[c1*v1[0]+c2*v2[0],c1*v1[1]+c2*v2[1]];document.getElementById('recipeOut').textContent=`v1 = (${v1[0].toFixed(1)}, ${v1[1].toFixed(1)})\nv2 = (${v2[0].toFixed(1)}, ${v2[1].toFixed(1)})\n${c1.toFixed(1)}v1 + ${c2.toFixed(1)}v2 = (${r[0].toFixed(2)}, ${r[1].toFixed(2)})`;let ctx=document.getElementById('comboCanvas').getContext('2d');clear(ctx);grid(ctx);arrow(ctx,0,0,v1[0],v1[1],'#2563eb','v1');arrow(ctx,0,0,v2[0],v2[1],'#7c3aed','v2');arrow(ctx,0,0,c1*v1[0],c1*v1[1],'#0f766e','c1v1');arrow(ctx,c1*v1[0],c1*v1[1],r[0],r[1],'#b45309','c2v2');arrow(ctx,0,0,r[0],r[1],'#dc2626','result')}
+function updateSpan(){['sv1x','sv1y','sv2x','sv2y'].forEach(show);let v1=[val('sv1x'),val('sv1y')],v2=[val('sv2x'),val('sv2y')];let det=v1[0]*v2[1]-v1[1]*v2[0];document.getElementById('spanOut').textContent=`determinant-like area = ${det.toFixed(3)}\n${Math.abs(det)<0.05?'The vectors are nearly dependent: span looks like a line.':'The vectors give two directions: span fills the plane.'}`;let ctx=document.getElementById('spanCanvas').getContext('2d');clear(ctx);grid(ctx,26);ctx.fillStyle='rgba(37,99,235,.50)';for(let a=-4;a<=4;a+=0.5){for(let b=-4;b<=4;b+=0.5){let x=a*v1[0]+b*v2[0],y=a*v1[1]+b*v2[1];let p=world(ctx,x,y,26);ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,2*Math.PI);ctx.fill()}}arrow(ctx,0,0,v1[0],v1[1],'#2563eb','v1',26);arrow(ctx,0,0,v2[0],v2[1],'#7c3aed','v2',26)}
+function setDependent(){document.getElementById('sv1x').value=2;document.getElementById('sv1y').value=1;document.getElementById('sv2x').value=4;document.getElementById('sv2y').value=2;updateAll()}
+function setIndependent(){document.getElementById('sv1x').value=2;document.getElementById('sv1y').value=1;document.getElementById('sv2x').value=-1;document.getElementById('sv2y').value=2;updateAll()}
+function solveTarget(){let v1=[val('v1x'),val('v1y')],v2=[val('v2x'),val('v2y')],b=[val('tx'),val('ty')];let det=v1[0]*v2[1]-v2[0]*v1[1];let out=document.getElementById('targetOut');if(Math.abs(det)<1e-6){out.textContent='The two building blocks are dependent. There may be no solution or many solutions.';return}let c1=(b[0]*v2[1]-v2[0]*b[1])/det;let c2=(v1[0]*b[1]-b[0]*v1[1])/det;out.textContent=`Using Section 1 vectors as columns:\nc1 = ${c1.toFixed(3)}\nc2 = ${c2.toFixed(3)}\nSo target ≈ c1 v1 + c2 v2.`}
+function updateTarget(){['tx','ty'].forEach(show)}
+function updateConvex(){show('t');let t=val('t'),u=[1,1],v=[7,4],p=[(1-t)*u[0]+t*v[0],(1-t)*u[1]+t*v[1]];document.getElementById('convexOut').textContent=`(1−t)u + tv = (${p[0].toFixed(2)}, ${p[1].toFixed(2)})`;let ctx=document.getElementById('convexCanvas').getContext('2d');clear(ctx);grid(ctx,45,90,330);let a=world(ctx,u[0],u[1],45,90,330),b=world(ctx,v[0],v[1],45,90,330),q=world(ctx,p[0],p[1],45,90,330);ctx.strokeStyle='#94a3b8';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();ctx.fillStyle='#2563eb';ctx.beginPath();ctx.arc(a[0],a[1],8,0,2*Math.PI);ctx.fill();ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(b[0],b[1],8,0,2*Math.PI);ctx.fill();ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(q[0],q[1],10,0,2*Math.PI);ctx.fill()}
+function updateSignal(){['a1','a2','a3'].forEach(show);let ctx=document.getElementById('signalCanvas').getContext('2d');clear(ctx);let W=ctx.canvas.width,H=ctx.canvas.height;ctx.strokeStyle='#e5e7eb';ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();let a1=val('a1'),a2=val('a2'),a3=val('a3');ctx.strokeStyle='#2563eb';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<W;i++){let t=i/W;let y=a1*Math.sin(2*Math.PI*2*t)+a2*Math.sin(2*Math.PI*5*t)+a3*Math.sin(2*Math.PI*11*t);let py=H/2-y*55;if(i===0)ctx.moveTo(i,py);else ctx.lineTo(i,py)}ctx.stroke()}
+function updateImage(){show('alpha');let ctx=document.getElementById('imageCanvas').getContext('2d');clear(ctx);let alpha=val('alpha'),n=120;function pix(cx,cy,type){let x=(cx-n/2)/(n/2),y=(cy-n/2)/(n/2);if(type===0)return Math.exp(-9*((x+.3)**2+(y+.1)**2));return Math.exp(-9*((x-.3)**2+(y-.1)**2))*(.7+.3*Math.sin(12*x)*Math.cos(12*y))}function drawImage(offset,type){let img=ctx.createImageData(n,n);for(let j=0;j<n;j++){for(let i=0;i<n;i++){let a=pix(i,j,0),b=pix(i,j,1),z=type===0?a:(type===1?b:alpha*a+(1-alpha)*b);let g=Math.max(0,Math.min(255,Math.round(z*255)));let idx=4*(j*n+i);img.data[idx]=img.data[idx+1]=img.data[idx+2]=g;img.data[idx+3]=255}}ctx.putImageData(img,offset,70)}drawImage(80,0);drawImage(390,1);drawImage(700,2);ctx.fillStyle='#14213d';ctx.font='16px system-ui';ctx.fillText('Image A',110,220);ctx.fillText('Image B',420,220);ctx.fillText('αA + (1−α)B',715,220)}
+function highDExperiment(){['d','k','m'].forEach(show);let d=val('d'),k=val('k'),m=val('m');let rank=Math.min(d,k,m);document.getElementById('highdOut').textContent=`Ambient dimension d = ${d}\nBuilding blocks k = ${k}\nNumber of generated recipes m = ${m}\nTypical span dimension = min(d,k,m) = ${rank}\n\nEven with ${m} vectors in R^${d}, if they are made from ${k} building blocks, they live in at most ${k} dimensions.`}
+function updateAll(){ids.forEach(show);updateCombo();updateSpan();updateTarget();updateConvex();updateSignal();updateImage();}
+updateAll(); highDExperiment();
+</script>
+</body>
+</html>

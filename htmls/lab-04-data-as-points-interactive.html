@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 04 — Data as Points</title>
+<style>
+:root{
+  --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0;
+  --accent:#2563eb; --accent2:#7c3aed; --soft:#eff6ff; --warn:#fff7ed;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header{background:linear-gradient(135deg,#0f172a,#1d4ed8,#7c3aed);color:white;padding:56px 22px 44px}
+.header-inner{max-width:1100px;margin:0 auto}
+h1{font-size:clamp(2rem,4vw,4rem);line-height:1.05;margin:0 0 12px}
+.subtitle{font-size:clamp(1rem,2vw,1.35rem);opacity:.92;max-width:850px}
+nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .inner{max-width:1100px;margin:0 auto;display:flex;gap:10px;overflow-x:auto;padding:10px 18px}
+nav a{white-space:nowrap;text-decoration:none;color:#334155;border:1px solid var(--line);padding:7px 11px;border-radius:999px;font-size:.92rem;background:white}
+main{max-width:1100px;margin:0 auto;padding:26px 18px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin:20px 0;box-shadow:0 10px 30px rgba(15,23,42,.06)}
+h2{font-size:1.65rem;margin:0 0 10px} h3{margin-top:20px}.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px}.mini{background:#f8fafc;border:1px solid var(--line);padding:16px;border-radius:16px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:14px 0}.control{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+label{display:block;font-weight:700;margin-bottom:6px} input[type=range]{width:100%} select,button{font:inherit;border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:white}button{cursor:pointer;background:#0f172a;color:white;border-color:#0f172a}.secondary{background:white;color:#0f172a}
+canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:16px;background:white}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f1f5f9;border-radius:12px;padding:12px;overflow:auto}.note{background:var(--soft);border-left:5px solid var(--accent);padding:14px;border-radius:12px}.warn{background:var(--warn);border-left:5px solid #f97316;padding:14px;border-radius:12px}.pill{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:3px 9px;margin:3px;font-size:.85rem}
+table{border-collapse:collapse;width:100%;overflow:hidden;border-radius:14px}th,td{border:1px solid var(--line);padding:8px;text-align:right}th:first-child,td:first-child{text-align:left}th{background:#f1f5f9}.slider-value{font-weight:800;color:#1d4ed8}
+textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;background:#fff}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><h1>Lab 04 — Data as Points</h1><div class="subtitle">Feature spaces, data clouds, scaling, clusters, outliers, and high-dimensional intuition.</div></div></header>
+<nav><div class="inner"><a href="#story">Story</a><a href="#matrix">Data Matrix</a><a href="#cloud">Cloud Builder</a><a href="#scaling">Scaling</a><a href="#clusters">Clusters</a><a href="#outliers">Outliers</a><a href="#nearest">Nearest Neighbor</a><a href="#image">Image Vector</a><a href="#highdim">High Dimension</a><a href="#reflection">Reflection</a></div></nav>
+<main>
+<section id="story" class="card">
+<h2>1. The Big Idea</h2>
+<p>A dataset is more than a table. After we choose features, each row becomes a point in a feature space. Many rows become a data cloud.</p>
+<div class="note"><strong>Main message:</strong> Data becomes geometry. Linear algebra gives us tools for studying the shape of that geometry.</div>
+<div class="grid">
+<div class="mini"><h3>Object</h3><p>One student, house, song, image, document, or customer.</p></div>
+<div class="mini"><h3>Vector</h3><p>A numerical description of one object.</p></div>
+<div class="mini"><h3>Dataset</h3><p>Many vectors collected together.</p></div>
+<div class="mini"><h3>Cloud</h3><p>The geometric picture made by all points.</p></div>
+</div>
+</section>
+
+<section id="matrix" class="card">
+<h2>2. Rows, Columns, and the Data Matrix</h2>
+<p>In many data science settings, rows are objects and columns are features.</p>
+<table><thead><tr><th>Student</th><th>Hours</th><th>Sleep</th><th>Score</th></tr></thead><tbody>
+<tr><td>A</td><td>2</td><td>7</td><td>70</td></tr><tr><td>B</td><td>5</td><td>6</td><td>85</td></tr><tr><td>C</td><td>1</td><td>8</td><td>65</td></tr><tr><td>D</td><td>7</td><td>5</td><td>92</td></tr>
+</tbody></table>
+<div class="formula">X = [[2, 7, 70], [5, 6, 85], [1, 8, 65], [7, 5, 92]]</div>
+<div class="controls"><div class="control"><label>Choose a row</label><select id="rowSelect"><option value="0">Student A</option><option value="1">Student B</option><option value="2">Student C</option><option value="3">Student D</option></select></div><div class="control"><label>Choose a column</label><select id="colSelect"><option value="0">Hours</option><option value="1">Sleep</option><option value="2">Score</option></select></div></div>
+<div class="grid"><div class="mini"><strong>Selected row vector</strong><div id="rowOut" class="formula"></div></div><div class="mini"><strong>Selected feature vector</strong><div id="colOut" class="formula"></div></div></div>
+</section>
+
+<section id="cloud" class="card">
+<h2>3. Interactive Data Cloud Builder</h2>
+<p>Use the sliders to change the slope, noise, and number of points. Watch the shape of the cloud change.</p>
+<div class="controls">
+<div class="control"><label>Slope: <span id="slopeVal" class="slider-value"></span></label><input id="slope" type="range" min="-8" max="8" step="0.1" value="4"></div>
+<div class="control"><label>Noise: <span id="noiseVal" class="slider-value"></span></label><input id="noise" type="range" min="0" max="20" step="0.5" value="6"></div>
+<div class="control"><label>Points: <span id="nVal" class="slider-value"></span></label><input id="nPoints" type="range" min="20" max="200" step="5" value="80"></div>
+</div>
+<canvas id="cloudCanvas" width="760" height="460"></canvas>
+<div class="note" id="cloudNote"></div>
+</section>
+
+<section id="scaling" class="card">
+<h2>4. Scaling Changes Distance</h2>
+<p>The same houses can look geometrically different when price is measured in dollars, thousands of dollars, or standardized units.</p>
+<div class="controls"><div class="control"><label>Price scale</label><select id="scaleMode"><option value="dollars">Dollars</option><option value="thousands">Thousands of dollars</option><option value="standardized">Standardized features</option></select></div></div>
+<canvas id="scaleCanvas" width="760" height="460"></canvas>
+<div id="distOut" class="formula"></div>
+<div class="warn"><strong>Warning:</strong> A distance computation is only as meaningful as the feature representation behind it.</div>
+</section>
+
+<section id="clusters" class="card">
+<h2>5. Clusters</h2>
+<p>Clusters are groups of nearby points. Change the separation and spread to see when clusters become clear or confusing.</p>
+<div class="controls"><div class="control"><label>Separation: <span id="sepVal" class="slider-value"></span></label><input id="sep" type="range" min="1" max="8" step="0.1" value="5"></div><div class="control"><label>Spread: <span id="spreadVal" class="slider-value"></span></label><input id="spread" type="range" min="0.2" max="2.5" step="0.1" value="0.8"></div></div>
+<canvas id="clusterCanvas" width="760" height="460"></canvas>
+</section>
+
+<section id="outliers" class="card">
+<h2>6. Outliers</h2>
+<p>An outlier is a point far from the main cloud. It may be an error, a special case, or an important discovery.</p>
+<button id="newOutliers">Generate new outlier cloud</button>
+<canvas id="outlierCanvas" width="760" height="460"></canvas>
+<div id="outlierText" class="formula"></div>
+</section>
+
+<section id="nearest" class="card">
+<h2>7. Nearest Neighbor Classification</h2>
+<p>Move the new point. It is classified by whichever class center is closer.</p>
+<div class="controls"><div class="control"><label>New x: <span id="nxVal" class="slider-value"></span></label><input id="newX" type="range" min="0" max="7" step="0.1" value="3.5"></div><div class="control"><label>New y: <span id="nyVal" class="slider-value"></span></label><input id="newY" type="range" min="0" max="3" step="0.1" value="1.2"></div></div>
+<canvas id="nnCanvas" width="760" height="460"></canvas>
+<div id="nnOut" class="formula"></div>
+</section>
+
+<section id="image" class="card">
+<h2>8. Image as a Point</h2>
+<p>Draw a small 8 by 8 image. The image is also a vector in <span class="formula">R^64</span>.</p>
+<div class="grid"><div><canvas id="pixelCanvas" width="400" height="400"></canvas><p><button id="clearPixels" class="secondary">Clear</button> <button id="randomPixels">Random</button></p></div><div><h3>Flattened vector</h3><div id="pixelVector" class="formula"></div><p class="muted">Each square is one coordinate. A full-size image can have thousands or millions of coordinates.</p></div></div>
+</section>
+
+<section id="highdim" class="card">
+<h2>9. High-Dimensional Distance</h2>
+<p>Random points tend to get farther apart as dimension increases. This is one reason high-dimensional intuition is different.</p>
+<div class="controls"><div class="control"><label>Dimension: <span id="dimVal" class="slider-value"></span></label><input id="dim" type="range" min="2" max="500" step="1" value="50"></div></div>
+<canvas id="dimCanvas" width="760" height="360"></canvas>
+<div id="dimOut" class="formula"></div>
+</section>
+
+<section id="reflection" class="card">
+<h2>10. Reflection</h2>
+<p>Write a short response after using the page.</p>
+<p><span class="pill">feature space</span><span class="pill">data cloud</span><span class="pill">scaling</span><span class="pill">clusters</span><span class="pill">outliers</span><span class="pill">high dimension</span></p>
+<textarea placeholder="What does it mean to say that a table has become geometry?"></textarea>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const X=[[2,7,70],[5,6,85],[1,8,65],[7,5,92]];
+function updateMatrix(){let r=+$('rowSelect').value,c=+$('colSelect').value;$('rowOut').textContent='['+X[r].join(', ')+']';$('colOut').textContent='['+X.map(row=>row[c]).join(', ')+']';}
+$('rowSelect').oninput=updateMatrix;$('colSelect').oninput=updateMatrix;updateMatrix();
+function rng(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;}}
+function normal(rand){let u=1-rand(),v=1-rand();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function clear(ctx,w,h){ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h)}
+function axes(ctx,w,h,xlab,ylab){ctx.strokeStyle='#cbd5e1';ctx.lineWidth=1;for(let i=0;i<=10;i++){let x=50+i*(w-80)/10;ctx.beginPath();ctx.moveTo(x,30);ctx.lineTo(x,h-50);ctx.stroke();let y=30+i*(h-80)/10;ctx.beginPath();ctx.moveTo(50,y);ctx.lineTo(w-30,y);ctx.stroke()}ctx.fillStyle='#334155';ctx.font='14px system-ui';ctx.fillText(xlab,w/2-40,h-15);ctx.save();ctx.translate(16,h/2+40);ctx.rotate(-Math.PI/2);ctx.fillText(ylab,0,0);ctx.restore()}
+function map(x,y,xmin,xmax,ymin,ymax,w,h){return [50+(x-xmin)/(xmax-xmin)*(w-80), h-50-(y-ymin)/(ymax-ymin)*(h-80)]}
+function drawCloud(){let c=$('cloudCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h,'Feature 1','Feature 2');let slope=+$('slope').value,noise=+$('noise').value,n=+$('nPoints').value;$('slopeVal').textContent=slope.toFixed(1);$('noiseVal').textContent=noise.toFixed(1);$('nVal').textContent=n;let rand=rng(4);let pts=[];for(let i=0;i<n;i++){let x=8*rand();let y=50+slope*x+normal(rand)*noise;pts.push([x,y]);}let ys=pts.map(p=>p[1]);let ymin=Math.min(...ys)-5,ymax=Math.max(...ys)+5;ctx.fillStyle='#2563eb';for(let p of pts){let [px,py]=map(p[0],p[1],0,8,ymin,ymax,w,h);ctx.globalAlpha=.75;ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill()}ctx.globalAlpha=1;$('cloudNote').textContent=slope>1?'The cloud has an upward trend.':slope<-1?'The cloud has a downward trend.':'The cloud has little linear trend.'}
+['slope','noise','nPoints'].forEach(id=>$(id).oninput=drawCloud);drawCloud();
+function drawScaling(){let c=$('scaleCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h,'Size','Price feature');let houses=[[1400,430000],[1800,500000],[1900,510000],[2500,700000],[1200,350000]],mode=$('scaleMode').value;let P=houses.map(p=>p.slice());if(mode==='thousands')P=P.map(p=>[p[0],p[1]/1000]);if(mode==='standardized'){let mx=P.reduce((a,p)=>a+p[0],0)/P.length,my=P.reduce((a,p)=>a+p[1],0)/P.length;let sx=Math.sqrt(P.reduce((a,p)=>a+(p[0]-mx)**2,0)/P.length),sy=Math.sqrt(P.reduce((a,p)=>a+(p[1]-my)**2,0)/P.length);P=P.map(p=>[(p[0]-mx)/sx,(p[1]-my)/sy]);}
+let xs=P.map(p=>p[0]),ys=P.map(p=>p[1]),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);let padX=(xmax-xmin)*.2||1,padY=(ymax-ymin)*.2||1;ctx.fillStyle='#7c3aed';P.forEach((p,i)=>{let [px,py]=map(p[0],p[1],xmin-padX,xmax+padX,ymin-padY,ymax+padY,w,h);ctx.beginPath();ctx.arc(px,py,7,0,7);ctx.fill();ctx.fillText('H'+(i+1),px+8,py)});let d=Math.hypot(P[1][0]-P[2][0],P[1][1]-P[2][1]);$('distOut').textContent='Distance between H2 and H3 in this representation: '+d.toFixed(3)}
+$('scaleMode').oninput=drawScaling;drawScaling();
+function drawClusters(){let c=$('clusterCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h,'Feature 1','Feature 2');let sep=+$('sep').value,spread=+$('spread').value;$('sepVal').textContent=sep.toFixed(1);$('spreadVal').textContent=spread.toFixed(1);let centers=[[2,2],[2+sep,2],[2+sep/2,2+sep*.7]],rand=rng(9);let cols=['#2563eb','#7c3aed','#059669'];centers.forEach((cen,k)=>{ctx.fillStyle=cols[k];for(let i=0;i<45;i++){let x=cen[0]+normal(rand)*spread,y=cen[1]+normal(rand)*spread;let [px,py]=map(x,y,0,10,0,10,w,h);ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill()}ctx.globalAlpha=1;let [cx,cy]=map(cen[0],cen[1],0,10,0,10,w,h);ctx.fillRect(cx-6,cy-6,12,12)})}
+['sep','spread'].forEach(id=>$(id).oninput=drawClusters);drawClusters();
+function drawOutliers(){let c=$('outlierCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h,'Feature 1','Feature 2');let rand=rng(Math.floor(Math.random()*9999)+1),pts=[];for(let i=0;i<90;i++)pts.push([normal(rand),normal(rand)]);pts.push([4.5,4.2],[-4.2,3.8],[3.8,-4.6]);let cx=pts.reduce((a,p)=>a+p[0],0)/pts.length,cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;let ds=pts.map(p=>Math.hypot(p[0]-cx,p[1]-cy));let sorted=[...ds].sort((a,b)=>a-b),thr=sorted[Math.floor(.96*sorted.length)];pts.forEach((p,i)=>{let [px,py]=map(p[0],p[1],-6,6,-6,6,w,h);ctx.fillStyle=ds[i]>=thr?'#dc2626':'#2563eb';ctx.globalAlpha=ds[i]>=thr?1:.55;ctx.beginPath();ctx.arc(px,py,ds[i]>=thr?7:4,0,7);ctx.fill()});ctx.globalAlpha=1;$('outlierText').textContent='Flagged points are those with distance to center above about the 96th percentile.'}
+$('newOutliers').onclick=drawOutliers;drawOutliers();
+function drawNN(){let c=$('nnCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h,'Petal length','Petal width');let nx=+$('newX').value,ny=+$('newY').value;$('nxVal').textContent=nx.toFixed(1);$('nyVal').textContent=ny.toFixed(1);let A=[2,.7],B=[5,1.6],rand=rng(22);ctx.fillStyle='#2563eb';for(let i=0;i<45;i++){let [px,py]=map(A[0]+normal(rand)*.25,A[1]+normal(rand)*.12,0,7,0,3,w,h);ctx.globalAlpha=.6;ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill()}ctx.fillStyle='#7c3aed';for(let i=0;i<45;i++){let [px,py]=map(B[0]+normal(rand)*.35,B[1]+normal(rand)*.18,0,7,0,3,w,h);ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill()}ctx.globalAlpha=1;let [apx,apy]=map(A[0],A[1],0,7,0,3,w,h),[bpx,bpy]=map(B[0],B[1],0,7,0,3,w,h),[npx,npy]=map(nx,ny,0,7,0,3,w,h);ctx.fillStyle='#0f172a';ctx.fillRect(apx-6,apy-6,12,12);ctx.fillRect(bpx-6,bpy-6,12,12);ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(npx,npy,9,0,7);ctx.fill();let da=Math.hypot(nx-A[0],ny-A[1]),db=Math.hypot(nx-B[0],ny-B[1]);ctx.strokeStyle=da<db?'#2563eb':'#7c3aed';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(npx,npy);ctx.lineTo(da<db?apx:bpx,da<db?apy:bpy);ctx.stroke();$('nnOut').textContent=`Distance to A center = ${da.toFixed(3)}; distance to B center = ${db.toFixed(3)}; predicted class = ${da<db?'A':'B'}.`}
+['newX','newY'].forEach(id=>$(id).oninput=drawNN);drawNN();
+let pixels=Array(64).fill(0);function drawPixels(){let c=$('pixelCanvas'),ctx=c.getContext('2d'),w=c.width/8;clear(ctx,c.width,c.height);for(let i=0;i<8;i++)for(let j=0;j<8;j++){let v=pixels[i*8+j];ctx.fillStyle=`rgb(${255-v*255},${255-v*255},${255-v*255})`;ctx.fillRect(j*w,i*w,w,w);ctx.strokeStyle='#cbd5e1';ctx.strokeRect(j*w,i*w,w,w)}$('pixelVector').textContent='['+pixels.map(v=>v.toFixed(0)).join(', ')+']'}
+$('pixelCanvas').onclick=e=>{let r=$('pixelCanvas').getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*8),y=Math.floor((e.clientY-r.top)/r.height*8);pixels[y*8+x]=1-pixels[y*8+x];drawPixels()};$('clearPixels').onclick=()=>{pixels=Array(64).fill(0);drawPixels()};$('randomPixels').onclick=()=>{let rand=rng(Date.now()%9999);pixels=pixels.map(()=>rand()>.7?1:0);drawPixels()};drawPixels();
+function drawDim(){let c=$('dimCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;clear(ctx,w,h);let d=+$('dim').value;$('dimVal').textContent=d;let mean=Math.sqrt(2*d);let rel=1/Math.sqrt(2*d);$('dimOut').textContent=`Approximate average distance between two random standard normal points in R^${d}: ${mean.toFixed(3)}. Relative variation is roughly ${rel.toFixed(3)}.`;axes(ctx,w,h,'Dimension','Average distance');let dims=[2,5,10,20,50,100,200,500];ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.beginPath();dims.forEach((dd,i)=>{let [px,py]=map(dd,Math.sqrt(2*dd),0,500,0,32,w,h);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)});ctx.stroke();let [px,py]=map(d,mean,0,500,0,32,w,h);ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(px,py,8,0,7);ctx.fill()}
+$('dim').oninput=drawDim;drawDim();
+</script>
+</body>
+</html>

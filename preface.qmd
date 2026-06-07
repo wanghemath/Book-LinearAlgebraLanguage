@@ -1,0 +1,179 @@
+# Preface {.unnumbered}
+
+## Why This Book Exists
+
+This book began with a simple belief:
+
+> Linear algebra should be learned as a language.
+
+Many readers first encounter linear algebra through procedures: solve the system, multiply the matrices, compute the determinant, find the eigenvalues. These procedures are important, but they can hide the deeper story.
+
+Linear algebra is not merely a set of techniques.
+
+It is a language for describing information.
+
+It helps us describe how data is stored, how images are transformed, how signals are decomposed, how recommendations are made, how neural networks process inputs, and how artificial intelligence represents meaning.
+
+The purpose of this book is to help the reader see that language before being overwhelmed by notation.
+
+## The Main Promise
+
+The promise of the book is simple:
+
+> After reading this book, you should be able to look at a dataset, an image, a signal, a recommendation system, or a neural network layer and say:  
+> I can see the linear algebra inside.
+
+This does not mean that every topic will be easy. Linear algebra has real depth. But depth should not require mystery. A concept becomes much less frightening when the reader understands what problem it solves, what picture it draws, and why it matters.
+
+## A Book for the AI Era
+
+Linear algebra has always been central to mathematics, physics, engineering, statistics, and computation. But in the age of data science and AI, it has become even more visible.
+
+Images are stored as arrays of numbers.  
+Text is represented by vectors.  
+Search engines compare directions in high-dimensional spaces.  
+Recommendation systems use hidden low-dimensional structure.  
+Neural networks are built from matrix operations and nonlinear transformations.  
+PCA, SVD, Fourier methods, and embeddings appear across modern data analysis.
+
+For this reason, linear algebra is no longer only a course for mathematics majors. It is one of the basic languages of modern information.
+
+This book is written for readers who want to understand that language from the beginning.
+
+## The Central Metaphor
+
+The central metaphor of the book is:
+
+> Linear algebra is the grammar of modern information.
+
+A grammar explains how words combine to make meaning. Linear algebra explains how numbers combine to represent objects, transformations, patterns, and relationships.
+
+| Linear algebra idea | Beginner meaning | Modern example |
+|---|---|---|
+| Vector | A package of meaningful numbers | A person, image, document, gene, or word |
+| Matrix | A machine that transforms information | Image filter, ranking rule, neural network layer |
+| Linear combination | A recipe made from ingredients | Feature mixing, signal reconstruction |
+| Span | Everything a set of ingredients can build | All possible feature combinations |
+| Basis | A coordinate language | Pixels, Fourier waves, Haar blocks, embeddings |
+| Dot product | A similarity detector | Search, recommendation, cosine similarity |
+| Projection | The best shadow | Regression, denoising, approximation |
+| Orthogonality | Independent information | Feature separation, signal separation |
+| Eigenvector | A direction that survives change | Ranking, dynamics, stability |
+| SVD | A microscope for hidden structure | Compression, PCA, latent factors |
+| Low rank | Simple structure inside complex data | Images, users and items, semantic patterns |
+
+These meanings return again and again. The book does not treat them as isolated facts. It treats them as parts of one language.
+
+## What Makes This Book Different
+
+This is not a traditional textbook with a lighter tone. It is a different kind of linear algebra book.
+
+It is **concept-first**: the meaning of an idea comes before the formal machinery.
+
+It is **visual-first**: geometry and pictures are used whenever possible.
+
+It is **story-driven**: each chapter grows from a question about information, motion, data, approximation, or structure.
+
+It is **computation-supported**: Python is used not as decoration, but as a way to experiment with ideas.
+
+It is **AI-era friendly**: examples are drawn from data, images, text, recommendation systems, neural networks, and modern computation.
+
+The guiding rule is:
+
+> Never introduce a formula before the reader knows what question the formula answers.
+
+## What the Reader Needs
+
+No prior linear algebra is assumed.
+
+The reader should be comfortable with:
+
+- algebraic expressions,
+- graphs of simple functions,
+- basic coordinate geometry,
+- curiosity about data and technology.
+
+Calculus is not required for the main story. Programming experience is helpful but not necessary. When Python appears, it is used as an exploratory tool. The mathematical ideas are explained before the code.
+
+## How the Book Is Written
+
+Each chapter is designed to move through several layers:
+
+1. **A motivating question**  
+   The chapter begins with a real problem or image of an idea.
+
+2. **A story and visual intuition**  
+   The idea is introduced through meaning before formal notation.
+
+3. **Definitions and formulas**  
+   Formal language is introduced after the reader has a reason to need it.
+
+4. **Examples and computations**  
+   Small examples show how the idea works.
+
+5. **Python explorations**  
+   Code helps readers experiment, visualize, and test intuition.
+
+6. **Applications**  
+   The chapter connects the idea to data, signals, images, machine learning, or AI.
+
+7. **Reflection and practice**  
+   Exercises and AI companion activities encourage the reader to explain, question, and extend the idea.
+
+The goal is not only to teach facts. The goal is to build mathematical fluency.
+
+## How to Use AI While Reading
+
+AI can be a powerful companion for learning mathematics. It can explain an idea in different words, create additional examples, check computations, and ask practice questions.
+
+But AI should not replace the reader's own thinking.
+
+When using AI with this book, try prompts like:
+
+- "Explain this definition using a concrete example."
+- "Give me a small numerical example of this idea."
+- "Ask me three questions to check whether I understand this section."
+- "Show me a geometric interpretation."
+- "Help me find the mistake in my calculation."
+- "Connect this idea to images, text, or machine learning."
+
+The best use of AI is not to get answers faster. The best use is to create better conversations with the material.
+
+## A Note to Teachers
+
+This book can be used as a companion to a standard linear algebra course, as a bridge into applied linear algebra, or as a conceptual introduction before a more formal course.
+
+Teachers may use the chapters for short readings, visual introductions, Python labs, project-based modules, or AI-assisted learning activities. The chapters are intentionally written to invite discussion:
+
+- What does this vector represent?
+- What does this matrix do?
+- What information is preserved?
+- What information is lost?
+- What structure is hidden?
+- What approximation is being made?
+
+These questions help students move from procedure to understanding.
+
+## A Note to Students
+
+Do not worry if the ideas feel abstract at first. Linear algebra is a new language, and languages are learned through repeated use.
+
+Read with a pencil. Draw arrows. Make small examples. Change numbers and see what happens. Explain ideas out loud. Use Python to experiment. Use AI to ask for more examples, but always return to your own understanding.
+
+The most important question is not "What formula should I use?"
+
+The most important question is:
+
+> What does this object mean?
+
+## Closing
+
+Linear algebra begins with simple objects: numbers, arrows, tables, and equations.
+
+But those simple objects grow into a powerful way of understanding the modern world.
+
+They become data points, transformations, projections, stable directions, hidden patterns, compressed images, semantic vectors, recommendation systems, and neural networks.
+
+This book is an invitation to learn that language slowly, visually, and meaningfully.
+
+Welcome to **The Language of Linear Algebra**.

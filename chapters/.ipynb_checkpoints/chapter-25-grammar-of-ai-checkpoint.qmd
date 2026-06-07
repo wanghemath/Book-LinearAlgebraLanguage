@@ -1,0 +1,1026 @@
+---
+title: "Chapter 25: The Grammar of AI"
+subtitle: "How vectors, matrices, embeddings, attention, and optimization become intelligent systems"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+jupyter: python3
+---
+ 
+
+## Opening story: from numbers to language, vision, and decisions
+
+At the beginning of this book, we learned a simple but powerful idea:
+
+> To compute with the world, we first turn the world into numbers.
+
+A house became a list of features.  
+A picture became a matrix of pixel values.  
+A sentence became a vector of word counts.  
+A dataset became a cloud of points.  
+A matrix became a machine that moves, mixes, compresses, and transforms information.
+
+Modern artificial intelligence is built from the same story, only at a much larger scale.
+
+An AI system may look mysterious from the outside. It can recognize an image, recommend a movie, translate a sentence, summarize a paper, generate code, answer a question, or write a paragraph. But inside the machine, the basic grammar is familiar:
+
+- objects become vectors;
+- collections of objects become matrices;
+- similarity becomes dot product or cosine similarity;
+- memory becomes stored vectors;
+- attention becomes a matrix of comparisons;
+- a neural network layer becomes a matrix machine followed by a nonlinear gate;
+- learning becomes optimization over many matrix entries;
+- compression becomes low-rank structure;
+- generalization depends on geometry in high-dimensional space.
+
+This chapter is the closing chapter of the book. It is not a full textbook on deep learning. Instead, it is a map showing how the central ideas of linear algebra appear again and again inside modern AI.
+
+::: {.callout-important}
+## Central message
+
+Linear algebra is the grammar of AI.
+
+It gives AI systems a language for representing data, comparing meaning, transforming information, compressing structure, and learning from examples.
+:::
+
+## Learning goals
+
+By the end of this chapter, you should be able to:
+
+1. Explain why AI systems turn text, images, users, items, and actions into vectors.
+2. Interpret embeddings as learned coordinates for meaning.
+3. Use dot products and cosine similarity to compare embeddings.
+4. Explain vector search as nearest-neighbor search in embedding space.
+5. Interpret a neural network layer as $h = \sigma(Wx+b)$.
+6. Explain attention as a matrix of dot-product comparisons.
+7. Connect SVD, PCA, low-rank structure, and embeddings.
+8. Explain training as optimization over matrix parameters.
+9. Understand why high-dimensional geometry is both powerful and dangerous.
+10. Describe how the ideas in this book combine into the mathematical grammar of AI.
+
+## 25.1 The representation principle
+
+AI systems compute with numbers. Before an AI model can use an object, the object must be represented numerically.
+
+| Real-world object | Numerical representation | Linear algebra object |
+|---|---:|---|
+| Image | pixel intensities | matrix or tensor |
+| Sentence | token vectors | sequence of vectors |
+| Document | embedding | vector |
+| User | interaction history | sparse vector |
+| Movie/product | feature or latent-factor vector | vector |
+| Dataset | rows of examples | matrix |
+| Network/graph | adjacency table | matrix |
+| Model parameters | weights | matrices and vectors |
+
+This gives the first principle of AI.
+
+::: {.callout-important}
+## Representation principle
+
+An AI system can only compute with an object after the object has been represented as numbers.
+
+Most modern AI begins by turning objects into vectors, matrices, or tensors.
+:::
+
+A representation is not just bookkeeping. It decides what the model can see. Two different representations of the same object may lead to very different behavior.
+
+For example, the word "bank" can mean a financial institution or the side of a river. A simple word-count vector may not distinguish the two meanings well. A contextual embedding from a modern language model may place the word in different regions depending on the surrounding sentence.
+
+## 25.2 Embeddings: coordinates for meaning
+
+An **embedding** is a vector representation of an object. The object could be a word, sentence, image, user, item, protein, graph node, or mathematical expression.
+
+For example,
+
+$$
+\text{``linear algebra''}
+\longmapsto
+\begin{bmatrix}
+0.18 \\
+-0.42 \\
+1.07 \\
+\vdots \\
+0.31
+\end{bmatrix}
+\in \mathbb{R}^{d}.
+$$
+
+The individual coordinates of an embedding are usually not chosen by hand. They are learned from data. The goal is not that coordinate 17 has a simple human name. The goal is that the geometry of the space becomes useful.
+
+::: {.callout-note}
+## Embedding principle
+
+An embedding turns an object into a vector so that useful relationships become geometric relationships.
+:::
+
+In a good embedding space:
+
+- similar documents point in similar directions;
+- related images lie near each other;
+- users with similar preferences have nearby vectors;
+- items with similar audiences have nearby vectors;
+- questions and relevant answers have high similarity.
+
+This is why the earlier chapters on distance, angle, projection, SVD, and PCA are not separate from AI. They are the mathematical tools for studying embedding spaces.
+
+## 25.3 Similarity: the dot product returns
+
+Given two embedding vectors $u$ and $v$, one common measure of similarity is cosine similarity:
+
+$$
+\operatorname{cosine}(u,v)
+=
+\frac{u\cdot v}{\|u\|\|v\|}.
+$$
+
+This quantity measures whether two vectors point in similar directions.
+
+- If $\operatorname{cosine}(u,v) \approx 1$, the vectors point in nearly the same direction.
+- If $\operatorname{cosine}(u,v) \approx 0$, the vectors are nearly orthogonal.
+- If $\operatorname{cosine}(u,v) \approx -1$, the vectors point in opposite directions.
+
+This simple formula appears throughout AI:
+
+| AI task | What is compared? | Linear algebra operation |
+|---|---|---|
+| Search | query vs documents | cosine similarity |
+| Recommendation | user vs item | dot product |
+| Classification | point vs class direction | dot product score |
+| Attention | token vs token | dot product matrix |
+| Clustering | point vs centroid | distance or cosine |
+| Retrieval-augmented generation | question vs stored chunks | nearest-neighbor search |
+
+::: {.callout-important}
+## Dot-product principle
+
+The dot product is a basic comparison engine in AI.
+
+It turns two vectors into a score.
+:::
+
+### Example 25.1: a tiny semantic search system
+
+Suppose we store three document embeddings:
+
+$$
+d_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix},
+\qquad
+d_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix},
+\qquad
+ d_3 = \begin{bmatrix} 0.8 \\ 0.6 \end{bmatrix}.
+$$
+
+Suppose a query has embedding
+
+$$
+q = \begin{bmatrix} 0.9 \\ 0.4 \end{bmatrix}.
+$$
+
+The system ranks documents by comparing $q$ with each $d_i$ using cosine similarity.
+
+<details>
+<summary>Show solution</summary>
+
+First compute the norms:
+
+$$
+\|q\|=\sqrt{0.9^2+0.4^2}=\sqrt{0.97}.
+$$
+
+The first document has cosine similarity
+
+$$
+\frac{q\cdot d_1}{\|q\|\|d_1\|}
+=
+\frac{0.9}{\sqrt{0.97}}.
+$$
+
+The second document has cosine similarity
+
+$$
+\frac{q\cdot d_2}{\|q\|\|d_2\|}
+=
+\frac{0.4}{\sqrt{0.97}}.
+$$
+
+The third document has
+
+$$
+q\cdot d_3 = 0.9(0.8)+0.4(0.6)=0.96.
+$$
+
+Since $\|d_3\|=1$, the cosine similarity is
+
+$$
+\frac{0.96}{\sqrt{0.97}}.
+$$
+
+Thus $d_3$ is most similar to the query.
+
+</details>
+
+## 25.4 Vector search: memory as geometry
+
+A modern AI assistant often uses stored documents. The system may work like this:
+
+1. Split documents into smaller chunks.
+2. Convert each chunk into an embedding vector.
+3. Store all embedding vectors in a vector database.
+4. Convert the user question into an embedding vector.
+5. Retrieve nearby chunks.
+6. Use those chunks as context for a language model.
+
+This is called **retrieval-augmented generation**, often abbreviated as RAG.
+
+The key linear algebra step is vector search:
+
+$$
+\text{find documents } d_i \text{ with large } \operatorname{cosine}(q,d_i).
+$$
+
+This is just nearest-neighbor search in a high-dimensional space.
+
+::: {.callout-note}
+## RAG as linear algebra
+
+A retrieval system uses geometry to decide which pieces of text are relevant to a question.
+
+The question and the stored text chunks are vectors.
+:::
+
+## 25.5 Matrices as batches of embeddings
+
+A single embedding is a vector. A collection of embeddings is a matrix.
+
+Suppose we have $n$ objects, each represented by a $d$-dimensional vector. We can place them into a matrix
+
+$$
+X =
+\begin{bmatrix}
+--- x_1^T --- \\
+--- x_2^T --- \\
+\vdots \\
+--- x_n^T ---
+\end{bmatrix}
+\in \mathbb{R}^{n\times d}.
+$$
+
+Each row is an object. Each column is a coordinate in embedding space.
+
+This row-matrix view appears everywhere:
+
+- a batch of images becomes an input matrix;
+- a set of documents becomes a document-embedding matrix;
+- a sentence becomes a token-embedding matrix;
+- a user-item rating table becomes a matrix with many missing entries;
+- a dataset becomes a design matrix for learning.
+
+Now matrix multiplication can process many objects at once.
+
+## 25.6 A neural network layer is a matrix machine
+
+A basic neural network layer has the form
+
+$$
+h = \sigma(Wx+b).
+$$
+
+Here:
+
+- $x$ is the input vector;
+- $W$ is a weight matrix;
+- $b$ is a bias vector;
+- $Wx+b$ is an affine transformation;
+- $\sigma$ is a nonlinear activation function;
+- $h$ is the output vector.
+
+Without $\sigma$, a stack of layers would still be just one large linear transformation. The nonlinear activation is what allows neural networks to represent curved decision boundaries and complex functions.
+
+::: {.callout-important}
+## Neural network layer
+
+A neural network layer is a matrix machine followed by a nonlinear gate.
+
+$$
+h = \sigma(Wx+b).
+$$
+:::
+
+### Row view and feature detection
+
+If
+
+$$
+W =
+\begin{bmatrix}
+--- w_1^T --- \\
+--- w_2^T --- \\
+\vdots \\
+--- w_m^T ---
+\end{bmatrix},
+$$
+
+then
+
+$$
+Wx =
+\begin{bmatrix}
+w_1\cdot x \\
+w_2\cdot x \\
+\vdots \\
+w_m\cdot x
+\end{bmatrix}.
+$$
+
+Each row $w_i$ acts like a detector. It asks: "How much does the input look like this pattern?"
+
+This connects neural networks to cosine similarity, projection, and dot products.
+
+### Batch computation
+
+If $X$ contains many input vectors as rows, then a layer can process the whole batch by
+
+$$
+H = \sigma(XW^T + \mathbf{1}b^T).
+$$
+
+This is why matrix multiplication is the computational heart of deep learning.
+
+## 25.7 Training is optimization over matrices
+
+A neural network has many parameters. These parameters are entries of matrices and vectors.
+
+Training means choosing those numbers so that the model performs well on examples.
+
+Given data points $(x_i,y_i)$ and a model $f_\theta$, training often means solving
+
+$$
+\min_\theta \; \frac{1}{n}\sum_{i=1}^n L(f_\theta(x_i),y_i),
+$$
+
+where $\theta$ represents all trainable weights and biases.
+
+This is an optimization problem.
+
+The earlier chapter on energy landscapes now reappears: the loss function is a landscape over parameter space. Gradient descent moves through that landscape.
+
+::: {.callout-note}
+## Learning principle
+
+Learning means adjusting matrices and vectors so that a loss function becomes small.
+:::
+
+## 25.8 Attention: a matrix of comparisons
+
+Attention is one of the most important ideas in modern language models.
+
+The basic idea is simple:
+
+> Each token asks which other tokens are relevant to it.
+
+Suppose a sentence has token vectors arranged in a matrix $X$. A transformer layer forms three new matrices:
+
+$$
+Q = XW_Q, \qquad K = XW_K, \qquad V = XW_V.
+$$
+
+These are called queries, keys, and values.
+
+The attention score matrix is
+
+$$
+S = QK^T.
+$$
+
+The entry $S_{ij}$ is a dot product between the query vector of token $i$ and the key vector of token $j$.
+
+After scaling and applying softmax row by row, we get attention weights:
+
+$$
+A = \operatorname{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right).
+$$
+
+Then the output is
+
+$$
+Z = AV.
+$$
+
+This says: each output token is a weighted combination of value vectors.
+
+::: {.callout-important}
+## Attention as linear algebra
+
+Attention is built from matrix multiplication, dot products, softmax normalization, and weighted averages.
+
+$$
+Z = \operatorname{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V.
+$$
+:::
+
+### Why this is powerful
+
+Attention lets a model decide which parts of the input matter for each position.
+
+For example, in the sentence
+
+> The student opened the notebook because she wanted to study.
+
+A language model may use attention to connect "she" with "student" or "notebook" with "study," depending on the task.
+
+Mathematically, this is a learned geometry of relevance.
+
+## 25.9 Low-rank structure and hidden factors
+
+Many AI systems discover that data has hidden lower-dimensional structure.
+
+This idea appeared throughout the book:
+
+- PCA finds important directions in a data cloud.
+- SVD decomposes a matrix into rank-one layers.
+- Image compression keeps the strongest singular directions.
+- Recommendation systems learn user and item factors.
+- Text models discover topic-like directions.
+- Neural networks learn hidden representations.
+
+A low-rank approximation has the form
+
+$$
+A \approx U_k\Sigma_kV_k^T.
+$$
+
+This says that a large table of data can often be explained by a smaller number of hidden patterns.
+
+::: {.callout-note}
+## Hidden-factor principle
+
+Large data often has hidden structure.
+
+Linear algebra helps reveal it through projections, eigenvectors, SVD, and low-rank approximation.
+:::
+
+## 25.10 AI as a chain of representations
+
+An AI model often transforms data through many representation spaces.
+
+For an image classifier:
+
+$$
+\text{pixels}
+\longrightarrow
+\text{edges}
+\longrightarrow
+\text{textures}
+\longrightarrow
+\text{parts}
+\longrightarrow
+\text{object class}.
+$$
+
+For a language model:
+
+$$
+\text{tokens}
+\longrightarrow
+\text{embeddings}
+\longrightarrow
+\text{contextual vectors}
+\longrightarrow
+\text{next-token scores}.
+$$
+
+For a recommender system:
+
+$$
+\text{ratings/clicks}
+\longrightarrow
+\text{user factors and item factors}
+\longrightarrow
+\text{predicted preference}.
+$$
+
+Each stage changes the coordinate system. Each stage tries to make the next task easier.
+
+This is why representation learning is so important.
+
+## 25.11 High-dimensional geometry: power and risk
+
+AI works in high-dimensional spaces. An embedding vector may have hundreds, thousands, or even more coordinates.
+
+High dimensions are powerful because they provide room to separate many different patterns. But they are also risky because geometry behaves differently.
+
+Important high-dimensional phenomena include:
+
+1. Random vectors are often nearly orthogonal.
+2. Distances can concentrate.
+3. Nearest neighbors can become less meaningful without good representation.
+4. Sparse vectors can be very far apart in Euclidean distance but meaningful under cosine similarity.
+5. Small perturbations can sometimes change model outputs.
+
+::: {.callout-warning}
+## High-dimensional warning
+
+In high dimensions, intuition from the plane can fail.
+
+AI systems need good representations, normalization, and evaluation because high-dimensional geometry can be surprising.
+:::
+
+## 25.12 A map of the book inside AI
+
+The chapters of this book form a sequence of ideas that now fit together.
+
+| Book idea | AI interpretation |
+|---|---|
+| World as numbers | data representation |
+| Vectors | features and embeddings |
+| Linear combinations | mixtures and learned features |
+| Data as points | datasets in feature space |
+| Matrix machine | model layers and transformations |
+| Geometry of matrices | learned transformations |
+| Solving systems | inverse problems and fitting |
+| Information loss | compression and non-invertibility |
+| Length and distance | errors, nearest neighbors |
+| Angles and similarity | cosine search, attention scores |
+| Projection | approximation and least squares |
+| Orthogonality | stable coordinates and decompositions |
+| Eigenvectors | stable directions and ranking |
+| Iteration | Markov chains, PageRank, dynamics |
+| Energy landscapes | loss functions and optimization |
+| SVD | compression, PCA, latent factors |
+| Image compression | low-rank visual structure |
+| PCA | dimension reduction and visualization |
+| Fourier/Haar | signal and image features |
+| Images as matrices | computer vision |
+| Text as vectors | NLP and semantic search |
+| Neural networks | trainable matrix machines |
+| Recommendation systems | matrix completion and latent geometry |
+
+The subject has been linear algebra all along. The applications changed, but the grammar stayed consistent.
+
+## 25.13 Worked example: a tiny attention calculation
+
+Suppose a sequence has two token vectors. Let
+
+$$
+Q =
+\begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix},
+\qquad
+K =
+\begin{bmatrix}
+1 & 1 \\
+1 & 0
+\end{bmatrix},
+\qquad
+V =
+\begin{bmatrix}
+2 & 0 \\
+0 & 3
+\end{bmatrix}.
+$$
+
+Compute the unnormalized attention score matrix $S=QK^T$.
+
+<details>
+<summary>Show solution</summary>
+
+Since
+
+$$
+K^T =
+\begin{bmatrix}
+1 & 1 \\
+1 & 0
+\end{bmatrix},
+$$
+
+we get
+
+$$
+S = QK^T
+=
+\begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+1 & 1 \\
+1 & 0
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & 1 \\
+1 & 0
+\end{bmatrix}.
+$$
+
+The first token gives equal raw attention score to both tokens. The second token gives higher raw score to the first token than to the second.
+
+</details>
+
+## 25.14 Worked example: a tiny neural layer
+
+Let
+
+$$
+W=
+\begin{bmatrix}
+1 & -1 \\
+2 & 1
+\end{bmatrix},
+\qquad
+b=
+\begin{bmatrix}
+0.5 \\
+-1
+\end{bmatrix},
+\qquad
+x=
+\begin{bmatrix}
+2 \\
+1
+\end{bmatrix}.
+$$
+
+Let $\sigma(t)=\max(0,t)$ be ReLU applied coordinatewise. Compute
+
+$$
+h=\sigma(Wx+b).
+$$
+
+<details>
+<summary>Show solution</summary>
+
+First compute
+
+$$
+Wx=
+\begin{bmatrix}
+1 & -1 \\
+2 & 1
+\end{bmatrix}
+\begin{bmatrix}
+2 \\
+1
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 \\
+5
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+Wx+b=
+\begin{bmatrix}
+1 \\
+5
+\end{bmatrix}
++
+\begin{bmatrix}
+0.5 \\
+-1
+\end{bmatrix}
+=
+\begin{bmatrix}
+1.5 \\
+4
+\end{bmatrix}.
+$$
+
+Applying ReLU gives
+
+$$
+h=
+\begin{bmatrix}
+1.5 \\
+4
+\end{bmatrix}.
+$$
+
+</details>
+
+## 25.15 Python: embedding search from scratch
+
+```{python}
+import numpy as np
+
+# Toy embeddings for short documents
+labels = np.array([
+    "linear algebra and matrices",
+    "dogs and cats",
+    "machine learning and neural networks",
+    "eigenvectors and PCA",
+    "cooking pasta"
+])
+
+X = np.array([
+    [1.0, 0.9, 0.0, 0.1],
+    [0.0, 0.1, 1.0, 0.8],
+    [0.9, 0.8, 0.1, 0.2],
+    [1.0, 0.7, 0.0, 0.0],
+    [0.0, 0.0, 0.2, 0.1]
+])
+
+query = np.array([1.0, 0.8, 0.0, 0.1])
+
+def cosine_similarity_matrix(X, q):
+    X_norm = X / np.linalg.norm(X, axis=1, keepdims=True)
+    q_norm = q / np.linalg.norm(q)
+    return X_norm @ q_norm
+
+scores = cosine_similarity_matrix(X, query)
+order = np.argsort(-scores)
+
+for i in order:
+    print(f"{scores[i]:.3f}  {labels[i]}")
+```
+
+This is a tiny version of vector search. Real systems use much larger vectors and specialized algorithms, but the underlying geometry is the same.
+
+## 25.16 Python: attention from scratch
+
+```{python}
+import numpy as np
+
+np.set_printoptions(precision=3, suppress=True)
+
+def softmax_rows(S):
+    S_shifted = S - S.max(axis=1, keepdims=True)
+    E = np.exp(S_shifted)
+    return E / E.sum(axis=1, keepdims=True)
+
+X = np.array([
+    [1.0, 0.0, 0.5],   # token 1
+    [0.0, 1.0, 0.5],   # token 2
+    [1.0, 1.0, 0.0]    # token 3
+])
+
+WQ = np.array([[1,0],[0,1],[1,1]])
+WK = np.array([[1,1],[1,0],[0,1]])
+WV = np.array([[1,0],[0,1],[1,-1]])
+
+Q = X @ WQ
+K = X @ WK
+V = X @ WV
+
+S = Q @ K.T / np.sqrt(Q.shape[1])
+A = softmax_rows(S)
+Z = A @ V
+
+print("Attention scores S:")
+print(S)
+print("\nAttention weights A:")
+print(A)
+print("\nOutput Z:")
+print(Z)
+```
+
+The row $A_{i,:}$ tells us how token $i$ combines information from all value vectors.
+
+## 25.17 Practice problems
+
+### Problem 1: representation
+
+Give three possible vector representations for a movie. Which representation would be useful for recommendation? Which would be useful for content search?
+
+<details>
+<summary>Show solution</summary>
+
+Possible representations include:
+
+1. A hand-designed feature vector: genre, year, runtime, language, rating.
+2. A user-rating vector: ratings from many users, with many missing entries.
+3. A learned latent-factor vector: hidden dimensions such as action level, romance level, humor level, or more abstract learned patterns.
+
+Content search may use the hand-designed feature vector or a text embedding of the movie description. Recommendation often uses user-rating vectors or learned latent-factor vectors.
+
+</details>
+
+### Problem 2: cosine similarity
+
+Let
+
+$$
+u = \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix},
+\qquad
+v = \begin{bmatrix} 2 \\ 1 \\ 0 \end{bmatrix}.
+$$
+
+Compute the cosine similarity between $u$ and $v$.
+
+<details>
+<summary>Show solution</summary>
+
+We have
+
+$$
+u\cdot v = 1(2)+2(1)+0(0)=4.
+$$
+
+Also
+
+$$
+\|u\|=\sqrt{1^2+2^2}=\sqrt{5},
+\qquad
+\|v\|=\sqrt{2^2+1^2}=\sqrt{5}.
+$$
+
+Therefore
+
+$$
+\operatorname{cosine}(u,v)=\frac{4}{5}=0.8.
+$$
+
+</details>
+
+### Problem 3: neural layer
+
+Let
+
+$$
+W=
+\begin{bmatrix}
+1 & 2 \\
+-1 & 1
+\end{bmatrix},
+\qquad
+b=\begin{bmatrix}0\\1\end{bmatrix},
+\qquad
+x=\begin{bmatrix}1\\3\end{bmatrix}.
+$$
+
+Compute $\sigma(Wx+b)$ where $\sigma$ is ReLU.
+
+<details>
+<summary>Show solution</summary>
+
+First
+
+$$
+Wx=
+\begin{bmatrix}
+1 & 2 \\
+-1 & 1
+\end{bmatrix}
+\begin{bmatrix}1\\3\end{bmatrix}
+=
+\begin{bmatrix}7\\2\end{bmatrix}.
+$$
+
+Then
+
+$$
+Wx+b=\begin{bmatrix}7\\3\end{bmatrix}.
+$$
+
+Both entries are positive, so ReLU does not change them:
+
+$$
+\sigma(Wx+b)=\begin{bmatrix}7\\3\end{bmatrix}.
+$$
+
+</details>
+
+### Problem 4: attention shape
+
+Suppose $X\in\mathbb{R}^{6\times 10}$, $W_Q,W_K\in\mathbb{R}^{10\times 4}$, and $W_V\in\mathbb{R}^{10\times 8}$. What are the shapes of $Q$, $K$, $V$, $QK^T$, and the final attention output?
+
+<details>
+<summary>Show solution</summary>
+
+We have
+
+$$
+Q=XW_Q\in\mathbb{R}^{6\times 4},
+\qquad
+K=XW_K\in\mathbb{R}^{6\times 4},
+\qquad
+V=XW_V\in\mathbb{R}^{6\times 8}.
+$$
+
+Thus
+
+$$
+QK^T\in\mathbb{R}^{6\times 6}.
+$$
+
+After row-softmax, the attention matrix is still $6\times 6$. The output is
+
+$$
+AV\in\mathbb{R}^{6\times 8}.
+$$
+
+</details>
+
+### Problem 5: low-rank meaning
+
+Explain why a low-rank approximation can be useful in recommendation systems and image compression.
+
+<details>
+<summary>Show solution</summary>
+
+In recommendation systems, a low-rank model assumes that user preferences and item properties can be explained by a smaller number of hidden factors. Instead of storing every user-item rating independently, the model stores user vectors and item vectors.
+
+In image compression, a low-rank approximation keeps the strongest large-scale patterns in the image while discarding weaker details. This can reduce storage while preserving the most important visual structure.
+
+In both cases, low-rank structure means that a large object has hidden simpler structure.
+
+</details>
+
+## 25.18 Challenge questions
+
+1. Why is cosine similarity often preferred over Euclidean distance for text embeddings?
+2. Explain attention using only the words "query," "key," "value," and "weighted average."
+3. Why would stacking only linear layers without nonlinear activations fail to create a truly deep model?
+4. In what sense is a recommender system a form of matrix completion?
+5. How does PCA help us understand hidden directions in a learned representation?
+6. Why might high-dimensional embeddings make search powerful but also difficult to interpret?
+
+## 25.19 AI companion activities
+
+Use an AI assistant as a learning partner, not as a replacement for your own reasoning.
+
+### Activity A: explain the formula
+
+Ask:
+
+> Explain the attention formula $\operatorname{softmax}(QK^T/\sqrt{d})V$ using only ideas from linear algebra.
+
+Then check whether the answer mentions dot products, normalization, and weighted averages.
+
+### Activity B: create a toy embedding space
+
+Ask:
+
+> Create a small 2D embedding example with five words. Show how cosine similarity ranks them for a query word.
+
+Then compute the cosine similarities yourself.
+
+### Activity C: connect all chapters
+
+Ask:
+
+> Make a concept map connecting vectors, matrices, projections, eigenvectors, SVD, PCA, Fourier, Haar, images, text, neural networks, and recommendation systems.
+
+Then edit the map so it matches your own understanding.
+
+## 25.20 Summary
+
+This chapter gathered the main ideas of the book into one AI-centered story.
+
+AI begins by representing the world numerically. Once objects become vectors and matrices, linear algebra becomes the grammar for computation.
+
+- Embeddings turn meaning into geometry.
+- Dot products compare vectors.
+- Cosine similarity powers search.
+- Matrices transform representations.
+- Neural network layers are trainable matrix machines with nonlinear gates.
+- Attention is a matrix of dot-product comparisons followed by weighted averaging.
+- Training is optimization over matrices and vectors.
+- SVD, PCA, and low-rank structure reveal hidden patterns.
+- High-dimensional geometry makes AI powerful but difficult to interpret.
+
+The story of the book can now be stated in one sentence:
+
+> Linear algebra is the language that lets machines represent, transform, compare, compress, and learn from the world.
+
+## 25.21 Looking forward
+
+This book began with simple numbers and ended with the grammar of AI. But the subject does not end here.
+
+From this point, you can continue in many directions:
+
+- numerical linear algebra,
+- optimization,
+- machine learning,
+- deep learning,
+- signal processing,
+- computer vision,
+- natural language processing,
+- recommendation systems,
+- scientific computing,
+- data geometry,
+- and mathematical foundations of intelligence.
+
+The main lesson is not that every AI system is simple. Modern AI is complex. But its complexity is built from structures you now know how to recognize.
+
+Vectors are not just lists of numbers.  
+Matrices are not just tables.  
+Projections are not just shadows.  
+SVD is not just a factorization.  
+Attention is not magic.
+
+They are parts of a mathematical language.
+
+And now you can read that language.

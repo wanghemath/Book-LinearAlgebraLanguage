@@ -1,0 +1,631 @@
+---
+title: "Chapter 24: Recommendation Systems"
+subtitle: "Finding hidden taste with vectors, similarity, and low-rank structure"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+jupyter: python3
+---
+ 
+
+## Opening Story: How Does a Platform Know What You Might Like?
+
+You watch a movie. A platform suggests another one.
+
+You buy a book. The store says, "Readers also liked..."
+
+You listen to a song. A playlist appears.
+
+A recommendation system looks personal, but its first language is often linear algebra. It sees a person not as a complete personality, but as a row in a matrix. It sees a movie, book, song, or course not as a cultural object, but as a column in the same matrix. The entries of the matrix record interactions: ratings, clicks, purchases, watch time, likes, skips, enrollments, or reviews.
+
+The matrix is usually incomplete. Most users have seen only a tiny fraction of all items. The central question is:
+
+> From the entries we already know, can we predict the entries we do not know?
+
+This is why recommendation systems belong naturally in a linear algebra book. They combine many ideas we have already met:
+
+- vectors as feature lists;
+- dot products and cosine similarity as measures of alignment;
+- projections and least squares as best approximation;
+- eigenvectors and iteration as ranking tools;
+- SVD as a microscope for hidden low-dimensional structure;
+- optimization as the process of learning unknown parameters.
+
+The main message of this chapter is:
+
+::: {.callout-important}
+## Main Idea
+
+A recommendation system tries to complete a partially observed user--item matrix by discovering similarity and hidden low-dimensional structure.
+:::
+
+## Learning Goals
+
+By the end of this chapter, you should be able to:
+
+1. Represent users, items, and ratings using vectors and matrices.
+2. Explain the difference between content-based filtering and collaborative filtering.
+3. Compute user-user and item-item similarities using cosine similarity.
+4. Use neighborhood methods to predict missing ratings.
+5. Interpret recommendation as matrix completion.
+6. Explain why low-rank structure is a useful model of taste.
+7. Use SVD ideas to describe latent factors.
+8. Build a small matrix-factorization recommender using gradient descent.
+9. Evaluate recommendations using train/test splits and RMSE.
+10. Discuss limitations such as cold start, popularity bias, feedback loops, and fairness.
+
+## 24.1 From Preference to Matrix
+
+Suppose five users rate six movies. A blank entry means the user has not rated that movie.
+
+| User | Space Quest | Robot Dreams | Love in Paris | City Romance | Dragon War | Castle Magic |
+|---|---:|---:|---:|---:|---:|---:|
+| Ada | 5 | 5 | 1 | 1 | ? | ? |
+| Ben | 4 | 5 | 1 | ? | 2 | ? |
+| Chloe | 1 | ? | 5 | 5 | ? | 4 |
+| Diego | ? | 2 | 4 | 5 | 1 | 5 |
+| Emma | 5 | 4 | ? | 1 | 5 | ? |
+
+This table is a matrix. Rows correspond to users. Columns correspond to items. An entry $r_{ui}$ is the rating user $u$ gave item $i$.
+
+We write the observed rating matrix as
+
+$$
+R = (r_{ui}).
+$$
+
+The recommendation problem is not simply to fill every missing number perfectly. Real systems usually want to rank items: among the items a user has not seen, which items should appear first?
+
+::: {.callout-note}
+## Prediction versus ranking
+
+A rating prediction asks: "What number would this user give this item?"
+
+A ranking problem asks: "Which unseen items should we show first?"
+
+The mathematics overlaps, but the evaluation can be different.
+:::
+
+## 24.2 Three Views of Recommendation
+
+There are three common ways to build recommendations.
+
+### Content-based filtering
+
+Content-based filtering uses features of the item itself. A movie may have features such as:
+
+$$
+\text{movie vector} =
+\begin{bmatrix}
+\text{action} \\
+\text{romance} \\
+\text{comedy} \\
+\text{sci-fi} \\
+\text{animation}
+\end{bmatrix}.
+$$
+
+If a user likes science-fiction and action, we recommend items with large science-fiction and action coordinates.
+
+### Collaborative filtering
+
+Collaborative filtering uses behavior of many users. It says:
+
+> Users who behaved similarly in the past may behave similarly in the future.
+
+or
+
+> Items liked by similar groups of users may be similar items.
+
+This approach may work even without knowing the meaning of the items.
+
+### Hybrid systems
+
+Modern systems often combine both. They may use item metadata, user profiles, text descriptions, images, graph structure, ratings, clicks, and neural embeddings.
+
+Linear algebra remains the organizing language: all of these objects become vectors, matrices, or tensors.
+
+## 24.3 Users as Vectors
+
+A row of the rating matrix is a user vector. For example, if Ada's ratings are
+
+$$
+\mathbf r_{Ada} = [5,5,1,1,?,?],
+$$
+
+then Ada is represented by known coordinates in a movie space.
+
+Two users are similar if their known ratings point in similar directions.
+
+For two complete rating vectors $x,y \in \mathbb R^n$, cosine similarity is
+
+$$
+\cos(x,y)=\frac{x\cdot y}{\|x\|\|y\|}.
+$$
+
+Cosine similarity ignores overall scale and focuses on direction. If one user gives high ratings to everything and another gives lower ratings but follows the same pattern, cosine similarity may still be high.
+
+::: {.callout-warning}
+## Missing entries are not zeros
+
+A missing rating does not mean a rating of zero. It means unknown.
+
+Treating missing entries as zeros can create misleading similarity scores. In practice, we compute similarity only on co-rated items, or we impute/center ratings carefully.
+:::
+
+## 24.4 Centering Ratings: Taste versus Generosity
+
+Some users rate generously; others rate harshly. Suppose one user rates movies as $[5,4,5,4]$ while another rates the same pattern as $[3,2,3,2]$. Their raw ratings differ, but their preferences are aligned.
+
+A common adjustment is to subtract each user's mean rating.
+
+If user $u$ has average rating $\bar r_u$, define the centered rating
+
+$$
+\tilde r_{ui} = r_{ui} - \bar r_u.
+$$
+
+Then positive values mean "above this user's average," and negative values mean "below this user's average."
+
+This turns rating prediction into preference prediction.
+
+### Example
+
+Suppose
+
+$$
+x=[5,4,5,4], \qquad y=[3,2,3,2].
+$$
+
+The means are $\bar x=4.5$ and $\bar y=2.5$. The centered vectors are
+
+$$
+\tilde x=[0.5,-0.5,0.5,-0.5], \qquad
+\tilde y=[0.5,-0.5,0.5,-0.5].
+$$
+
+After centering, the two users have exactly the same preference pattern.
+
+## 24.5 User-Based Collaborative Filtering
+
+User-based collaborative filtering predicts a missing rating by looking at similar users.
+
+Suppose we want to predict user $u$'s rating for item $i$. Let $N(u)$ be a set of users similar to $u$ who have rated item $i$. A simple weighted prediction is
+
+$$
+\hat r_{ui}
+= \bar r_u
++ \frac{\sum_{v\in N(u)} s(u,v)(r_{vi}-\bar r_v)}
+{\sum_{v\in N(u)} |s(u,v)|},
+$$
+
+where $s(u,v)$ is a similarity score between users $u$ and $v$.
+
+The formula says:
+
+1. Start with user $u$'s average rating.
+2. Look at how similar users felt about item $i$ relative to their own averages.
+3. Combine those deviations using similarity weights.
+
+::: {.callout-tip}
+## Interpretation
+
+The term $r_{vi}-\bar r_v$ is not simply "Did user $v$ like this item?"
+
+It means "Did user $v$ like this item more or less than they usually like items?"
+:::
+
+## 24.6 Item-Based Collaborative Filtering
+
+Item-based collaborative filtering compares columns instead of rows.
+
+Two movies are similar if the same users tend to rate them similarly. If a user liked one movie, we recommend similar movies.
+
+If $s(i,j)$ is the similarity between items $i$ and $j$, a simple prediction is
+
+$$
+\hat r_{ui}
+= \frac{\sum_{j\in I(u)} s(i,j) r_{uj}}
+{\sum_{j\in I(u)} |s(i,j)|},
+$$
+
+where $I(u)$ is the set of items user $u$ has rated.
+
+Item-based methods are often stable because item similarities may change more slowly than user behavior.
+
+## 24.7 Recommendation as Matrix Completion
+
+The rating matrix is incomplete. Matrix completion asks:
+
+> Can we infer missing entries from observed entries?
+
+This is impossible without assumptions. If the missing entries are arbitrary, no method can know them.
+
+A powerful assumption is low-rank structure.
+
+The idea is that user preferences may be driven by a small number of hidden factors:
+
+- action versus romance;
+- serious versus funny;
+- old versus new;
+- mainstream versus niche;
+- theoretical versus applied;
+- beginner-friendly versus advanced.
+
+If there are only $k$ major hidden factors, then a large rating matrix may be approximately rank $k$.
+
+## 24.8 Latent Factor Models
+
+A latent factor model gives each user a vector and each item a vector in a hidden $k$-dimensional taste space.
+
+Let
+
+$$
+p_u \in \mathbb R^k
+$$
+
+be the latent vector for user $u$, and
+
+$$
+q_i \in \mathbb R^k
+$$
+
+be the latent vector for item $i$.
+
+The predicted rating is
+
+$$
+\hat r_{ui} = p_u \cdot q_i.
+$$
+
+This formula is simple and deep. It says:
+
+> A user likes an item when the user's hidden taste vector aligns with the item's hidden feature vector.
+
+If we place all user vectors as rows of a matrix $P$ and all item vectors as rows of a matrix $Q$, then the predicted rating matrix is
+
+$$
+\hat R = P Q^T.
+$$
+
+Since $P$ has only $k$ columns and $Q$ has only $k$ columns, the matrix $PQ^T$ has rank at most $k$.
+
+Thus latent factor recommendation is low-rank matrix approximation with missing entries.
+
+## 24.9 Where SVD Helps, and Where It Does Not
+
+If the full rating matrix were known, SVD would give a best rank-$k$ approximation:
+
+$$
+R \approx U_k \Sigma_k V_k^T.
+$$
+
+This would be an elegant way to find hidden taste coordinates.
+
+But recommendation matrices are usually missing most entries. Standard SVD expects a complete matrix. Filling missing entries with zeros can distort the result.
+
+So in practice, we often learn $P$ and $Q$ only from observed entries by solving an optimization problem.
+
+## 24.10 Learning Latent Factors by Optimization
+
+Let $\Omega$ be the set of observed user--item pairs. We want predicted ratings $p_u\cdot q_i$ to match observed ratings $r_{ui}$.
+
+A common objective is
+
+$$
+\min_{P,Q}
+\sum_{(u,i)\in \Omega}
+(r_{ui}-p_u\cdot q_i)^2
++ \lambda \left(\sum_u \|p_u\|^2 + \sum_i \|q_i\|^2\right).
+$$
+
+The first term measures prediction error. The second term is regularization. It discourages very large latent vectors and helps prevent overfitting.
+
+For one observed rating, define the error
+
+$$
+e_{ui}=r_{ui}-p_u\cdot q_i.
+$$
+
+Gradient descent updates have the form
+
+$$
+p_u \leftarrow p_u + \eta(e_{ui}q_i - \lambda p_u),
+$$
+
+$$
+q_i \leftarrow q_i + \eta(e_{ui}p_u - \lambda q_i),
+$$
+
+where $\eta$ is the learning rate.
+
+This is one of the clearest places where the book's story comes together:
+
+- dot products predict alignment;
+- squared error measures mismatch;
+- gradients tell us how to adjust;
+- low-rank matrices model hidden structure;
+- optimization learns the representation.
+
+## 24.11 Bias Terms: Some Users Rate High, Some Items Are Popular
+
+A better model includes baseline effects:
+
+$$
+\hat r_{ui}=\mu + b_u + c_i + p_u\cdot q_i.
+$$
+
+Here:
+
+- $\mu$ is the global average rating;
+- $b_u$ is the user bias;
+- $c_i$ is the item bias;
+- $p_u\cdot q_i$ is the personalized interaction.
+
+For example, some movies are widely liked, so they have positive item bias. Some users rate everything highly, so they have positive user bias.
+
+The latent factor term captures what remains after baseline popularity and generosity are considered.
+
+## 24.12 Evaluation: Do Recommendations Actually Work?
+
+To evaluate a recommender, we hide some known ratings as a test set. We train the model on the remaining observed ratings and predict the hidden ones.
+
+A common metric is root mean squared error:
+
+$$
+\operatorname{RMSE} =
+\sqrt{\frac{1}{m}\sum_{(u,i)\in T}(r_{ui}-\hat r_{ui})^2}.
+$$
+
+For ranking, other metrics are often used, such as precision@k, recall@k, hit rate, mean average precision, or normalized discounted cumulative gain.
+
+::: {.callout-note}
+## Accuracy is not the only goal
+
+A recommendation system may also need diversity, novelty, fairness, transparency, privacy, and user control.
+:::
+
+## 24.13 Cold Start and Sparse Data
+
+Recommendation systems face a major problem: what should we recommend for a new user or a new item?
+
+This is called the cold-start problem.
+
+- A new user has no interaction history.
+- A new item has no ratings.
+- A niche item may be hidden because few people have interacted with it.
+
+Content information can help. If a new movie has genre, actors, keywords, images, and text descriptions, we can recommend it even before many users rate it.
+
+This is why modern recommenders often combine collaborative filtering with content embeddings.
+
+## 24.14 Feedback Loops and Bias
+
+Recommendation systems do not merely observe preferences. They can shape preferences.
+
+If a system recommends popular items, popular items get more attention. If they get more attention, they become even more popular. This creates a feedback loop.
+
+A system may also trap users in narrow regions of content. This is sometimes called a filter bubble.
+
+Mathematically, recommendation is a prediction problem. Socially, it is an intervention problem: the system changes what data will be observed next.
+
+Responsible recommendation requires asking:
+
+- What is being optimized?
+- Who benefits from the recommendation?
+- What choices are hidden from the user?
+- Does the system reinforce unfair patterns?
+- Does it encourage exploration?
+
+## 24.15 Worked Example: A Tiny Movie Recommender
+
+Suppose we have a partially observed matrix:
+
+$$
+R=\begin{bmatrix}
+5&5&1&1&?\\
+4&5&1&?&2\\
+1&?&5&5&4\\
+?&2&4&5&5
+\end{bmatrix}.
+$$
+
+The first two users prefer the first two movies. The last two users prefer the last three movies. A rank-2 model is natural: perhaps one hidden factor is "science-fiction/action" and another is "romance/fantasy."
+
+A matrix factorization model tries to learn
+
+$$
+R \approx P Q^T,
+$$
+
+where each user and movie gets two hidden coordinates.
+
+After training, an unknown entry such as Ada's rating for Movie 5 is predicted by
+
+$$
+\hat r_{Ada,5}=p_{Ada}\cdot q_5.
+$$
+
+The recommendation is not based on a single rule. It comes from the geometry of hidden vectors.
+
+## 24.16 Python Example: Similarity and Matrix Factorization
+
+```{python}
+import numpy as np
+
+R = np.array([
+    [5, 5, 1, 1, np.nan],
+    [4, 5, 1, np.nan, 2],
+    [1, np.nan, 5, 5, 4],
+    [np.nan, 2, 4, 5, 5]
+], dtype=float)
+
+R
+```
+
+Compute user means while ignoring missing values:
+
+```{python}
+user_means = np.nanmean(R, axis=1)
+user_means
+```
+
+A simple baseline prediction for each user is their average rating:
+
+```{python}
+baseline = np.where(np.isnan(R), user_means[:, None], R)
+baseline
+```
+
+A more serious model learns hidden user and item factors from observed entries.
+
+```{python}
+rng = np.random.default_rng(0)
+num_users, num_items = R.shape
+k = 2
+P = 0.1 * rng.normal(size=(num_users, k))
+Q = 0.1 * rng.normal(size=(num_items, k))
+
+observed = np.argwhere(~np.isnan(R))
+eta = 0.03
+lam = 0.02
+
+for epoch in range(3000):
+    rng.shuffle(observed)
+    for u, i in observed:
+        pred = P[u] @ Q[i]
+        err = R[u, i] - pred
+        old_p = P[u].copy()
+        P[u] += eta * (err * Q[i] - lam * P[u])
+        Q[i] += eta * (err * old_p - lam * Q[i])
+
+R_hat = P @ Q.T
+np.round(R_hat, 2)
+```
+
+The completed matrix gives predictions for missing entries. The largest predicted unknown entries are candidates for recommendation.
+
+## 24.17 Practice Problems
+
+### Problem 1
+
+Explain why a rating matrix is usually sparse.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Most users interact with only a small fraction of all available items. For example, a streaming platform may have thousands of movies, but a user may have rated only tens of them. Therefore most entries are unknown.
+:::
+
+### Problem 2
+
+Why is a missing rating different from a zero rating?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+A zero rating is an observed negative value. A missing rating means no information was recorded. Treating missing values as zeros can incorrectly imply dislike.
+:::
+
+### Problem 3
+
+Let
+
+$$
+x=[5,4,1], \qquad y=[4,5,1].
+$$
+
+Compute the cosine similarity between $x$ and $y$.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+We have
+
+$$
+x\cdot y = 5\cdot 4 + 4\cdot 5 + 1\cdot 1 = 41.
+$$
+
+Also
+
+$$
+\|x\|=\sqrt{25+16+1}=\sqrt{42}, \qquad
+\|y\|=\sqrt{16+25+1}=\sqrt{42}.
+$$
+
+Thus
+
+$$
+\cos(x,y)=\frac{41}{42}\approx 0.976.
+$$
+
+The users are very similar.
+:::
+
+### Problem 4
+
+Suppose $P$ is $1000\times 20$ and $Q$ is $500\times 20$. What is the size of $PQ^T$? What does this matrix represent in a recommendation system?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+$PQ^T$ has size $1000\times 500$. It represents predicted ratings or scores for 1000 users and 500 items.
+:::
+
+### Problem 5
+
+Why does regularization help matrix factorization?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Regularization discourages very large user and item vectors. This helps prevent overfitting to the observed ratings and usually improves prediction on unseen ratings.
+:::
+
+## 24.18 Challenge Questions
+
+1. Build a small rating matrix for courses instead of movies. What hidden factors might explain student preferences?
+2. Compare user-based and item-based recommendations. When might one be more stable than the other?
+3. Create a rank-1 rating matrix. What kind of world does rank 1 represent?
+4. Explain why recommendation is related to projection and least squares.
+5. Explain how a recommender can create a feedback loop.
+6. Design a recommendation system that balances accuracy and exploration.
+
+## 24.19 AI Companion Activities
+
+Use an AI assistant as a mathematical discussion partner.
+
+1. Ask it to explain collaborative filtering using only a $4\times 5$ matrix.
+2. Ask it to create three different rating matrices: rank 1, approximately rank 2, and full rank.
+3. Ask it to compare cosine similarity and Euclidean distance for recommendation.
+4. Ask it to write pseudocode for matrix factorization by gradient descent.
+5. Ask it to critique a recommender from the viewpoint of fairness and feedback loops.
+6. Ask it to explain how recommendation systems connect to embeddings in modern AI.
+
+## 24.20 Summary
+
+A recommendation system begins with a simple table: users by items. But that table quickly becomes a rich linear algebra object.
+
+In this chapter:
+
+- users and items became vectors;
+- ratings became entries of a matrix;
+- similarity used dot products and cosine similarity;
+- missing ratings became a matrix completion problem;
+- hidden tastes became latent vectors;
+- low-rank structure connected recommendation to SVD;
+- gradient descent learned user and item factors;
+- evaluation measured prediction quality;
+- ethical issues reminded us that recommendation systems shape behavior, not just predict it.
+
+The central lesson is:
+
+::: {.callout-important}
+## Final Message
+
+Recommendation systems use linear algebra to turn partial behavior into geometric prediction. A good recommendation is not magic; it is a learned relationship between user vectors, item vectors, and hidden structure.
+:::

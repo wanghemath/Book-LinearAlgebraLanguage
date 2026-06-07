@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab Overview | Linear Algebra as a Language</title>
+<style>
+:root { --bg:#f8fafc; --panel:#ffffff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#2563eb; --accent2:#7c3aed; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+.hero { padding:64px 24px 38px; background:linear-gradient(135deg,#eef2ff,#eff6ff 48%,#f0fdfa); border-bottom:1px solid var(--line); }
+.wrap { max-width:1180px; margin:0 auto; }
+h1 { margin:0; font-size:clamp(2.2rem,5vw,4.8rem); line-height:1.05; letter-spacing:-.04em; }
+.subtitle { max-width:820px; font-size:1.18rem; color:var(--muted); margin-top:18px; }
+.actions { margin-top:24px; display:flex; flex-wrap:wrap; gap:12px; }
+.btn { display:inline-block; padding:11px 16px; border-radius:999px; text-decoration:none; font-weight:700; border:1px solid var(--line); background:#fff; color:var(--ink); }
+.btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+main { padding:34px 24px 72px; }
+.section { margin:32px 0; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:20px; box-shadow:0 10px 30px rgba(15,23,42,.05); }
+.card h3 { margin:.35rem 0 .4rem; font-size:1.05rem; }
+.card p { color:var(--muted); margin:.2rem 0 1rem; font-size:.94rem; }
+.num { width:42px; height:42px; border-radius:13px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; font-weight:800; }
+.links { display:flex; gap:10px; flex-wrap:wrap; }
+.links a, td a { color:var(--accent); font-weight:700; text-decoration:none; }
+.links a { border:1px solid #bfdbfe; padding:7px 10px; border-radius:999px; background:#eff6ff; }
+.callout { background:#fff; border:1px solid var(--line); border-left:6px solid var(--accent); border-radius:18px; padding:18px 20px; margin:24px 0; }
+.phases { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+.phase { background:#fff; border:1px solid var(--line); border-radius:18px; padding:16px; }
+.phase strong { display:block; margin-bottom:6px; }
+table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:18px; overflow:hidden; display:block; overflow-x:auto; }
+th,td { padding:12px 14px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+th { background:#f1f5f9; }
+footer { color:var(--muted); border-top:1px solid var(--line); padding:28px 24px; background:#fff; }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<h1>Lab Overview</h1>
+<p class="subtitle">Interactive and computational labs for <em>Linear Algebra as a Language</em>. Each chapter has a Jupyter notebook for deeper Python work and a standalone HTML lab for visual exploration.</p>
+<div class="actions"><a class="btn primary" href="#complete-list">View all labs</a><a class="btn" href="#how-to-use">How to use the labs</a></div>
+</div></header>
+<main class="wrap">
+<section id="how-to-use" class="section">
+<h2>How to use these labs</h2>
+<div class="callout"><strong>Recommended rhythm:</strong> read the chapter story, explore the interactive page, then work through the notebook. The HTML labs build intuition; the notebooks turn intuition into computation.</div>
+<div class="phases">
+<div class="phase"><strong>1. Representation</strong>Chapters 1–4 turn the world into vectors, tables, and data clouds.</div>
+<div class="phase"><strong>2. Transformation</strong>Chapters 5–8 use matrices as machines and study solving, rank, and information loss.</div>
+<div class="phase"><strong>3. Geometry</strong>Chapters 9–12 develop distance, angle, projection, and orthogonality.</div>
+<div class="phase"><strong>4. Hidden structure</strong>Chapters 13–18 reveal eigenvectors, energy, SVD, compression, and PCA.</div>
+<div class="phase"><strong>5. Signals and AI</strong>Chapters 19–25 connect Fourier, Haar, images, text, neural networks, recommendation, and AI.</div>
+</div>
+</section>
+<section class="section">
+<h2>Lab cards</h2>
+<div class="grid"><article class="card">
+  <div class="num">01</div>
+  <h3>The World as Numbers</h3>
+  <p>Representation, features, scaling, and first data geometry</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-01-world-as-numbers.ipynb">Notebook</a>
+    <a href="htmls/lab-01-world-as-numbers-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">02</div>
+  <h3>Vectors: Numbers with Meaning</h3>
+  <p>Vectors as points, arrows, states, and high-dimensional objects</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-02-vectors-numbers-with-meaning.ipynb">Notebook</a>
+    <a href="htmls/lab-02-vectors-numbers-with-meaning-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">03</div>
+  <h3>Combining Ideas</h3>
+  <p>Linear combinations, span, mixtures, and matrix-vector products</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-03-combining-ideas.ipynb">Notebook</a>
+    <a href="htmls/lab-03-combining-ideas-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">04</div>
+  <h3>Data as Points</h3>
+  <p>Data clouds, features, scaling, clusters, and nearest neighbors</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-04-data-as-points.ipynb">Notebook</a>
+    <a href="htmls/lab-04-data-as-points-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">05</div>
+  <h3>Matrix Machines</h3>
+  <p>Matrices as transformations and feature-mixing machines</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-05-matrix-machine.ipynb">Notebook</a>
+    <a href="htmls/lab-05-matrix-machine-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">06</div>
+  <h3>Stretching, Rotating, Shearing</h3>
+  <p>Geometric transformations, determinant, area, and composition</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-06-stretching-rotating-shearing.ipynb">Notebook</a>
+    <a href="htmls/lab-06-stretching-rotating-shearing-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">07</div>
+  <h3>Solving Backwards</h3>
+  <p>Linear systems, inverse problems, elimination, and consistency</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-07-solving-backwards.ipynb">Notebook</a>
+    <a href="htmls/lab-07-solving-backwards-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">08</div>
+  <h3>When Information Is Lost</h3>
+  <p>Rank, null space, column space, and information loss</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-08-when-information-is-lost.ipynb">Notebook</a>
+    <a href="htmls/lab-08-when-information-is-lost-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">09</div>
+  <h3>Length and Distance</h3>
+  <p>Norms, distances, nearest neighbors, and high-dimensional distance</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-09-length-and-distance.ipynb">Notebook</a>
+    <a href="htmls/lab-09-length-and-distance-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">10</div>
+  <h3>Angles and Similarity</h3>
+  <p>Dot products, cosine similarity, correlation, and text similarity</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-10-angles-and-similarity.ipynb">Notebook</a>
+    <a href="htmls/lab-10-angles-and-similarity-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">11</div>
+  <h3>Projection: The Best Shadow</h3>
+  <p>Projection, residuals, least squares, and approximation</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-11-projection-best-shadow.ipynb">Notebook</a>
+    <a href="htmls/lab-11-projection-best-shadow-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">12</div>
+  <h3>Orthogonality</h3>
+  <p>Orthonormal bases, Gram-Schmidt, QR, and stable computation</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-12-orthogonality.ipynb">Notebook</a>
+    <a href="htmls/lab-12-orthogonality-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">13</div>
+  <h3>Eigenvectors</h3>
+  <p>Hidden directions, eigenvalues, repeated action, and data variation</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-13-eigenvectors.ipynb">Notebook</a>
+    <a href="htmls/lab-13-eigenvectors-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">14</div>
+  <h3>Stability, Ranking, Iteration</h3>
+  <p>Power iteration, Markov chains, stationary behavior, and ranking</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-14-stability-ranking-iteration.ipynb">Notebook</a>
+    <a href="htmls/lab-14-stability-ranking-iteration-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">15</div>
+  <h3>Energy Landscapes</h3>
+  <p>Quadratic forms, positive definiteness, gradients, and optimization</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-15-energy-landscapes.ipynb">Notebook</a>
+    <a href="htmls/lab-15-energy-landscapes-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">16</div>
+  <h3>SVD: Matrix Microscope</h3>
+  <p>Singular values, rank-one layers, low-rank structure, and denoising</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-16-svd-matrix-microscope.ipynb">Notebook</a>
+    <a href="htmls/lab-16-svd-matrix-microscope-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">17</div>
+  <h3>Image Compression</h3>
+  <p>Images, SVD compression, storage, energy, and denoising</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-17-image-compression.ipynb">Notebook</a>
+    <a href="htmls/lab-17-image-compression-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">18</div>
+  <h3>PCA</h3>
+  <p>Variance, covariance, scores, loadings, dimension reduction, and visualization</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-18-pca.ipynb">Notebook</a>
+    <a href="htmls/lab-18-pca-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">19</div>
+  <h3>Fourier Analysis</h3>
+  <p>Signals as vectors, frequency bases, FFT, filtering, and compression</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-19-fourier.ipynb">Notebook</a>
+    <a href="htmls/lab-19-fourier-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">20</div>
+  <h3>Haar Wavelets</h3>
+  <p>Local averages, differences, multiscale structure, compression, and denoising</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-20-haar.ipynb">Notebook</a>
+    <a href="htmls/lab-20-haar-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">21</div>
+  <h3>Images as Matrices</h3>
+  <p>Pixels, color channels, convolution, edges, pooling, and feature maps</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-21-images-as-matrices.ipynb">Notebook</a>
+    <a href="htmls/lab-21-images-as-matrices-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">22</div>
+  <h3>Text as Vectors</h3>
+  <p>Document vectors, TF-IDF, cosine search, SVD topics, and embeddings</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-22-text-as-vectors.ipynb">Notebook</a>
+    <a href="htmls/lab-22-text-as-vectors-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">23</div>
+  <h3>Neural Networks as Matrix Machines</h3>
+  <p>Layers, activations, softmax, hidden representations, and training</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-23-neural-networks-as-matrix-machines.ipynb">Notebook</a>
+    <a href="htmls/lab-23-neural-networks-as-matrix-machines-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">24</div>
+  <h3>Recommendation Systems</h3>
+  <p>User-item matrices, similarity, latent factors, and matrix factorization</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-24-recommendation-systems.ipynb">Notebook</a>
+    <a href="htmls/lab-24-recommendation-systems-interactive.html">Interactive</a>
+  </div>
+</article>
+<article class="card">
+  <div class="num">25</div>
+  <h3>The Grammar of AI</h3>
+  <p>Embeddings, attention, neural layers, vector search, and AI systems</p>
+  <div class="links">
+    <a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-25-grammar-of-ai.ipynb">Notebook</a>
+    <a href="htmls/lab-25-grammar-of-ai-interactive.html">Interactive</a>
+  </div>
+</article></div>
+</section>
+<section id="complete-list" class="section">
+<h2>Complete lab list</h2>
+<table><thead><tr><th>Chapter</th><th>Lab</th><th>Main idea</th><th>Notebook</th><th>Interactive</th></tr></thead><tbody><tr><td>1</td><td>The World as Numbers</td><td>Representation, features, scaling, and first data geometry</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-01-world-as-numbers.ipynb">Notebook</a></td><td><a href="htmls/lab-01-world-as-numbers-interactive.html">Interactive</a></td></tr>
+<tr><td>2</td><td>Vectors: Numbers with Meaning</td><td>Vectors as points, arrows, states, and high-dimensional objects</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-02-vectors-numbers-with-meaning.ipynb">Notebook</a></td><td><a href="htmls/lab-02-vectors-numbers-with-meaning-interactive.html">Interactive</a></td></tr>
+<tr><td>3</td><td>Combining Ideas</td><td>Linear combinations, span, mixtures, and matrix-vector products</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-03-combining-ideas.ipynb">Notebook</a></td><td><a href="htmls/lab-03-combining-ideas-interactive.html">Interactive</a></td></tr>
+<tr><td>4</td><td>Data as Points</td><td>Data clouds, features, scaling, clusters, and nearest neighbors</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-04-data-as-points.ipynb">Notebook</a></td><td><a href="htmls/lab-04-data-as-points-interactive.html">Interactive</a></td></tr>
+<tr><td>5</td><td>Matrix Machines</td><td>Matrices as transformations and feature-mixing machines</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-05-matrix-machine.ipynb">Notebook</a></td><td><a href="htmls/lab-05-matrix-machine-interactive.html">Interactive</a></td></tr>
+<tr><td>6</td><td>Stretching, Rotating, Shearing</td><td>Geometric transformations, determinant, area, and composition</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-06-stretching-rotating-shearing.ipynb">Notebook</a></td><td><a href="htmls/lab-06-stretching-rotating-shearing-interactive.html">Interactive</a></td></tr>
+<tr><td>7</td><td>Solving Backwards</td><td>Linear systems, inverse problems, elimination, and consistency</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-07-solving-backwards.ipynb">Notebook</a></td><td><a href="htmls/lab-07-solving-backwards-interactive.html">Interactive</a></td></tr>
+<tr><td>8</td><td>When Information Is Lost</td><td>Rank, null space, column space, and information loss</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-08-when-information-is-lost.ipynb">Notebook</a></td><td><a href="htmls/lab-08-when-information-is-lost-interactive.html">Interactive</a></td></tr>
+<tr><td>9</td><td>Length and Distance</td><td>Norms, distances, nearest neighbors, and high-dimensional distance</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-09-length-and-distance.ipynb">Notebook</a></td><td><a href="htmls/lab-09-length-and-distance-interactive.html">Interactive</a></td></tr>
+<tr><td>10</td><td>Angles and Similarity</td><td>Dot products, cosine similarity, correlation, and text similarity</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-10-angles-and-similarity.ipynb">Notebook</a></td><td><a href="htmls/lab-10-angles-and-similarity-interactive.html">Interactive</a></td></tr>
+<tr><td>11</td><td>Projection: The Best Shadow</td><td>Projection, residuals, least squares, and approximation</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-11-projection-best-shadow.ipynb">Notebook</a></td><td><a href="htmls/lab-11-projection-best-shadow-interactive.html">Interactive</a></td></tr>
+<tr><td>12</td><td>Orthogonality</td><td>Orthonormal bases, Gram-Schmidt, QR, and stable computation</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-12-orthogonality.ipynb">Notebook</a></td><td><a href="htmls/lab-12-orthogonality-interactive.html">Interactive</a></td></tr>
+<tr><td>13</td><td>Eigenvectors</td><td>Hidden directions, eigenvalues, repeated action, and data variation</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-13-eigenvectors.ipynb">Notebook</a></td><td><a href="htmls/lab-13-eigenvectors-interactive.html">Interactive</a></td></tr>
+<tr><td>14</td><td>Stability, Ranking, Iteration</td><td>Power iteration, Markov chains, stationary behavior, and ranking</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-14-stability-ranking-iteration.ipynb">Notebook</a></td><td><a href="htmls/lab-14-stability-ranking-iteration-interactive.html">Interactive</a></td></tr>
+<tr><td>15</td><td>Energy Landscapes</td><td>Quadratic forms, positive definiteness, gradients, and optimization</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-15-energy-landscapes.ipynb">Notebook</a></td><td><a href="htmls/lab-15-energy-landscapes-interactive.html">Interactive</a></td></tr>
+<tr><td>16</td><td>SVD: Matrix Microscope</td><td>Singular values, rank-one layers, low-rank structure, and denoising</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-16-svd-matrix-microscope.ipynb">Notebook</a></td><td><a href="htmls/lab-16-svd-matrix-microscope-interactive.html">Interactive</a></td></tr>
+<tr><td>17</td><td>Image Compression</td><td>Images, SVD compression, storage, energy, and denoising</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-17-image-compression.ipynb">Notebook</a></td><td><a href="htmls/lab-17-image-compression-interactive.html">Interactive</a></td></tr>
+<tr><td>18</td><td>PCA</td><td>Variance, covariance, scores, loadings, dimension reduction, and visualization</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-18-pca.ipynb">Notebook</a></td><td><a href="htmls/lab-18-pca-interactive.html">Interactive</a></td></tr>
+<tr><td>19</td><td>Fourier Analysis</td><td>Signals as vectors, frequency bases, FFT, filtering, and compression</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-19-fourier.ipynb">Notebook</a></td><td><a href="htmls/lab-19-fourier-interactive.html">Interactive</a></td></tr>
+<tr><td>20</td><td>Haar Wavelets</td><td>Local averages, differences, multiscale structure, compression, and denoising</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-20-haar.ipynb">Notebook</a></td><td><a href="htmls/lab-20-haar-interactive.html">Interactive</a></td></tr>
+<tr><td>21</td><td>Images as Matrices</td><td>Pixels, color channels, convolution, edges, pooling, and feature maps</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-21-images-as-matrices.ipynb">Notebook</a></td><td><a href="htmls/lab-21-images-as-matrices-interactive.html">Interactive</a></td></tr>
+<tr><td>22</td><td>Text as Vectors</td><td>Document vectors, TF-IDF, cosine search, SVD topics, and embeddings</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-22-text-as-vectors.ipynb">Notebook</a></td><td><a href="htmls/lab-22-text-as-vectors-interactive.html">Interactive</a></td></tr>
+<tr><td>23</td><td>Neural Networks as Matrix Machines</td><td>Layers, activations, softmax, hidden representations, and training</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-23-neural-networks-as-matrix-machines.ipynb">Notebook</a></td><td><a href="htmls/lab-23-neural-networks-as-matrix-machines-interactive.html">Interactive</a></td></tr>
+<tr><td>24</td><td>Recommendation Systems</td><td>User-item matrices, similarity, latent factors, and matrix factorization</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-24-recommendation-systems.ipynb">Notebook</a></td><td><a href="htmls/lab-24-recommendation-systems-interactive.html">Interactive</a></td></tr>
+<tr><td>25</td><td>The Grammar of AI</td><td>Embeddings, attention, neural layers, vector search, and AI systems</td><td><a href="https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-25-grammar-of-ai.ipynb">Notebook</a></td><td><a href="htmls/lab-25-grammar-of-ai-interactive.html">Interactive</a></td></tr></tbody></table>
+</section>
+<section class="section">
+<h2>Suggested assignment patterns</h2>
+<div class="phases">
+<div class="phase"><strong>Short weekly lab</strong>Complete selected notebook cells plus one reflection question.</div>
+<div class="phase"><strong>Interactive pre-class</strong>Explore the HTML page and write three observations before lecture.</div>
+<div class="phase"><strong>Full computational lab</strong>Complete the full notebook, including student tasks and extensions.</div>
+<div class="phase"><strong>Mini-project extension</strong>Modify a dataset, image, signal, text corpus, or network from the lab.</div>
+</div>
+</section>
+</main>
+<footer><div class="wrap">Linear Algebra as a Language · Lab Overview Page</div></footer>
+</body></html>

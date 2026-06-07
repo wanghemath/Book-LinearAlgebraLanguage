@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 20: Haar Wavelets Interactive</title>
+<style>
+:root{--bg:#f7fafc;--card:#ffffff;--ink:#162033;--muted:#5b677a;--accent:#2563eb;--accent2:#7c3aed;--line:#d9e2ef;--soft:#eef4ff;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f8fbff,#eef4ff);color:var(--ink);}
+header{padding:46px 20px 30px;text-align:center;background:radial-gradient(circle at top left,#dbeafe,transparent 35%),radial-gradient(circle at top right,#ede9fe,transparent 35%)}
+header h1{margin:0;font-size:clamp(2rem,4vw,3.4rem)} header p{max-width:850px;margin:14px auto;color:var(--muted);font-size:1.08rem;line-height:1.6}
+main{max-width:1120px;margin:0 auto;padding:22px} section{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin:22px 0;box-shadow:0 10px 28px rgba(15,23,42,.08)}
+h2{margin-top:0;font-size:1.55rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}.controls{background:var(--soft);border-radius:16px;padding:16px;border:1px solid var(--line)}
+label{display:block;margin:10px 0 4px;font-weight:650}input[type=range]{width:100%}canvas{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:16px}.note{color:var(--muted);line-height:1.55}.pill{display:inline-block;background:#e0e7ff;color:#1e3a8a;padding:4px 10px;border-radius:999px;font-size:.86rem;font-weight:700}.metric{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f172a;color:#e5e7eb;padding:12px;border-radius:12px;white-space:pre-wrap}button{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:10px 14px;font-weight:750;cursor:pointer}button.secondary{background:var(--accent2)}.small{font-size:.92rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+<div class="pill">Chapter 20 Interactive Lab</div>
+<h1>Haar Wavelets: Local Change at Many Scales</h1>
+<p>Explore how a signal can be rewritten as averages and differences. Fourier asks which frequencies are present. Haar asks where the signal changes and at what scale.</p>
+</header>
+<main>
+<section>
+<h2>1. Two numbers: average and difference</h2>
+<div class="grid"><div class="controls">
+<label>First value a: <span id="aval">80</span></label><input id="a" type="range" min="0" max="255" value="80">
+<label>Second value b: <span id="bval">180</span></label><input id="b" type="range" min="0" max="255" value="180">
+<div id="twometric" class="metric"></div>
+</div><div><canvas id="twoCanvas" width="520" height="300"></canvas></div></div>
+<p class="note">The first Haar coefficient measures shared level. The second measures local contrast. Large difference coefficients often indicate edges.</p>
+</section>
+<section>
+<h2>2. Multiscale Haar transform of a length-16 signal</h2>
+<div class="grid"><div class="controls">
+<label>Pattern</label><select id="pattern"><option value="step">Step edge</option><option value="blocks">Blocks</option><option value="spike">Local spike</option><option value="alt">Alternating</option><option value="smooth">Smooth wave</option></select>
+<label>Noise: <span id="noiseval">0.00</span></label><input id="noise" type="range" min="0" max="1" step="0.01" value="0">
+<button id="newNoise">New noise</button>
+<div id="coeffmetric" class="metric"></div>
+</div><div><canvas id="signalCanvas" width="680" height="420"></canvas></div></div>
+<p class="note">The coefficient plot shows where the signal has energy in the Haar language. Coarse coefficients describe broad changes; fine coefficients describe local jumps.</p>
+</section>
+<section>
+<h2>3. Compression: keep only the largest Haar coefficients</h2>
+<div class="grid"><div class="controls">
+<label>Number of coefficients kept: <span id="kval">4</span></label><input id="keep" type="range" min="1" max="16" value="4">
+<div id="compmetric" class="metric"></div>
+</div><div><canvas id="compressCanvas" width="680" height="420"></canvas></div></div>
+<p class="note">Because the Haar matrix is orthonormal, the reconstruction error is exactly controlled by the discarded coefficients.</p>
+</section>
+<section>
+<h2>4. Threshold denoising</h2>
+<div class="grid"><div class="controls">
+<label>Threshold: <span id="tauval">0.40</span></label><input id="tau" type="range" min="0" max="3" step="0.05" value="0.4">
+<div id="denoisemetric" class="metric"></div>
+</div><div><canvas id="denoiseCanvas" width="680" height="420"></canvas></div></div>
+<p class="note">Small noisy wiggles often become small Haar coefficients. Removing them can reveal the larger piecewise structure.</p>
+</section>
+<section>
+<h2>5. Tiny image: edges through row and column Haar transforms</h2>
+<div class="grid"><div class="controls">
+<label>Keep largest 2D coefficients: <span id="imgkval">16</span></label><input id="imgkeep" type="range" min="4" max="64" value="16">
+<button id="imgPattern" class="secondary">Switch image pattern</button>
+<div id="imgmetric" class="metric"></div>
+</div><div><canvas id="imgCanvas" width="680" height="320"></canvas></div></div>
+<p class="note">A 2D Haar transform uses C = H X H^T. It separates coarse brightness from horizontal, vertical, and diagonal changes.</p>
+</section>
+</main>
+<script>
+function haarMatrix(n){if(n===1)return [[1]]; const Hs=haarMatrix(n/2); let top=[],bottom=[]; for(let r=0;r<Hs.length;r++){let row=[]; for(let v of Hs[r]){row.push(v/Math.sqrt(2),v/Math.sqrt(2));} top.push(row);} for(let i=0;i<n/2;i++){let row=Array(n).fill(0); row[2*i]=1/Math.sqrt(2); row[2*i+1]=-1/Math.sqrt(2); bottom.push(row);} return top.concat(bottom);}
+function matVec(H,x){return H.map(row=>row.reduce((s,v,i)=>s+v*x[i],0));}
+function tMatVec(H,c){let n=H.length,y=Array(n).fill(0); for(let i=0;i<n;i++)for(let j=0;j<n;j++)y[j]+=H[i][j]*c[i]; return y;}
+function dot(a,b){return a.reduce((s,v,i)=>s+v*b[i],0)} function norm(a){return Math.sqrt(dot(a,a))}
+function clear(c){let ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);return ctx}
+function axes(ctx,w,h){ctx.strokeStyle='#d9e2ef';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(40,h/2);ctx.lineTo(w-20,h/2);ctx.moveTo(40,20);ctx.lineTo(40,h-30);ctx.stroke()}
+function drawBar(ctx,x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);ctx.strokeStyle='#162033';ctx.strokeRect(x,y,w,h)}
+function two(){let a=+document.getElementById('a').value,b=+document.getElementById('b').value;document.getElementById('aval').textContent=a;document.getElementById('bval').textContent=b;let s=(a+b)/Math.sqrt(2),d=(a-b)/Math.sqrt(2);document.getElementById('twometric').textContent=`s = (a+b)/√2 = ${s.toFixed(2)}\nd = (a-b)/√2 = ${d.toFixed(2)}\nenergy check: a²+b² = ${(a*a+b*b).toFixed(1)}, s²+d² = ${(s*s+d*d).toFixed(1)}`;let cv=document.getElementById('twoCanvas'),ctx=clear(cv);let vals=[a,b],labels=['a','b'];for(let i=0;i<2;i++){let bh=vals[i]/255*220;drawBar(ctx,110+i*150,260-bh,90,bh,i==0?'#93c5fd':'#c4b5fd');ctx.fillStyle='#162033';ctx.fillText(labels[i]+'='+vals[i],125+i*150,282)}ctx.fillStyle='#162033';ctx.font='16px sans-serif';ctx.fillText('Two neighboring samples',150,28);}
+let noiseSeed=1;function rand(i){let x=Math.sin((i+1)*(noiseSeed+3)*12.9898)*43758.5453;return x-Math.floor(x)-0.5}
+function baseSignal(){let p=document.getElementById('pattern').value,n=16,x=[];for(let i=0;i<n;i++){if(p==='step')x.push(i<8?1:4); if(p==='blocks')x.push(i<4?1:i<8?3:i<12?-1:2); if(p==='spike')x.push(i===9?5:1); if(p==='alt')x.push(i%2? -1:1); if(p==='smooth')x.push(2+Math.sin(2*Math.PI*i/n));}let sig=+document.getElementById('noise').value;document.getElementById('noiseval').textContent=sig.toFixed(2);return x.map((v,i)=>v+sig*rand(i));}
+function drawStem(ctx,arr,x0,y0,w,h,title){let max=Math.max(...arr.map(v=>Math.abs(v)),.001);ctx.fillStyle='#162033';ctx.fillText(title,x0,y0-8);ctx.strokeStyle='#d9e2ef';ctx.beginPath();ctx.moveTo(x0,y0+h/2);ctx.lineTo(x0+w,y0+h/2);ctx.stroke();let dx=w/arr.length;for(let i=0;i<arr.length;i++){let yy=y0+h/2-arr[i]/max*h*.45;ctx.strokeStyle='#2563eb';ctx.beginPath();ctx.moveTo(x0+i*dx+dx/2,y0+h/2);ctx.lineTo(x0+i*dx+dx/2,yy);ctx.stroke();ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(x0+i*dx+dx/2,yy,3,0,7);ctx.fill();}}
+function drawLine(ctx,arr,x0,y0,w,h,title,color){let mn=Math.min(...arr),mx=Math.max(...arr); if(mx-mn<.001){mx+=1;mn-=1}ctx.fillStyle='#162033';ctx.fillText(title,x0,y0-8);ctx.strokeStyle='#d9e2ef';ctx.strokeRect(x0,y0,w,h);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();arr.forEach((v,i)=>{let xx=x0+i*w/(arr.length-1),yy=y0+h-(v-mn)/(mx-mn)*h;if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)});ctx.stroke();ctx.lineWidth=1;}
+const H16=haarMatrix(16); let current=[];function signal(){current=baseSignal();let c=matVec(H16,current);let cv=document.getElementById('signalCanvas'),ctx=clear(cv);drawLine(ctx,current,40,35,580,130,'signal','#2563eb');drawStem(ctx,c,40,230,580,150,'Haar coefficients');let sorted=[...c].map(Math.abs).sort((a,b)=>b-a).slice(0,5);document.getElementById('coeffmetric').textContent=`largest |coefficients|:\n${sorted.map(v=>v.toFixed(3)).join(', ')}`;compress();denoise();}
+function compress(){let x=current.length?current:baseSignal();let c=matVec(H16,x),k=+document.getElementById('keep').value;document.getElementById('kval').textContent=k;let idx=[...Array(c.length).keys()].sort((i,j)=>Math.abs(c[j])-Math.abs(c[i])).slice(0,k);let ck=Array(c.length).fill(0);idx.forEach(i=>ck[i]=c[i]);let rec=tMatVec(H16,ck),err=norm(x.map((v,i)=>v-rec[i]))/norm(x);let cv=document.getElementById('compressCanvas'),ctx=clear(cv);drawLine(ctx,x,40,40,580,140,'original','#2563eb');drawLine(ctx,rec,40,230,580,140,'reconstruction','#7c3aed');document.getElementById('compmetric').textContent=`kept ${k} of 16 coefficients\nrelative error = ${err.toFixed(4)}`;}
+function denoise(){let clean=[...Array(16)].map((_,i)=>i<4?0:i<8?2:i<12?-1:1.3);let noisy=clean.map((v,i)=>v+0.55*rand(i+50));let c=matVec(H16,noisy),tau=+document.getElementById('tau').value;document.getElementById('tauval').textContent=tau.toFixed(2);let ct=c.map(v=>Math.abs(v)<tau?0:v);let rec=tMatVec(H16,ct);let cv=document.getElementById('denoiseCanvas'),ctx=clear(cv);drawLine(ctx,clean,40,30,580,95,'clean','#111827');drawLine(ctx,noisy,40,160,580,95,'noisy','#2563eb');drawLine(ctx,rec,40,290,580,95,'denoised','#7c3aed');document.getElementById('denoisemetric').textContent=`nonzero coefficients after threshold = ${ct.filter(v=>Math.abs(v)>1e-9).length}\nerror to clean = ${(norm(clean.map((v,i)=>v-rec[i]))/norm(clean)).toFixed(4)}`;}
+let imgMode=0;function matmul(A,B){let n=A.length,m=B[0].length,p=B.length,R=Array.from({length:n},()=>Array(m).fill(0));for(let i=0;i<n;i++)for(let k=0;k<p;k++)for(let j=0;j<m;j++)R[i][j]+=A[i][k]*B[k][j];return R}function transpose(A){return A[0].map((_,j)=>A.map(r=>r[j]))}function flatten(A){return A.flat()}function img(){let n=8,H=haarMatrix(n),X=Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=> imgMode%2===0 ? ((j>1&&j<5&&i>1&&i<7)?1:(i>j+1?.45:.1)) : ((i-3.5)**2+(j-3.5)**2<6?1:.15)));let C=matmul(matmul(H,X),transpose(H));let k=+document.getElementById('imgkeep').value;document.getElementById('imgkval').textContent=k;let flat=flatten(C),idx=[...Array(flat.length).keys()].sort((i,j)=>Math.abs(flat[j])-Math.abs(flat[i])).slice(0,k);let Cf=Array.from({length:n},()=>Array(n).fill(0));idx.forEach(id=>{Cf[Math.floor(id/n)][id%n]=flat[id]});let R=matmul(matmul(transpose(H),Cf),H);let cv=document.getElementById('imgCanvas'),ctx=clear(cv);function drawMat(M,x0,title){ctx.fillStyle='#162033';ctx.fillText(title,x0,20);let cell=28;for(let i=0;i<n;i++)for(let j=0;j<n;j++){let v=Math.max(0,Math.min(1,M[i][j]));let g=Math.round(255*(1-v));ctx.fillStyle=`rgb(${g},${g},${g})`;ctx.fillRect(x0+j*cell,40+i*cell,cell,cell);ctx.strokeStyle='#e5e7eb';ctx.strokeRect(x0+j*cell,40+i*cell,cell,cell)}}drawMat(X,30,'original');drawMat(R,320,'Haar reconstruction');let err=0,den=0;for(let i=0;i<n;i++)for(let j=0;j<n;j++){err+=(X[i][j]-R[i][j])**2;den+=X[i][j]**2;}document.getElementById('imgmetric').textContent=`kept ${k} of 64 coefficients\nrelative error = ${Math.sqrt(err/den).toFixed(4)}`;}
+['a','b'].forEach(id=>document.getElementById(id).oninput=two);['pattern','noise'].forEach(id=>document.getElementById(id).oninput=signal);document.getElementById('newNoise').onclick=()=>{noiseSeed++;signal()};document.getElementById('keep').oninput=compress;document.getElementById('tau').oninput=denoise;document.getElementById('imgkeep').oninput=img;document.getElementById('imgPattern').onclick=()=>{imgMode++;img()};two();signal();img();
+</script>
+</body></html>

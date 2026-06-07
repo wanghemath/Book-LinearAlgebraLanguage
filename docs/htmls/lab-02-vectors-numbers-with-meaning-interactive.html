@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Lab 02 — Vectors: Numbers with Meaning</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0;
+  --accent:#2563eb; --accent2:#7c3aed; --good:#059669; --warn:#d97706;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#eef6ff 0%,var(--bg) 280px);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);line-height:1.55}
+header{padding:56px 22px 34px;max-width:1100px;margin:0 auto}
+.kicker{font-weight:800;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-size:.82rem}
+h1{font-size:clamp(2.1rem,4vw,4rem);line-height:1.04;margin:.4rem 0 1rem;max-width:900px}
+.lede{font-size:1.2rem;color:var(--muted);max-width:860px}
+main{max-width:1100px;margin:0 auto;padding:0 22px 70px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+.card h2{margin-top:0;font-size:1.45rem}.card h3{margin-bottom:.4rem}.wide{grid-column:span 12}.half{grid-column:span 6}.third{grid-column:span 4}.two{grid-column:span 8}.one{grid-column:span 4}@media(max-width:800px){.half,.third,.two,.one{grid-column:span 12}}
+.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}@media(max-width:700px){.controls{grid-template-columns:1fr}}
+label{font-weight:700;font-size:.95rem}input[type=range]{width:100%}.value{display:inline-block;min-width:44px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:800}.math{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f1f5f9;border:1px solid #e2e8f0;padding:12px;border-radius:14px;overflow:auto}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#f8fafc;margin:3px;font-weight:700;color:#334155}.note{border-left:5px solid var(--accent);background:#eff6ff;padding:14px;border-radius:14px;color:#1e3a8a}.warn{border-left:5px solid var(--warn);background:#fff7ed;padding:14px;border-radius:14px;color:#7c2d12}canvas{max-width:100%}.button{appearance:none;border:0;background:var(--accent);color:white;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}.button.secondary{background:#334155}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit}.mini{font-size:.92rem;color:var(--muted)}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:left}th{color:#334155}.footer{color:var(--muted);text-align:center;margin-top:30px}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Interactive Lab 02</div>
+  <h1>Vectors: Numbers with Meaning</h1>
+  <p class="lede">Move sliders, draw arrows, compare feature vectors, test scaling, and explore why high-dimensional vectors are the basic objects of data and AI.</p>
+</header>
+<main>
+  <section class="grid">
+    <div class="card wide">
+      <h2>1. A vector is a coordinate story</h2>
+      <p>The vector <span class="math">[3, 4]</span> is not automatically a movement, a point, a purchase, or a document. The numbers become meaningful when we decide what the coordinates represent.</p>
+      <div class="row">
+        <span class="pill">point: (3,4)</span>
+        <span class="pill">movement: 3 east, 4 north</span>
+        <span class="pill">shopping: 3 coffees, 4 sandwiches</span>
+        <span class="pill">text: 3 counts of word A, 4 counts of word B</span>
+      </div>
+    </div>
+
+    <div class="card half">
+      <h2>2. Vector as point and arrow</h2>
+      <div class="controls">
+        <div><label>x-coordinate: <span id="vxVal" class="value">3</span></label><input id="vx" type="range" min="-6" max="6" step="1" value="3"></div>
+        <div><label>y-coordinate: <span id="vyVal" class="value">2</span></label><input id="vy" type="range" min="-6" max="6" step="1" value="2"></div>
+      </div>
+      <canvas id="vectorCanvas" width="520" height="420"></canvas>
+      <p class="math" id="vectorText"></p>
+    </div>
+
+    <div class="card half">
+      <h2>3. Vector addition</h2>
+      <div class="controls">
+        <div><label>u₁: <span id="u1Val" class="value">2</span></label><input id="u1" type="range" min="-5" max="5" value="2"></div>
+        <div><label>u₂: <span id="u2Val" class="value">1</span></label><input id="u2" type="range" min="-5" max="5" value="1"></div>
+        <div><label>v₁: <span id="w1Val" class="value">1</span></label><input id="w1" type="range" min="-5" max="5" value="1"></div>
+        <div><label>v₂: <span id="w2Val" class="value">3</span></label><input id="w2" type="range" min="-5" max="5" value="3"></div>
+      </div>
+      <canvas id="addCanvas" width="520" height="420"></canvas>
+      <p class="math" id="addText"></p>
+      <p class="mini">The purple arrow is the total movement. The second vector starts at the tip of the first vector.</p>
+    </div>
+
+    <div class="card half">
+      <h2>4. Scalar multiplication</h2>
+      <div class="controls">
+        <div><label>base x: <span id="sxVal" class="value">3</span></label><input id="sx" type="range" min="-5" max="5" value="3"></div>
+        <div><label>base y: <span id="syVal" class="value">2</span></label><input id="sy" type="range" min="-5" max="5" value="2"></div>
+        <div><label>scalar c: <span id="cVal" class="value">1.5</span></label><input id="sc" type="range" min="-3" max="3" step="0.25" value="1.5"></div>
+      </div>
+      <canvas id="scaleCanvas" width="520" height="420"></canvas>
+      <p class="math" id="scaleText"></p>
+    </div>
+
+    <div class="card half">
+      <h2>5. Distance between two vectors</h2>
+      <div class="controls">
+        <div><label>A x: <span id="axVal" class="value">5</span></label><input id="ax" type="range" min="-6" max="6" value="5"></div>
+        <div><label>A y: <span id="ayVal" class="value">4</span></label><input id="ay" type="range" min="-6" max="6" value="4"></div>
+        <div><label>B x: <span id="bxVal" class="value">2</span></label><input id="bx" type="range" min="-6" max="6" value="2"></div>
+        <div><label>B y: <span id="byVal" class="value">1</span></label><input id="by" type="range" min="-6" max="6" value="1"></div>
+      </div>
+      <canvas id="distCanvas" width="520" height="420"></canvas>
+      <p class="math" id="distText"></p>
+    </div>
+
+    <div class="card wide">
+      <h2>6. Feature vectors and scaling</h2>
+      <p>Each restaurant is represented by <span class="math">[price level, distance, rating]</span>. Raw distance can be dominated by the coordinate with the largest numerical scale.</p>
+      <div class="grid">
+        <div class="card third"><h3>A</h3><p>price 2, distance 1.5, rating 4.6</p></div>
+        <div class="card third"><h3>B</h3><p>price 3, distance 2.0, rating 4.8</p></div>
+        <div class="card third"><h3>C</h3><p>price 1, distance 8.0, rating 4.2</p></div>
+      </div>
+      <div class="row" style="margin:14px 0"><button class="button" id="toggleScale">Use scaled features</button><span id="scaleMode" class="pill">Currently: raw features</span></div>
+      <canvas id="barChart" height="120"></canvas>
+      <div class="warn"><strong>Modeling warning:</strong> Linear algebra computes exactly what you ask it to compute. It does not automatically know which units are meaningful.</div>
+    </div>
+
+    <div class="card half">
+      <h2>7. High-dimensional length simulation</h2>
+      <p>Generate random vectors and watch how their lengths behave as dimension grows.</p>
+      <div class="controls">
+        <div><label>dimension: <span id="dimVal" class="value">50</span></label><input id="dim" type="range" min="2" max="500" value="50"></div>
+        <div><label>number of vectors: <span id="nVal" class="value">300</span></label><input id="npts" type="range" min="50" max="1000" step="50" value="300"></div>
+      </div>
+      <button class="button secondary" id="resample">Resample random vectors</button>
+      <p class="math" id="hdText"></p>
+      <canvas id="hdChart" height="180"></canvas>
+    </div>
+
+    <div class="card half">
+      <h2>8. Reflection notebook</h2>
+      <p>Use this space during class. Your text stays in your browser only.</p>
+      <label>Explain why a vector is more than a list of numbers.</label>
+      <textarea id="reflection1" placeholder="Write your explanation here..."></textarea>
+      <label>Give your own feature-vector example.</label>
+      <textarea id="reflection2" placeholder="Object type, coordinates, and meaning..."></textarea>
+      <button class="button" onclick="localStorage.setItem('lab02_ref1',document.getElementById('reflection1').value);localStorage.setItem('lab02_ref2',document.getElementById('reflection2').value);alert('Saved in this browser.');">Save reflections</button>
+    </div>
+
+    <div class="card wide">
+      <h2>9. Chapter takeaway</h2>
+      <p class="note">A vector has algebraic rules, geometric pictures, and real-world meanings. Addition combines, scalar multiplication changes intensity, subtraction measures change, norm measures size, and distance compares objects.</p>
+    </div>
+  </section>
+  <p class="footer">Chapter 2 Interactive Lab — Vectors: Numbers with Meaning</p>
+</main>
+<script>
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id).value)}
+function setupCanvas(id){const c=$(id), ctx=c.getContext('2d'); return {c,ctx,w:c.width,h:c.height}}
+function drawGrid(ctx,w,h,scale=30){ctx.clearRect(0,0,w,h);ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;const ox=w/2, oy=h/2;for(let x=ox%scale;x<w;x+=scale){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=oy%scale;y<h;y+=scale){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.strokeStyle='#334155';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(w,oy);ctx.stroke();ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,h);ctx.stroke();return {ox,oy,scale}}
+function fitScale(w,h,maxCoord){return Math.max(12,Math.min(30,Math.floor(Math.min(w,h)/(2*(maxCoord+1))))) }
+function arrow(ctx,ox,oy,scale,x1,y1,x2,y2,color,label){const sx=ox+x1*scale, sy=oy-y1*scale, ex=ox+x2*scale, ey=oy-y2*scale;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();const ang=Math.atan2(ey-sy,ex-sx);const head=11;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-head*Math.cos(ang-Math.PI/6),ey-head*Math.sin(ang-Math.PI/6));ctx.lineTo(ex-head*Math.cos(ang+Math.PI/6),ey-head*Math.sin(ang+Math.PI/6));ctx.closePath();ctx.fill();if(label){ctx.font='15px system-ui';ctx.fillText(label,ex+8,ey-8)}}
+function point(ctx,ox,oy,scale,x,y,color,label){ctx.fillStyle=color;ctx.beginPath();ctx.arc(ox+x*scale,oy-y*scale,6,0,Math.PI*2);ctx.fill();ctx.font='15px system-ui';ctx.fillText(label,ox+x*scale+8,oy-y*scale-8)}
+function updateVector(){['vx','vy'].forEach(id=>$(id+'Val').textContent=val(id));const x=val('vx'),y=val('vy');const {ctx,w,h}=setupCanvas('vectorCanvas');const g=drawGrid(ctx,w,h);arrow(ctx,g.ox,g.oy,g.scale,0,0,x,y,'#2563eb','arrow');point(ctx,g.ox,g.oy,g.scale,x,y,'#7c3aed','point');$('vectorText').textContent=`v = [${x}, ${y}],   ||v|| = ${Math.hypot(x,y).toFixed(3)}`}
+function updateAdd(){['u1','u2','w1','w2'].forEach(id=>$(id+'Val').textContent=val(id));const u=[val('u1'),val('u2')], v=[val('w1'),val('w2')], s=[u[0]+v[0],u[1]+v[1]];const {ctx,w,h}=setupCanvas('addCanvas');const g=drawGrid(ctx,w,h);arrow(ctx,g.ox,g.oy,g.scale,0,0,u[0],u[1],'#2563eb','u');arrow(ctx,g.ox,g.oy,g.scale,u[0],u[1],s[0],s[1],'#059669','v');arrow(ctx,g.ox,g.oy,g.scale,0,0,s[0],s[1],'#7c3aed','u+v');$('addText').textContent=`u=[${u}], v=[${v}], u+v=[${s}]`}
+function updateScale(){
+  $('sxVal').textContent=val('sx');
+  $('syVal').textContent=val('sy');
+  $('cVal').textContent=val('sc');
+  const x=val('sx'), y=val('sy'), c=val('sc'), cx=c*x, cy=c*y;
+  const {ctx,w,h}=setupCanvas('scaleCanvas');
+  const maxCoord=Math.max(6,Math.abs(x),Math.abs(y),Math.abs(cx),Math.abs(cy));
+  const g=drawGrid(ctx,w,h,fitScale(w,h,maxCoord));
+  arrow(ctx,g.ox,g.oy,g.scale,0,0,x,y,'#2563eb','v');
+  arrow(ctx,g.ox,g.oy,g.scale,0,0,cx,cy,'#d97706','cv');
+  $('scaleText').textContent=`v=[${x}, ${y}], c=${c}, cv=[${cx.toFixed(2)}, ${cy.toFixed(2)}]`;
+}
+function updateDist(){
+  ['ax','ay','bx','by'].forEach(id=>$(id+'Val').textContent=val(id));
+  const a=[val('ax'),val('ay')], b=[val('bx'),val('by')], d=[a[0]-b[0],a[1]-b[1]];
+  const {ctx,w,h}=setupCanvas('distCanvas');
+  const maxCoord=Math.max(6,Math.abs(a[0]),Math.abs(a[1]),Math.abs(b[0]),Math.abs(b[1]));
+  const g=drawGrid(ctx,w,h,fitScale(w,h,maxCoord));
+  point(ctx,g.ox,g.oy,g.scale,a[0],a[1],'#2563eb','A');
+  point(ctx,g.ox,g.oy,g.scale,b[0],b[1],'#059669','B');
+  arrow(ctx,g.ox,g.oy,g.scale,b[0],b[1],a[0],a[1],'#7c3aed','A-B');
+  $('distText').textContent=`A-B=[${d}], distance = ||A-B|| = ${Math.hypot(d[0],d[1]).toFixed(3)}`;
+}
+let scaled=false, barChart=null;
+function restaurantDistances(){const X=[[2,1.5,4.6],[3,2.0,4.8],[1,8.0,4.2]];let Y=X.map(r=>r.slice());if(scaled){for(let j=0;j<3;j++){let m=Y.reduce((a,r)=>a+r[j],0)/Y.length;let sd=Math.sqrt(Y.reduce((a,r)=>a+(r[j]-m)**2,0)/Y.length);Y.forEach(r=>r[j]=(r[j]-m)/sd)}}function dist(i,j){return Math.hypot(...Y[i].map((x,k)=>x-Y[j][k]))}return [dist(0,1),dist(0,2),dist(1,2)]}
+function updateBars(){const data=restaurantDistances();$('scaleMode').textContent=scaled?'Currently: scaled features':'Currently: raw features';const ctx=$('barChart');if(barChart)barChart.destroy();barChart=new Chart(ctx,{type:'bar',data:{labels:['A-B','A-C','B-C'],datasets:[{label:'distance',data:data}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}
+function randn(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+let hdChart=null;
+function updateHD(){$('dimVal').textContent=val('dim');$('nVal').textContent=val('npts');const d=val('dim'), n=val('npts');let lengths=[];for(let i=0;i<n;i++){let s=0;for(let j=0;j<d;j++){let z=randn();s+=z*z}lengths.push(Math.sqrt(s))}let mean=lengths.reduce((a,b)=>a+b,0)/n;let sd=Math.sqrt(lengths.reduce((a,b)=>a+(b-mean)**2,0)/n);$('hdText').textContent=`mean length = ${mean.toFixed(3)}, standard deviation = ${sd.toFixed(3)}, typical scale ≈ sqrt(d) = ${Math.sqrt(d).toFixed(3)}`;let bins=24,min=Math.min(...lengths),max=Math.max(...lengths),width=(max-min)/bins, counts=Array(bins).fill(0);lengths.forEach(x=>{let k=Math.min(bins-1,Math.floor((x-min)/width));counts[k]++});let labels=counts.map((_,i)=>(min+(i+.5)*width).toFixed(1));if(hdChart)hdChart.destroy();hdChart=new Chart($('hdChart'),{type:'bar',data:{labels:labels,datasets:[{label:'count',data:counts}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8}},y:{beginAtZero:true}}}})}
+['vx','vy'].forEach(id=>$(id).addEventListener('input',updateVector));['u1','u2','w1','w2'].forEach(id=>$(id).addEventListener('input',updateAdd));['sx','sy','sc'].forEach(id=>$(id).addEventListener('input',updateScale));['ax','ay','bx','by'].forEach(id=>$(id).addEventListener('input',updateDist));$('toggleScale').addEventListener('click',()=>{scaled=!scaled;updateBars()});['dim','npts'].forEach(id=>$(id).addEventListener('input',updateHD));$('resample').addEventListener('click',updateHD);
+$('reflection1').value=localStorage.getItem('lab02_ref1')||'';$('reflection2').value=localStorage.getItem('lab02_ref2')||'';
+updateVector();updateAdd();updateScale();updateDist();updateBars();updateHD();
+</script>
+</body>
+</html>

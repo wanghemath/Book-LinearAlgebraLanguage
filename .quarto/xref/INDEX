@@ -1,0 +1,89 @@
+{
+  "index.qmd": {
+    "index.html": "16e25025"
+  },
+  "preface.qmd": {
+    "preface.html": "19eda3fa"
+  },
+  "introduction-overview.qmd": {
+    "introduction-overview.html": "04bd2321"
+  },
+  "chapters/chapter-01-world-as-numbers.qmd": {
+    "chapter-01-world-as-numbers.html": "5bb8bbf4"
+  },
+  "chapters/chapter-02-vectors-numbers-with-meaning.qmd": {
+    "chapter-02-vectors-numbers-with-meaning.html": "681a727d"
+  },
+  "chapters/chapter-03-combining-ideas.qmd": {
+    "chapter-03-combining-ideas.html": "90f1795a"
+  },
+  "chapters/chapter-04-data-as-points.qmd": {
+    "chapter-04-data-as-points.html": "74e3eb81"
+  },
+  "chapters/chapter-05-matrix-machine.qmd": {
+    "chapter-05-matrix-machine.html": "e9219217"
+  },
+  "chapters/chapter-06-stretching-rotating-shearing.qmd": {
+    "chapter-06-stretching-rotating-shearing.html": "a75c8e3e"
+  },
+  "chapters/chapter-07-solving-backwards.qmd": {
+    "chapter-07-solving-backwards.html": "e56a53f0"
+  },
+  "chapters/chapter-08-when-information-is-lost.qmd": {
+    "chapter-08-when-information-is-lost.html": "a2777b00"
+  },
+  "chapters/chapter-09-length-and-distance.qmd": {
+    "chapter-09-length-and-distance.html": "d5966c42"
+  },
+  "chapters/chapter-10-angles-and-similarity.qmd": {
+    "chapter-10-angles-and-similarity.html": "d0ccf68b"
+  },
+  "chapters/chapter-11-projection-best-shadow.qmd": {
+    "chapter-11-projection-best-shadow.html": "6300cc54"
+  },
+  "chapters/chapter-12-orthogonality.qmd": {
+    "chapter-12-orthogonality.html": "6a1f2a84"
+  },
+  "chapters/chapter-13-eigenvectors.qmd": {
+    "chapter-13-eigenvectors.html": "a0af53ca"
+  },
+  "chapters/chapter-14-stability-ranking-iteration.qmd": {
+    "chapter-14-stability-ranking-iteration.html": "de4d39e8"
+  },
+  "chapters/chapter-15-energy-landscapes.qmd": {
+    "chapter-15-energy-landscapes.html": "353799c3"
+  },
+  "chapters/chapter-16-svd-matrix-microscope.qmd": {
+    "chapter-16-svd-matrix-microscope.html": "90f3527b"
+  },
+  "chapters/chapter-17-image-compression.qmd": {
+    "chapter-17-image-compression.html": "4e00f779"
+  },
+  "chapters/chapter-18-pca.qmd": {
+    "chapter-18-pca.html": "cfc807cc"
+  },
+  "chapters/chapter-19-fourier.qmd": {
+    "chapter-19-fourier.html": "08b73fd1"
+  },
+  "chapters/chapter-20-haar.qmd": {
+    "chapter-20-haar.html": "d195a98e"
+  },
+  "chapters/chapter-21-images-as-matrices.qmd": {
+    "chapter-21-images-as-matrices.html": "b73f7931"
+  },
+  "chapters/chapter-22-text-as-vectors.qmd": {
+    "chapter-22-text-as-vectors.html": "b49e8e80"
+  },
+  "chapters/chapter-23-neural-networks-as-matrix-machines.qmd": {
+    "chapter-23-neural-networks-as-matrix-machines.html": "ca191aed"
+  },
+  "chapters/chapter-24-recommendation-systems.qmd": {
+    "chapter-24-recommendation-systems.html": "3fc157e5"
+  },
+  "chapters/chapter-25-grammar-of-ai.qmd": {
+    "chapter-25-grammar-of-ai.html": "305be141"
+  },
+  "labs-overview.qmd": {
+    "labs-overview.html": "25f8d860"
+  }
+}

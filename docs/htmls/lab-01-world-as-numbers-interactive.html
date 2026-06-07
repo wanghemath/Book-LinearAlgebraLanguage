@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 01 · The World as Numbers</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --paper:#ffffff; --ink:#162033; --muted:#5f6b7a; --line:#dbe2ea;
+    --accent:#335cff; --accent2:#00a7a7; --warm:#ffb545; --danger:#e75b5b;
+    --shadow:0 18px 50px rgba(20,30,55,.12); --radius:22px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#eef3ff 0%,var(--bg) 38%,#fff 100%);color:var(--ink);line-height:1.55}
+  a{color:var(--accent)}
+  .wrap{max-width:1180px;margin:auto;padding:0 22px}
+  header{position:relative;overflow:hidden;padding:68px 0 34px;background:radial-gradient(circle at 15% 0%,rgba(51,92,255,.22),transparent 32%),radial-gradient(circle at 90% 12%,rgba(0,167,167,.18),transparent 28%)}
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
+  .eyebrow{text-transform:uppercase;letter-spacing:.16em;color:var(--accent);font-weight:800;font-size:.8rem;margin-bottom:12px}
+  h1{font-size:clamp(2.25rem,5vw,5rem);line-height:.95;margin:.1rem 0 1rem;letter-spacing:-.055em}
+  .subtitle{font-size:1.2rem;color:#334155;max-width:760px}
+  .hero-card{background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);border-radius:28px;padding:22px;backdrop-filter:blur(16px)}
+  .vector-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:18px}
+  .pill{border-radius:999px;background:#edf2ff;color:#263a8b;padding:7px 10px;font-size:.82rem;text-align:center;font-weight:700}
+  .topnav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .topnav .wrap{display:flex;gap:10px;overflow:auto;padding-top:10px;padding-bottom:10px}
+  .topnav a{white-space:nowrap;text-decoration:none;color:#334155;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:7px 12px;font-size:.88rem;font-weight:700}
+  main{padding:28px 0 80px}
+  section{margin:30px 0}
+  .card{background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(20,30,55,.07);border-radius:var(--radius);padding:26px;margin:22px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  h2{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;margin:0 0 8px}
+  h3{font-size:1.3rem;margin:0 0 10px;letter-spacing:-.02em}
+  .lead{font-size:1.08rem;color:#334155}.muted{color:var(--muted)}
+  .callout{border-left:5px solid var(--accent);background:#f4f7ff;border-radius:18px;padding:18px 20px;margin:18px 0}
+  .task{border-left:5px solid var(--warm);background:#fff9ee;border-radius:18px;padding:16px 18px;margin:16px 0}
+  .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#0f172a;color:#e2e8f0;border-radius:16px;padding:14px 16px;overflow:auto}
+  .control{margin:12px 0}.control label{display:flex;justify-content:space-between;font-weight:800;font-size:.92rem;color:#334155}.control input[type=range]{width:100%}
+  .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  button{border:0;border-radius:999px;background:var(--accent);color:white;font-weight:800;padding:10px 14px;cursor:pointer;box-shadow:0 8px 20px rgba(51,92,255,.25)}
+  button.secondary{background:#e2e8f0;color:#1e293b;box-shadow:none} button.good{background:var(--accent2)}
+  canvas{width:100%;height:auto;background:#fbfdff;border:1px solid var(--line);border-radius:18px;display:block}
+  .statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}.stat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:12px}.stat b{display:block;font-size:1.45rem;line-height:1;color:#111827}.stat span{font-size:.82rem;color:var(--muted);font-weight:700}
+  .table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.94rem}.table th,.table td{border-bottom:1px solid #e2e8f0;padding:9px;text-align:left}.table th{color:#334155;background:#f8fafc}
+  textarea,input[type=text]{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:12px;font:inherit;background:#fff} textarea{min-height:92px}
+  details{border:1px solid #e2e8f0;border-radius:16px;background:#fbfdff;padding:12px 14px;margin:12px 0} summary{font-weight:900;cursor:pointer}
+  .footer{color:#64748b;font-size:.92rem;border-top:1px solid var(--line);padding-top:22px;margin-top:40px}
+  .badge{display:inline-flex;align-items:center;gap:7px;border:1px solid #dbe2ea;background:#fff;border-radius:999px;padding:8px 12px;font-weight:800;color:#334155;margin:5px 5px 5px 0}
+  .small{font-size:.9rem}.code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#f1f5f9;border-radius:8px;padding:2px 6px}
+  @media(max-width:850px){.hero,.grid2,.grid3{grid-template-columns:1fr}.statgrid{grid-template-columns:1fr}.vector-strip{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow">Interactive Lab 01</div>
+      <h1>The World as Numbers</h1>
+      <p class="subtitle">A guided computational lab for the first chapter of a story-driven linear algebra book. Students translate real objects into vectors, test what is gained and lost, and discover why high-dimensional data needs geometry.</p>
+      <div class="button-row"><a href="#start"><button>Start the lab</button></a><a href="#instructor"><button class="secondary">Instructor notes</button></a></div>
+    </div>
+    <div class="hero-card">
+      <h3>Central idea</h3>
+      <p>Linear algebra begins when we decide that something in the world can be represented by a list of numbers.</p>
+      <div class="formula">object → features → vector → geometry → computation</div>
+      <div class="vector-strip"><div class="pill">height</div><div class="pill">price</div><div class="pill">pixels</div><div class="pill">words</div><div class="pill">ratings</div><div class="pill">signals</div></div>
+    </div>
+  </div>
+</header>
+<nav class="topnav"><div class="wrap">
+  <a href="#start">1. Translation</a><a href="#builder">2. Vector builder</a><a href="#distance">3. Distance</a><a href="#scaling">4. Scaling</a><a href="#image">5. Images</a><a href="#text">6. Text</a><a href="#highdim">7. High dimension</a><a href="#reflection">8. Reflection</a>
+</div></nav>
+<main class="wrap">
+<section id="start" class="card">
+  <h2>1. From world to vector</h2>
+  <p class="lead">A vector is not only an arrow. In data science, a vector is often a compact description of an object. The choice of features is the first mathematical act.</p>
+  <div class="grid3">
+    <div class="card"><h3>Object</h3><p>A student, image, house, song, patient, document, or city.</p></div>
+    <div class="card"><h3>Features</h3><p>Measurable quantities selected by a human, model, or sensor.</p></div>
+    <div class="card"><h3>Vector</h3><p>An ordered list such as <span class="code">[2.1, 4.7, 0, 13]</span>.</p></div>
+  </div>
+  <div class="task"><b>Student task.</b> Write one object from your own life and list five possible features. Then identify one feature that is useful and one that may be misleading.</div>
+</section>
+
+<section id="builder" class="card">
+  <h2>2. Build a vector from a real object</h2>
+  <p class="lead">Change the features below. The object becomes a point in a small feature space. Notice that the numbers are meaningful only because we chose meanings for the coordinates.</p>
+  <div class="grid2">
+    <div>
+      <h3>Coffee shop representation</h3>
+      <div class="control"><label>Price ($) <span id="priceVal"></span></label><input id="price" type="range" min="2" max="9" value="5" step="0.1"></div>
+      <div class="control"><label>Distance from campus (minutes) <span id="campusVal"></span></label><input id="campus" type="range" min="1" max="40" value="12"></div>
+      <div class="control"><label>Quietness score <span id="quietVal"></span></label><input id="quiet" type="range" min="0" max="10" value="7"></div>
+      <div class="control"><label>Wi-Fi quality <span id="wifiVal"></span></label><input id="wifi" type="range" min="0" max="10" value="8"></div>
+      <div class="formula" id="shopVector"></div>
+    </div>
+    <div><canvas id="builderCanvas" width="560" height="420"></canvas></div>
+  </div>
+  <details><summary>Teaching note</summary><p>This example lets students see that a feature vector is a modeling decision. The same shop can become a 2D, 4D, or 100D vector depending on the question.</p></details>
+</section>
+
+<section id="distance" class="card">
+  <h2>3. Similarity becomes geometry</h2>
+  <p class="lead">Once objects become vectors, we can ask geometric questions: Which two objects are close? Which object is unusual? Which group forms a cluster?</p>
+  <div class="grid2">
+    <div><canvas id="distanceCanvas" width="560" height="430"></canvas></div>
+    <div>
+      <h3>Move point B</h3>
+      <div class="control"><label>B x-coordinate <span id="bxVal"></span></label><input id="bx" type="range" min="0" max="10" value="7" step="0.1"></div>
+      <div class="control"><label>B y-coordinate <span id="byVal"></span></label><input id="by" type="range" min="0" max="10" value="6" step="0.1"></div>
+      <div class="statgrid"><div class="stat"><b id="dxStat"></b><span>horizontal change</span></div><div class="stat"><b id="dyStat"></b><span>vertical change</span></div><div class="stat"><b id="distStat"></b><span>Euclidean distance</span></div></div>
+      <div class="formula">distance = sqrt((x_B - x_A)^2 + (y_B - y_A)^2)</div>
+    </div>
+  </div>
+</section>
+
+<section id="scaling" class="card">
+  <h2>4. The danger of units and scale</h2>
+  <p class="lead">A distance formula does not know whether one coordinate is dollars, minutes, pixels, or kilograms. Large-scale features can dominate the geometry.</p>
+  <div class="grid2">
+    <div>
+      <h3>Three apartments</h3>
+      <table class="table"><thead><tr><th>Apartment</th><th>Rent</th><th>Distance</th><th>Size</th></tr></thead><tbody><tr><td>A</td><td>$2100</td><td>8 min</td><td>650 sq ft</td></tr><tr><td>B</td><td>$2400</td><td>6 min</td><td>720 sq ft</td></tr><tr><td>C</td><td>$2200</td><td>26 min</td><td>680 sq ft</td></tr></tbody></table>
+      <div class="control"><label>Rent weight <span id="wrVal"></span></label><input id="wr" type="range" min="0" max="3" value="1" step="0.1"></div>
+      <div class="control"><label>Distance weight <span id="wdVal"></span></label><input id="wd" type="range" min="0" max="3" value="1" step="0.1"></div>
+      <div class="control"><label>Size weight <span id="wsVal"></span></label><input id="ws" type="range" min="0" max="3" value="1" step="0.1"></div>
+      <button onclick="resetWeights()" class="secondary">Reset weights</button>
+    </div>
+    <div>
+      <canvas id="scaleCanvas" width="560" height="420"></canvas>
+      <div class="callout" id="scaleResult"></div>
+    </div>
+  </div>
+</section>
+
+<section id="image" class="card">
+  <h2>5. Images are matrices before they become vectors</h2>
+  <p class="lead">A grayscale image is a grid of numbers. Flattening the grid creates a vector. This is one reason linear algebra is everywhere in image processing and machine learning.</p>
+  <div class="grid2">
+    <div>
+      <div class="control"><label>Pixel grid size <span id="gridSizeVal"></span></label><input id="gridSize" type="range" min="5" max="20" value="10"></div>
+      <div class="control"><label>Pattern frequency <span id="freqVal"></span></label><input id="freq" type="range" min="1" max="8" value="3"></div>
+      <div class="control"><label>Noise level <span id="noiseVal"></span></label><input id="noise" type="range" min="0" max="80" value="12"></div>
+      <div class="button-row"><button onclick="newImageSeed()">New pattern</button><button class="secondary" onclick="toggleFlatten()">Toggle flatten view</button></div>
+    </div>
+    <div><canvas id="imageCanvas" width="560" height="420"></canvas></div>
+  </div>
+  <div class="task"><b>Student task.</b> Increase the grid size. Why does a small image already become a high-dimensional vector?</div>
+</section>
+
+<section id="text" class="card">
+  <h2>6. Text can also become vectors</h2>
+  <p class="lead">A document can be represented by word counts. This is a simple version of the idea behind text embeddings: language is translated into coordinates.</p>
+  <div class="grid2">
+    <div>
+      <label><b>Document A</b></label><textarea id="docA">linear algebra turns data into geometry and geometry into computation</textarea>
+      <label><b>Document B</b></label><textarea id="docB">data science uses vectors matrices geometry and computation</textarea>
+      <button onclick="updateTextVectors()" class="good">Vectorize text</button>
+      <div class="statgrid"><div class="stat"><b id="vocabN"></b><span>vocabulary size</span></div><div class="stat"><b id="dotAB"></b><span>dot product</span></div><div class="stat"><b id="cosAB"></b><span>cosine similarity</span></div></div>
+    </div>
+    <div><canvas id="textCanvas" width="560" height="430"></canvas></div>
+  </div>
+  <details><summary>Why cosine similarity?</summary><p>Word-count vectors can be longer simply because a document has more words. Cosine similarity focuses on direction rather than length, so it often captures topical similarity better than raw distance.</p></details>
+</section>
+
+<section id="highdim" class="card">
+  <h2>7. High-dimensional geometry feels different</h2>
+  <p class="lead">Modern data often has many coordinates: pixels, gene expressions, words, ratings, sensor readings. This activity samples random points and shows how distances behave as dimension grows.</p>
+  <div class="grid2">
+    <div>
+      <div class="control"><label>Dimension <span id="dimVal"></span></label><input id="dim" type="range" min="2" max="200" value="20"></div>
+      <div class="control"><label>Number of points <span id="nptsVal"></span></label><input id="npts" type="range" min="20" max="300" value="120"></div>
+      <button onclick="updateHighDim()">Resample points</button>
+      <div class="statgrid"><div class="stat"><b id="minD"></b><span>nearest pair</span></div><div class="stat"><b id="avgD"></b><span>average distance</span></div><div class="stat"><b id="maxD"></b><span>farthest pair</span></div></div>
+      <div class="callout" id="dimComment"></div>
+    </div>
+    <div><canvas id="highCanvas" width="560" height="430"></canvas></div>
+  </div>
+  <div class="task"><b>Student task.</b> Compare dimension 2, 20, and 200. What happens to the spread of pairwise distances?</div>
+</section>
+
+<section id="reflection" class="card">
+  <h2>8. Reflection and AI companion prompts</h2>
+  <div class="grid2">
+    <div>
+      <h3>Reflection questions</h3>
+      <ol>
+        <li>What information is lost when an object becomes a vector?</li>
+        <li>When can distance be misleading?</li>
+        <li>Why might scaling be necessary before clustering or prediction?</li>
+        <li>What makes high-dimensional data both powerful and dangerous?</li>
+      </ol>
+    </div>
+    <div>
+      <h3>AI companion prompts</h3>
+      <p class="badge">Explain feature vectors using a real example from medicine.</p>
+      <p class="badge">Give me three bad feature choices for comparing colleges.</p>
+      <p class="badge">Create a tiny dataset where scaling changes the nearest neighbor.</p>
+      <p class="badge">Explain why a 100 × 100 image is a 10,000-dimensional vector.</p>
+    </div>
+  </div>
+</section>
+
+<section id="instructor" class="card">
+  <h2>Instructor notes</h2>
+  <p>This page can be used as an in-class demonstration, a companion to the Chapter 1 notebook, or a standalone online activity. Suggested pacing: 10 minutes for feature vectors, 10 minutes for distance and scaling, 10 minutes for image/text representations, and 10 minutes for high-dimensional intuition and discussion.</p>
+  <details><summary>Learning outcomes</summary><ul><li>Explain that a vector is an ordered list of meaningful features.</li><li>Compute and interpret simple distances and dot products.</li><li>Identify why units and scaling matter.</li><li>Recognize images and documents as numerical objects.</li><li>Describe one basic phenomenon of high-dimensional geometry.</li></ul></details>
+  <details><summary>Suggested extension</summary><p>Ask students to modify the Jupyter notebook so that their own dataset becomes a matrix: rows are objects, columns are features. Then ask them to normalize columns and compare nearest neighbors before and after normalization.</p></details>
+  <div class="footer">Interactive page for Chapter 1: <em>The World as Numbers</em>.</div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function nice(x,d=2){return Number(x).toFixed(d)}
+function clear(c){const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);return ctx}
+function axes(ctx,w,h,p=45){ctx.strokeStyle='#dbe2ea';ctx.lineWidth=1;for(let i=0;i<=10;i++){let x=p+i*(w-2*p)/10,y=h-p-i*(h-2*p)/10;ctx.beginPath();ctx.moveTo(x,p);ctx.lineTo(x,h-p);ctx.stroke();ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke()}ctx.strokeStyle='#334155';ctx.lineWidth=2;ctx.strokeRect(p,p,w-2*p,h-2*p)}
+function xy(x,y,w,h,p=45){return [p+x/10*(w-2*p), h-p-y/10*(h-2*p)]}
+function dot(ctx,x,y,r,color,label){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#111827';ctx.font='bold 15px system-ui';ctx.fillText(label,x+10,y-10)}
+function updateBuilder(){let price=+$('price').value,campus=+$('campus').value,quiet=+$('quiet').value,wifi=+$('wifi').value;$('priceVal').textContent='$'+nice(price,1);$('campusVal').textContent=campus+' min';$('quietVal').textContent=quiet;$('wifiVal').textContent=wifi;$('shopVector').textContent=`shop = [${nice(price,1)}, ${campus}, ${quiet}, ${wifi}]`;
+ const c=$('builderCanvas'),ctx=clear(c),w=c.width,h=c.height;axes(ctx,w,h);let px=(quiet),py=(wifi);let [x,y]=xy(px,py,w,h);ctx.fillStyle='rgba(51,92,255,.12)';ctx.fillRect(45,45,470,330);dot(ctx,x,y,10,'#335cff','shop');ctx.fillStyle='#334155';ctx.font='14px system-ui';ctx.fillText('x = quietness',210,400);ctx.save();ctx.translate(18,245);ctx.rotate(-Math.PI/2);ctx.fillText('y = Wi-Fi quality',0,0);ctx.restore();ctx.fillStyle='#64748b';ctx.fillText(`Other hidden coordinates: price = $${nice(price,1)}, distance = ${campus} minutes`,70,32)}
+function updateDistance(){let bx=+$('bx').value,by=+$('by').value,A=[2,3];$('bxVal').textContent=nice(bx,1);$('byVal').textContent=nice(by,1);let dx=bx-A[0],dy=by-A[1],d=Math.hypot(dx,dy);$('dxStat').textContent=nice(dx,1);$('dyStat').textContent=nice(dy,1);$('distStat').textContent=nice(d,2);const c=$('distanceCanvas'),ctx=clear(c),w=c.width,h=c.height;axes(ctx,w,h);let [ax,ay]=xy(A[0],A[1],w,h),[x,y]=xy(bx,by,w,h);ctx.strokeStyle='#e75b5b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(x,y);ctx.stroke();ctx.strokeStyle='#94a3b8';ctx.setLineDash([8,8]);ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(x,ay);ctx.lineTo(x,y);ctx.stroke();ctx.setLineDash([]);dot(ctx,ax,ay,9,'#00a7a7','A = [2, 3]');dot(ctx,x,y,9,'#335cff',`B = [${nice(bx,1)}, ${nice(by,1)}]`)}
+function resetWeights(){['wr','wd','ws'].forEach(id=>$(id).value=1);updateScaling()}
+function updateScaling(){let wr=+$('wr').value,wd=+$('wd').value,ws=+$('ws').value;$('wrVal').textContent=nice(wr,1);$('wdVal').textContent=nice(wd,1);$('wsVal').textContent=nice(ws,1);let raw={A:[2100,8,650],B:[2400,6,720],C:[2200,26,680]};let names=['A','B','C'];let means=[0,0,0],sds=[0,0,0];for(let j=0;j<3;j++){means[j]=names.reduce((s,n)=>s+raw[n][j],0)/3;sds[j]=Math.sqrt(names.reduce((s,n)=>(s+(raw[n][j]-means[j])**2),0)/3)||1}let W=[wr,wd,ws];function z(v){return v.map((x,j)=>(x-means[j])/sds[j]*W[j])}function dist(n,m){let a=z(raw[n]),b=z(raw[m]);return Math.hypot(...a.map((x,j)=>x-b[j]))}let pairs=[['A','B'],['A','C'],['B','C']].map(p=>[p[0]+p[1],dist(p[0],p[1])]);pairs.sort((a,b)=>a[1]-b[1]);$('scaleResult').innerHTML=`Closest pair after standardization and weights: <b>${pairs[0][0]}</b>, distance <b>${nice(pairs[0][1],2)}</b>. Change the weights to change the meaning of similarity.`;const c=$('scaleCanvas'),ctx=clear(c),w=c.width,h=c.height;ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,w,h);let max=Math.max(...pairs.map(p=>p[1]),1);pairs.forEach((p,i)=>{let y=95+i*90,bw=p[1]/max*360;ctx.fillStyle=i==0?'#00a7a7':'#335cff';ctx.fillRect(130,y,bw,34);ctx.fillStyle='#111827';ctx.font='bold 18px system-ui';ctx.fillText(p[0],70,y+24);ctx.font='14px system-ui';ctx.fillText(nice(p[1],2),140+bw,y+23)});ctx.fillStyle='#334155';ctx.font='bold 18px system-ui';ctx.fillText('Weighted standardized distances',70,48)}
+let imgSeed=2,flatten=false;function newImageSeed(){imgSeed=Math.random()*100;updateImage()}function toggleFlatten(){flatten=!flatten;updateImage()}function updateImage(){let n=+$('gridSize').value,f=+$('freq').value,noise=+$('noise').value;$('gridSizeVal').textContent=`${n} × ${n} = ${n*n} pixels`;$('freqVal').textContent=f;$('noiseVal').textContent=noise;const c=$('imageCanvas'),ctx=clear(c),w=c.width,h=c.height;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);let values=[];for(let i=0;i<n;i++){for(let j=0;j<n;j++){let v=128+90*Math.sin((i+j+imgSeed)*f*.35)+noise*(Math.sin((i*17+j*31+imgSeed)*2.1));v=clamp(v,0,255);values.push(v)}}let left=50,top=45,size=310/n;if(!flatten){for(let i=0;i<n;i++)for(let j=0;j<n;j++){let v=values[i*n+j];ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(left+j*size,top+i*size,size,size);ctx.strokeStyle='rgba(255,255,255,.25)';ctx.strokeRect(left+j*size,top+i*size,size,size)}ctx.fillStyle='#111827';ctx.font='bold 17px system-ui';ctx.fillText('Matrix view: rows and columns',50,390)}else{let barW=470/(n*n);values.forEach((v,k)=>{ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(45+k*barW,140,Math.max(1,barW),110)});ctx.fillStyle='#111827';ctx.font='bold 17px system-ui';ctx.fillText(`Flattened vector with ${n*n} coordinates`,50,285);ctx.fillStyle='#64748b';ctx.font='14px system-ui';ctx.fillText('[ pixel 1, pixel 2, pixel 3, ... ]',50,315)}}
+function words(s){return (s.toLowerCase().match(/[a-z]+/g)||[])}function updateTextVectors(){let A=words($('docA').value),B=words($('docB').value),vocab=[...new Set([...A,...B])].sort();let va=vocab.map(w=>A.filter(x=>x==w).length),vb=vocab.map(w=>B.filter(x=>x==w).length);let dotp=va.reduce((s,x,i)=>s+x*vb[i],0),na=Math.hypot(...va),nb=Math.hypot(...vb),cos=na*nb?dotp/(na*nb):0;$('vocabN').textContent=vocab.length;$('dotAB').textContent=dotp;$('cosAB').textContent=nice(cos,3);const c=$('textCanvas'),ctx=clear(c),w=c.width,h=c.height;ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,w,h);let max=Math.max(...va,...vb,1),barW=Math.max(8,440/vocab.length);vocab.forEach((word,i)=>{let x=70+i*barW;ctx.fillStyle='#335cff';ctx.fillRect(x,220-va[i]/max*150,barW*.38,va[i]/max*150);ctx.fillStyle='#00a7a7';ctx.fillRect(x+barW*.42,220-vb[i]/max*150,barW*.38,vb[i]/max*150);ctx.save();ctx.translate(x+3,245);ctx.rotate(-Math.PI/4);ctx.fillStyle='#334155';ctx.font='12px system-ui';ctx.fillText(word,0,0);ctx.restore()});ctx.fillStyle='#335cff';ctx.fillRect(70,35,18,18);ctx.fillStyle='#111827';ctx.font='14px system-ui';ctx.fillText('Document A',95,49);ctx.fillStyle='#00a7a7';ctx.fillRect(210,35,18,18);ctx.fillStyle='#111827';ctx.fillText('Document B',235,49)}
+function randn(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function updateHighDim(){let dim=+$('dim').value,n=+$('npts').value;$('dimVal').textContent=dim;$('nptsVal').textContent=n;let pts=Array.from({length:n},()=>Array.from({length:dim},randn));let ds=[];for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){let s=0;for(let k=0;k<dim;k++)s+=(pts[i][k]-pts[j][k])**2;ds.push(Math.sqrt(s))}let min=Math.min(...ds),max=Math.max(...ds),avg=ds.reduce((a,b)=>a+b,0)/ds.length;$('minD').textContent=nice(min,2);$('avgD').textContent=nice(avg,2);$('maxD').textContent=nice(max,2);$('dimComment').innerHTML=`Ratio farthest/nearest = <b>${nice(max/min,2)}</b>. In many high-dimensional datasets, distances can become less visually intuitive, so representation and normalization matter.`;const c=$('highCanvas'),ctx=clear(c),w=c.width,h=c.height;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#dbe2ea';ctx.strokeRect(50,45,460,320);let bins=24,hist=Array(bins).fill(0);ds.forEach(d=>{let b=Math.min(bins-1,Math.floor((d-min)/(max-min+1e-9)*bins));hist[b]++});let hm=Math.max(...hist);hist.forEach((v,i)=>{let x=60+i*(440/bins),bh=v/hm*250;ctx.fillStyle='#335cff';ctx.fillRect(x,345-bh,440/bins-3,bh)});ctx.fillStyle='#111827';ctx.font='bold 17px system-ui';ctx.fillText('Histogram of pairwise distances',60,30);ctx.font='13px system-ui';ctx.fillText('near',55,385);ctx.fillText('far',485,385)}
+['price','campus','quiet','wifi'].forEach(id=>$(id).addEventListener('input',updateBuilder));['bx','by'].forEach(id=>$(id).addEventListener('input',updateDistance));['wr','wd','ws'].forEach(id=>$(id).addEventListener('input',updateScaling));['gridSize','freq','noise'].forEach(id=>$(id).addEventListener('input',updateImage));['dim','npts'].forEach(id=>$(id).addEventListener('input',updateHighDim));['docA','docB'].forEach(id=>$(id).addEventListener('input',updateTextVectors));
+updateBuilder();updateDistance();updateScaling();updateImage();updateTextVectors();updateHighDim();
+</script>
+</body>
+</html>

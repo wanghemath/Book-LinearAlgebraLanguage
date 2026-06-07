@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 21 — Images as Matrices</title>
+<style>
+:root{--bg:#f6f8fb;--card:#ffffff;--ink:#1f2937;--muted:#64748b;--accent:#2563eb;--accent2:#7c3aed;--border:#dbe3ef;--soft:#eef4ff;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 42%);color:var(--ink);line-height:1.55}.wrap{max-width:1180px;margin:0 auto;padding:28px 18px 60px}header{padding:34px 26px;border:1px solid var(--border);background:rgba(255,255,255,.88);border-radius:26px;box-shadow:0 18px 45px rgba(30,64,175,.10);margin-bottom:22px}h1{font-size:clamp(2rem,4vw,3.4rem);margin:0 0 8px}h2{margin:0 0 16px;font-size:1.55rem}h3{margin:18px 0 8px}.subtitle{font-size:1.18rem;color:var(--muted);max-width:850px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:20px;box-shadow:0 8px 25px rgba(15,23,42,.06)}.span6{grid-column:span 6}.span5{grid-column:span 5}.span7{grid-column:span 7}.span12{grid-column:span 12}.pill{display:inline-block;background:var(--soft);color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:6px 12px;font-weight:700;font-size:.9rem;margin:4px 6px 4px 0}.controls{display:grid;gap:12px;margin:12px 0}.control{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center}.control label{font-weight:700;color:#334155}.control output{text-align:right;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:800}input[type=range]{width:100%}canvas{width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:16px}.matrix{font-family:"SFMono-Regular",Consolas,monospace;background:#0f172a;color:#e2e8f0;border-radius:16px;padding:14px;overflow:auto;font-size:.9rem}.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:14px;color:#7c2d12}.formula{font-family:Georgia,serif;background:#f8fafc;border-left:5px solid var(--accent);padding:13px 15px;border-radius:12px;margin:12px 0}.btns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.btn{border:1px solid var(--border);background:#fff;border-radius:12px;padding:8px 12px;cursor:pointer;font-weight:700;color:#1f2937}.btn.active,.btn:hover{background:#2563eb;color:#fff;border-color:#2563eb}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.stat{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center}.stat b{display:block;font-size:1.2rem;color:var(--accent)}textarea{width:100%;min-height:90px;border:1px solid var(--border);border-radius:14px;padding:12px;font-family:inherit}.footer{margin-top:28px;color:var(--muted);text-align:center}@media(max-width:850px){.span6,.span5,.span7{grid-column:span 12}.control{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="pill">Chapter 21</div><div class="pill">Interactive Lab</div><div class="pill">Images as Matrices</div>
+  <h1>Images as Matrices</h1>
+  <p class="subtitle">Explore pixels, brightness, contrast, thresholding, filters, convolution, edge detection, pooling, and high-dimensional image vectors. Every picture on this page is a numerical array.</p>
+</header>
+
+<section class="grid">
+  <div class="card span6">
+    <h2>1. Pixel Painter</h2>
+    <p>Click cells to turn pixels on and off. A tiny image is just a matrix of brightness values.</p>
+    <canvas id="paint" width="360" height="360"></canvas>
+    <div class="btns"><button class="btn" onclick="clearPaint()">Clear</button><button class="btn" onclick="diagPaint()">Diagonal</button><button class="btn" onclick="boxPaint()">Box</button></div>
+  </div>
+  <div class="card span6">
+    <h2>Matrix View</h2>
+    <p>The same image as numbers. White pixels are 1; black pixels are 0.</p>
+    <pre class="matrix" id="paintMatrix"></pre>
+    <div class="formula">A grayscale image is a matrix: <b>A = [a<sub>ij</sub>]</b>.</div>
+  </div>
+
+  <div class="card span7">
+    <h2>2. Brightness, Contrast, Inversion, Threshold</h2>
+    <p>These are pixelwise operations: every output pixel depends only on one input pixel.</p>
+    <canvas id="pixelwise" width="640" height="360"></canvas>
+  </div>
+  <div class="card span5">
+    <h2>Controls</h2>
+    <div class="controls">
+      <div class="control"><label>Brightness</label><input id="bright" type="range" min="-0.5" max="0.5" step="0.01" value="0"><output id="brightOut">0.00</output></div>
+      <div class="control"><label>Contrast</label><input id="contrast" type="range" min="0.2" max="3" step="0.05" value="1"><output id="contrastOut">1.00</output></div>
+      <div class="control"><label>Threshold</label><input id="thresh" type="range" min="0" max="1" step="0.01" value="0.5"><output id="threshOut">0.50</output></div>
+    </div>
+    <div class="btns"><button class="btn active" id="modeNormal" onclick="setPixelMode('normal')">Adjusted</button><button class="btn" id="modeInvert" onclick="setPixelMode('invert')">Invert</button><button class="btn" id="modeThresh" onclick="setPixelMode('threshold')">Threshold</button></div>
+    <div class="note">Try high contrast and then thresholding. You are turning a picture into a decision rule.</div>
+  </div>
+
+  <div class="card span7">
+    <h2>3. Convolution Filter Playground</h2>
+    <p>A filter is a small matrix slid across the image. Each output pixel is a local dot product.</p>
+    <canvas id="filterCanvas" width="640" height="360"></canvas>
+  </div>
+  <div class="card span5">
+    <h2>Choose a Kernel</h2>
+    <div class="btns">
+      <button class="btn active" id="kBlur" onclick="setKernel('blur')">Blur</button>
+      <button class="btn" id="kSharp" onclick="setKernel('sharp')">Sharpen</button>
+      <button class="btn" id="kEdgeX" onclick="setKernel('edgeX')">Vertical Edge</button>
+      <button class="btn" id="kEdgeY" onclick="setKernel('edgeY')">Horizontal Edge</button>
+      <button class="btn" id="kLap" onclick="setKernel('lap')">All Edges</button>
+    </div>
+    <pre class="matrix" id="kernelText"></pre>
+    <div class="formula">Filtered pixel = sum of <b>patch entry × kernel entry</b>.</div>
+  </div>
+
+  <div class="card span6">
+    <h2>4. Pooling and Downsampling</h2>
+    <p>Pooling reduces resolution. Average pooling keeps coarse brightness; max pooling keeps strong activations.</p>
+    <canvas id="poolCanvas" width="520" height="360"></canvas>
+    <div class="btns"><button class="btn active" id="poolAvg" onclick="setPool('avg')">Average Pool</button><button class="btn" id="poolMax" onclick="setPool('max')">Max Pool</button></div>
+  </div>
+  <div class="card span6">
+    <h2>5. Image as High-Dimensional Vector</h2>
+    <p>A 32 × 32 image is a point in 1024-dimensional space. Distance between images is vector distance.</p>
+    <canvas id="distCanvas" width="520" height="260"></canvas>
+    <div class="controls"><div class="control"><label>Shift</label><input id="shift" type="range" min="0" max="12" step="1" value="0"><output id="shiftOut">0</output></div><div class="control"><label>Noise</label><input id="noise" type="range" min="0" max="0.5" step="0.01" value="0"><output id="noiseOut">0.00</output></div></div>
+    <div class="stats"><div class="stat"><b id="dimStat">1024</b>dimension</div><div class="stat"><b id="distStat">0.00</b>distance</div><div class="stat"><b id="relStat">0.00</b>relative</div></div>
+  </div>
+
+  <div class="card span12">
+    <h2>6. Reflection Prompts</h2>
+    <p>Use the interactive tools above, then write short answers.</p>
+    <p><b>Prompt 1.</b> Which operations are pixelwise? Which operations use neighborhoods?</p>
+    <textarea placeholder="Your answer..."></textarea>
+    <p><b>Prompt 2.</b> Why is convolution a linear algebra operation?</p>
+    <textarea placeholder="Your answer..."></textarea>
+    <p><b>Prompt 3.</b> Why might pixel distance disagree with human visual similarity?</p>
+    <textarea placeholder="Your answer..."></textarea>
+  </div>
+</section>
+<div class="footer">Chapter 21 Interactive Lab — Images as Matrices</div>
+</div>
+<script>
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+function makeBase(n=64){let A=Array.from({length:n},()=>Array(n).fill(0));for(let i=12;i<48;i++)for(let j=10;j<30;j++)A[i][j]=0.65;for(let i=0;i<n;i++)for(let j=0;j<n;j++){let d=(i-38)**2+(j-44)**2;if(d<13**2)A[i][j]=1;A[i][j]=clamp(A[i][j]+0.15*j/n)}return A}
+function drawArray(canvas,A,opts={}){let ctx=canvas.getContext('2d'),h=A.length,w=A[0].length;let cw=canvas.width,ch=canvas.height;ctx.clearRect(0,0,cw,ch);let s=Math.min(cw/w,ch/h), ox=(cw-s*w)/2, oy=(ch-s*h)/2;for(let i=0;i<h;i++)for(let j=0;j<w;j++){let v=clamp(A[i][j]);let g=Math.round(v*255);ctx.fillStyle=`rgb(${g},${g},${g})`;ctx.fillRect(ox+j*s,oy+i*s,s+0.5,s+0.5)}if(opts.grid){ctx.strokeStyle='rgba(37,99,235,.45)';ctx.lineWidth=1;for(let k=0;k<=w;k++){ctx.beginPath();ctx.moveTo(ox+k*s,oy);ctx.lineTo(ox+k*s,oy+h*s);ctx.stroke()}for(let k=0;k<=h;k++){ctx.beginPath();ctx.moveTo(ox,oy+k*s);ctx.lineTo(ox+w*s,oy+k*s);ctx.stroke()}}}
+let paint=Array.from({length:8},()=>Array(8).fill(0));function updatePaint(){drawArray(document.getElementById('paint'),paint,{grid:true});document.getElementById('paintMatrix').textContent=paint.map(r=>'[ '+r.map(x=>x.toFixed(0)).join('  ')+' ]').join('\n')}document.getElementById('paint').addEventListener('click',e=>{let c=e.target,r=c.getBoundingClientRect();let x=e.clientX-r.left,y=e.clientY-r.top;let s=Math.min(c.clientWidth/8,c.clientHeight/8);let ox=(c.clientWidth-s*8)/2,oy=(c.clientHeight-s*8)/2;let j=Math.floor((x-ox)/s),i=Math.floor((y-oy)/s);if(i>=0&&i<8&&j>=0&&j<8){paint[i][j]=paint[i][j]?0:1;updatePaint()}});function clearPaint(){paint.forEach(r=>r.fill(0));updatePaint()}function diagPaint(){clearPaint();for(let i=0;i<8;i++)paint[i][i]=1;updatePaint()}function boxPaint(){clearPaint();for(let i=2;i<6;i++)for(let j=2;j<6;j++)paint[i][j]=1;updatePaint()}
+let base=makeBase(),pixelMode='normal';function setPixelMode(m){pixelMode=m;['Normal','Invert','Thresh'].forEach(n=>document.getElementById('mode'+n).classList.remove('active'));document.getElementById('mode'+(m==='normal'?'Normal':m==='invert'?'Invert':'Thresh')).classList.add('active');drawPixelwise()}function transform(A){let b=parseFloat(bright.value),c=parseFloat(contrast.value),t=parseFloat(thresh.value);let B=A.map(row=>row.map(v=>clamp(0.5+c*(v-0.5)+b)));if(pixelMode==='invert')B=B.map(row=>row.map(v=>1-v));if(pixelMode==='threshold')B=B.map(row=>row.map(v=>v>=t?1:0));return B}function drawPixelwise(){brightOut.value=parseFloat(bright.value).toFixed(2);contrastOut.value=parseFloat(contrast.value).toFixed(2);threshOut.value=parseFloat(thresh.value).toFixed(2);let canvas=document.getElementById('pixelwise'),ctx=canvas.getContext('2d');ctx.clearRect(0,0,640,360);let L=document.createElement('canvas'),R=document.createElement('canvas');L.width=R.width=300;L.height=R.height=300;drawArray(L,base);drawArray(R,transform(base));ctx.drawImage(L,10,45);ctx.drawImage(R,330,45);ctx.fillStyle='#1f2937';ctx.font='18px system-ui';ctx.fillText('Original',105,28);ctx.fillText('Transformed',425,28)}['bright','contrast','thresh'].forEach(id=>document.getElementById(id).addEventListener('input',drawPixelwise));
+const kernels={blur:[[1/9,1/9,1/9],[1/9,1/9,1/9],[1/9,1/9,1/9]],sharp:[[0,-1,0],[-1,5,-1],[0,-1,0]],edgeX:[[-1,0,1],[-2,0,2],[-1,0,1]],edgeY:[[-1,-2,-1],[0,0,0],[1,2,1]],lap:[[-1,-1,-1],[-1,8,-1],[-1,-1,-1]]};let kernelName='blur';function applyFilter(A,K){let h=A.length,w=A[0].length,Y=Array.from({length:h},()=>Array(w).fill(0));for(let i=0;i<h;i++)for(let j=0;j<w;j++){let s=0;for(let p=-1;p<=1;p++)for(let q=-1;q<=1;q++){let ii=Math.max(0,Math.min(h-1,i+p)),jj=Math.max(0,Math.min(w-1,j+q));s+=A[ii][jj]*K[p+1][q+1]}Y[i][j]=s}let abs=['edgeX','edgeY','lap'].includes(kernelName);if(abs){let M=0;Y=Y.map(r=>r.map(v=>Math.abs(v)));Y.forEach(r=>r.forEach(v=>M=Math.max(M,v)));Y=Y.map(r=>r.map(v=>v/(M||1)))}else Y=Y.map(r=>r.map(v=>clamp(v)));return Y}function setKernel(k){kernelName=k;['Blur','Sharp','EdgeX','EdgeY','Lap'].forEach(n=>document.getElementById('k'+n).classList.remove('active'));document.getElementById('k'+(k==='blur'?'Blur':k==='sharp'?'Sharp':k==='edgeX'?'EdgeX':k==='edgeY'?'EdgeY':'Lap')).classList.add('active');drawFilter()}function drawFilter(){let canvas=document.getElementById('filterCanvas'),ctx=canvas.getContext('2d');ctx.clearRect(0,0,640,360);let L=document.createElement('canvas'),R=document.createElement('canvas');L.width=R.width=300;L.height=R.height=300;drawArray(L,base);drawArray(R,applyFilter(base,kernels[kernelName]));ctx.drawImage(L,10,45);ctx.drawImage(R,330,45);ctx.fillStyle='#1f2937';ctx.font='18px system-ui';ctx.fillText('Input image',105,28);ctx.fillText('Filtered output',415,28);document.getElementById('kernelText').textContent=kernels[kernelName].map(r=>'[ '+r.map(x=>(Math.round(x*100)/100).toString().padStart(5,' ')).join(' ')+' ]').join('\n')}
+function pool(A,type){let h=A.length,w=A[0].length,Y=[];for(let i=0;i<h;i+=2){let row=[];for(let j=0;j<w;j+=2){let vals=[A[i][j],A[i+1]?.[j]??A[i][j],A[i][j+1]??A[i][j],A[i+1]?.[j+1]??A[i][j]];row.push(type==='avg'?vals.reduce((a,b)=>a+b,0)/4:Math.max(...vals))}Y.push(row)}return Y}let poolType='avg';function setPool(t){poolType=t;poolAvg.classList.toggle('active',t==='avg');poolMax.classList.toggle('active',t==='max');drawPool()}function drawPool(){let P=pool(base,poolType),canvas=poolCanvas,ctx=canvas.getContext('2d');ctx.clearRect(0,0,520,360);let L=document.createElement('canvas'),R=document.createElement('canvas');L.width=R.width=230;L.height=R.height=230;drawArray(L,base);drawArray(R,P);ctx.drawImage(L,10,70);ctx.drawImage(R,280,70);ctx.fillStyle='#1f2937';ctx.font='17px system-ui';ctx.fillText('64 × 64 input',75,40);ctx.fillText('32 × 32 pooled',340,40)}
+function makeSmall(n=32){let A=Array.from({length:n},()=>Array(n).fill(0));for(let i=6;i<24;i++)for(let j=8;j<18;j++)A[i][j]=.75;for(let i=0;i<n;i++)for(let j=0;j<n;j++)if((i-20)**2+(j-23)**2<6**2)A[i][j]=1;return A}let small=makeSmall();function shiftedNoisy(A,sh,ns){let h=A.length,w=A[0].length,Y=Array.from({length:h},()=>Array(w).fill(0));for(let i=0;i<h;i++)for(let j=0;j<w;j++){let jj=(j-sh+w)%w;let rand=(Math.sin((i*37+j*91+sh*17)*12.9898)*43758.5453)%1;Y[i][j]=clamp(A[i][jj]+ns*(rand-.5)*2)}return Y}function dist(A,B){let s=0,n=0;for(let i=0;i<A.length;i++)for(let j=0;j<A[0].length;j++){let d=A[i][j]-B[i][j];s+=d*d;n+=A[i][j]*A[i][j]}return [Math.sqrt(s),Math.sqrt(n)]}function drawDist(){shiftOut.value=shift.value;noiseOut.value=parseFloat(noise.value).toFixed(2);let B=shiftedNoisy(small,parseInt(shift.value),parseFloat(noise.value));let canvas=distCanvas,ctx=canvas.getContext('2d');ctx.clearRect(0,0,520,260);let L=document.createElement('canvas'),R=document.createElement('canvas');L.width=R.width=150;L.height=R.height=150;drawArray(L,small);drawArray(R,B);ctx.drawImage(L,70,30);ctx.drawImage(R,300,30);ctx.fillStyle='#1f2937';ctx.font='16px system-ui';ctx.fillText('Original vector',90,210);ctx.fillText('Changed vector',320,210);let [d,norm]=dist(small,B);distStat.textContent=d.toFixed(2);relStat.textContent=(d/(norm||1)).toFixed(2);dimStat.textContent=small.length*small[0].length}['shift','noise'].forEach(id=>document.getElementById(id).addEventListener('input',drawDist));
+updatePaint();drawPixelwise();drawFilter();drawPool();drawDist();
+</script>
+</body>
+</html>

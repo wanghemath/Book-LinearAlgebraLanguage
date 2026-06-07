@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 7 Interactive: Solving Backwards</title>
+<style>
+:root{
+  --bg:#f7f7fb; --card:#ffffff; --ink:#14213d; --muted:#5f6b7a; --accent:#2563eb; --accent2:#7c3aed; --soft:#e8eefc; --line:#d8dee9;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f7f9ff,#fff);color:var(--ink);}
+header{padding:48px 24px 30px;text-align:center;background:radial-gradient(circle at 30% 20%,#dbeafe,transparent 35%),radial-gradient(circle at 75% 15%,#ede9fe,transparent 35%);}
+header h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 10px;font-weight:850;letter-spacing:-.04em} header p{max-width:850px;margin:0 auto;font-size:1.15rem;color:var(--muted);line-height:1.6}
+nav{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:10;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px}
+nav a{color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:999px;font-size:.95rem} nav a:hover{background:var(--soft)}
+main{max-width:1180px;margin:0 auto;padding:28px 18px 70px}.section{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px;margin:22px 0;box-shadow:0 12px 35px rgba(15,23,42,.06)}
+h2{font-size:1.7rem;margin:0 0 10px;letter-spacing:-.02em}.lead{color:var(--muted);line-height:1.65}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.panel{background:#fbfcff;border:1px solid var(--line);border-radius:18px;padding:18px}.formula{font-family:"Times New Roman",serif;background:#f8fafc;border-left:4px solid var(--accent);padding:12px 16px;border-radius:12px;margin:12px 0;font-size:1.15rem}.controls label{display:block;margin:12px 0 6px;color:var(--muted);font-size:.95rem}.controls input[type=range]{width:100%}.value{font-weight:750;color:var(--accent)} canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:16px;background:white}.stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #d9e1ef}.stat:last-child{border-bottom:0}.pill{display:inline-block;background:var(--soft);color:#1e40af;border-radius:999px;padding:4px 10px;font-size:.85rem;font-weight:700}.button{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:10px 14px;font-weight:750;cursor:pointer}.button.secondary{background:var(--accent2)}textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit}.small{font-size:.92rem;color:var(--muted)}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:left}code{background:#eef2ff;padding:2px 5px;border-radius:6px}.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:14px;color:#7c2d12}
+</style>
+</head>
+<body>
+<header>
+  <div class="pill">Chapter 7 Interactive Lab</div>
+  <h1>Solving Backwards</h1>
+  <p>A matrix sends inputs to outputs. A linear system asks the reverse question: which input produced the output?</p>
+</header>
+<nav>
+  <a href="#machine">Machine</a><a href="#lines">Lines</a><a href="#columns">Columns</a><a href="#cases">Three Cases</a><a href="#elimination">Elimination</a><a href="#conditioning">Sensitivity</a><a href="#challenge">Challenge</a>
+</nav>
+<main>
+<section class="section" id="machine">
+  <h2>1. Matrix machine: forward and backward</h2>
+  <p class="lead">Choose the hidden input vector. The matrix sends it forward to an output. Then solve backwards to recover the input.</p>
+  <div class="grid">
+    <div class="panel controls">
+      <div class="formula">A = [[2, 1], [1, 3]], &nbsp; b = A x</div>
+      <label>x₁: <span class="value" id="x1v"></span></label><input id="x1" type="range" min="-5" max="5" step="0.1" value="2">
+      <label>x₂: <span class="value" id="x2v"></span></label><input id="x2" type="range" min="-5" max="5" step="0.1" value="3">
+      <div class="stat"><span>Output b₁ = 2x₁ + x₂</span><strong id="b1"></strong></div>
+      <div class="stat"><span>Output b₂ = x₁ + 3x₂</span><strong id="b2"></strong></div>
+      <div class="stat"><span>Recovered input</span><strong id="rec"></strong></div>
+    </div>
+    <div class="panel"><canvas id="machineCanvas" width="520" height="420"></canvas><p class="small">The blue arrow is the input x. The purple arrow is the output b.</p></div>
+  </div>
+</section>
+
+<section class="section" id="lines">
+  <h2>2. Equations as lines</h2>
+  <p class="lead">The system Ax = b can be drawn as two lines. The solution is their intersection.</p>
+  <div class="grid">
+    <div class="panel controls">
+      <p>System:</p><div class="formula">2x₁ + x₂ = b₁<br>x₁ + 3x₂ = b₂</div>
+      <label>b₁: <span class="value" id="lb1v"></span></label><input id="lb1" type="range" min="-10" max="15" step="0.1" value="7">
+      <label>b₂: <span class="value" id="lb2v"></span></label><input id="lb2" type="range" min="-10" max="20" step="0.1" value="11">
+      <div class="stat"><span>Intersection / solution</span><strong id="linsol"></strong></div>
+    </div>
+    <div class="panel"><canvas id="lineCanvas" width="560" height="460"></canvas></div>
+  </div>
+</section>
+
+<section class="section" id="columns">
+  <h2>3. Column picture: the solution is a recipe</h2>
+  <p class="lead">Solving Ax = b means building b from the columns of A. The entries of x are recipe coefficients.</p>
+  <div class="grid">
+    <div class="panel controls">
+      <div class="formula">x₁ [2,1] + x₂ [1,3] = b</div>
+      <label>coefficient x₁: <span class="value" id="cx1v"></span></label><input id="cx1" type="range" min="-4" max="4" step="0.1" value="2">
+      <label>coefficient x₂: <span class="value" id="cx2v"></span></label><input id="cx2" type="range" min="-4" max="4" step="0.1" value="3">
+      <div class="stat"><span>Built target b</span><strong id="builtb"></strong></div>
+    </div>
+    <div class="panel"><canvas id="colCanvas" width="560" height="460"></canvas><p class="small">The first arrow follows x₁ times column 1. The second arrow follows x₂ times column 2. Together they build b.</p></div>
+  </div>
+</section>
+
+<section class="section" id="cases">
+  <h2>4. The three possible outcomes</h2>
+  <p class="lead">A system can have exactly one solution, no solution, or infinitely many solutions.</p>
+  <div class="grid">
+    <div class="panel"><button class="button" onclick="setCase('one')">One solution</button> <button class="button secondary" onclick="setCase('none')">No solution</button> <button class="button" onclick="setCase('many')">Infinitely many</button><div id="caseText" class="note" style="margin-top:14px"></div></div>
+    <div class="panel"><canvas id="caseCanvas" width="560" height="440"></canvas></div>
+  </div>
+</section>
+
+<section class="section" id="elimination">
+  <h2>5. Elimination step by step</h2>
+  <p class="lead">Row operations simplify a system without changing its solution set.</p>
+  <div class="grid">
+    <div class="panel">
+      <button class="button" onclick="nextElim()">Next row operation</button>
+      <button class="button secondary" onclick="resetElim()">Reset</button>
+      <p class="small" id="elimDesc"></p>
+    </div>
+    <div class="panel"><table id="elimTable"></table></div>
+  </div>
+</section>
+
+<section class="section" id="conditioning">
+  <h2>6. Sensitivity: when solving backwards is fragile</h2>
+  <p class="lead">Some matrix machines can be reversed, but only with difficulty. Small changes in the output can cause large changes in the recovered input.</p>
+  <div class="grid">
+    <div class="panel controls">
+      <div class="formula">A = [[1, 1], [1, 1 + ε]]</div>
+      <label>ε: <span class="value" id="epsv"></span></label><input id="eps" type="range" min="0.02" max="2" step="0.02" value="0.2">
+      <label>noise in b₂: <span class="value" id="noisev"></span></label><input id="noise" type="range" min="-0.2" max="0.2" step="0.005" value="0.02">
+      <div class="stat"><span>Recovered x</span><strong id="sensx"></strong></div>
+      <div class="stat"><span>Amplification</span><strong id="amp"></strong></div>
+    </div>
+    <div class="panel"><canvas id="sensCanvas" width="560" height="440"></canvas></div>
+  </div>
+</section>
+
+<section class="section" id="challenge">
+  <h2>7. Reflection and design challenge</h2>
+  <p class="lead">Write your own reverse-engineering story. What are the hidden quantities? What observations are visible? What matrix connects them?</p>
+  <textarea placeholder="Example: Three food bundles have known total prices. The hidden vector contains unit prices. The matrix contains item counts..."></textarea>
+  <p class="small">A strong answer should include A, x, b, and an interpretation of the recovered x.</p>
+</section>
+</main>
+<script>
+function $(id){return document.getElementById(id)}
+function fmt(x){return (Math.round(x*100)/100).toFixed(2)}
+function solve2(A,b){let det=A[0][0]*A[1][1]-A[0][1]*A[1][0]; if(Math.abs(det)<1e-9)return null; return [(b[0]*A[1][1]-A[0][1]*b[1])/det,(A[0][0]*b[1]-b[0]*A[1][0])/det]}
+function axes(ctx,w,h,scale=30){ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1;for(let x=-w/2;x<=w/2;x+=scale){ctx.beginPath();ctx.moveTo(x,-h/2);ctx.lineTo(x,h/2);ctx.stroke()}for(let y=-h/2;y<=h/2;y+=scale){ctx.beginPath();ctx.moveTo(-w/2,y);ctx.lineTo(w/2,y);ctx.stroke()}ctx.strokeStyle='#94a3b8';ctx.beginPath();ctx.moveTo(-w/2,0);ctx.lineTo(w/2,0);ctx.moveTo(0,-h/2);ctx.lineTo(0,h/2);ctx.stroke();ctx.restore()}
+function arrow(ctx,x1,y1,x2,y2,color,scale=30){ctx.save();ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);ctx.scale(scale,-scale);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=0.08;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();let ang=Math.atan2(y2-y1,x2-x1),len=.28;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-len*Math.cos(ang-.45),y2-len*Math.sin(ang-.45));ctx.lineTo(x2-len*Math.cos(ang+.45),y2-len*Math.sin(ang+.45));ctx.closePath();ctx.fill();ctx.restore()}
+function updateMachine(){let x1=+$('x1').value,x2=+$('x2').value;let b1=2*x1+x2,b2=x1+3*x2;let rec=solve2([[2,1],[1,3]],[b1,b2]);$('x1v').textContent=fmt(x1);$('x2v').textContent=fmt(x2);$('b1').textContent=fmt(b1);$('b2').textContent=fmt(b2);$('rec').textContent=`(${fmt(rec[0])}, ${fmt(rec[1])})`;let c=$('machineCanvas'),ctx=c.getContext('2d');axes(ctx,c.width,c.height,30);arrow(ctx,0,0,x1,x2,'#2563eb',30);arrow(ctx,0,0,b1,b2,'#7c3aed',18)}
+function line(ctx,A,b,color){let w=ctx.canvas.width,h=ctx.canvas.height,scale=30;ctx.save();ctx.translate(w/2,h/2);ctx.scale(scale,-scale);ctx.strokeStyle=color;ctx.lineWidth=.06;ctx.beginPath();let xs=[-10,10], pts=[];for(let x of xs){let y=(b-A[0]*x)/A[1];pts.push([x,y])}ctx.moveTo(pts[0][0],pts[0][1]);ctx.lineTo(pts[1][0],pts[1][1]);ctx.stroke();ctx.restore()}
+function dot(ctx,x,y,color,scale=30){ctx.save();ctx.translate(ctx.canvas.width/2,ctx.canvas.height/2);ctx.scale(scale,-scale);ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,.14,0,2*Math.PI);ctx.fill();ctx.restore()}
+function updateLines(){let b1=+$('lb1').value,b2=+$('lb2').value;$('lb1v').textContent=fmt(b1);$('lb2v').textContent=fmt(b2);let sol=solve2([[2,1],[1,3]],[b1,b2]);$('linsol').textContent=`(${fmt(sol[0])}, ${fmt(sol[1])})`;let c=$('lineCanvas'),ctx=c.getContext('2d');axes(ctx,c.width,c.height,30);line(ctx,[2,1],b1,'#2563eb');line(ctx,[1,3],b2,'#7c3aed');dot(ctx,sol[0],sol[1],'#ef4444',30)}
+function updateCols(){let x1=+$('cx1').value,x2=+$('cx2').value;$('cx1v').textContent=fmt(x1);$('cx2v').textContent=fmt(x2);let v1=[2*x1,1*x1],v2=[1*x2,3*x2],b=[v1[0]+v2[0],v1[1]+v2[1]];$('builtb').textContent=`(${fmt(b[0])}, ${fmt(b[1])})`;let c=$('colCanvas'),ctx=c.getContext('2d');axes(ctx,c.width,c.height,30);arrow(ctx,0,0,v1[0],v1[1],'#2563eb',30);arrow(ctx,v1[0],v1[1],b[0],b[1],'#7c3aed',30);arrow(ctx,0,0,b[0],b[1],'#ef4444',30)}
+let caseName='one';function setCase(name){caseName=name;drawCase()}
+function drawCase(){let c=$('caseCanvas'),ctx=c.getContext('2d');axes(ctx,c.width,c.height,30);let text='';if(caseName==='one'){line(ctx,[2,1],7,'#2563eb');line(ctx,[1,3],11,'#7c3aed');dot(ctx,2,3,'#ef4444');text='The lines meet once. The system has exactly one solution: (2, 3).'}if(caseName==='none'){line(ctx,[1,1],2,'#2563eb');line(ctx,[1,1],5,'#7c3aed');text='The lines are parallel and distinct. The equations contradict each other. No solution.'}if(caseName==='many'){line(ctx,[1,1],2,'#2563eb');line(ctx,[2,2],4,'#7c3aed');text='The two equations describe the same line. Every point on the line is a solution.'}$('caseText').textContent=text}
+let elimSteps=[{d:'Start with the augmented matrix.',m:[[2,1,7],[1,3,11]]},{d:'Swap rows.',m:[[1,3,11],[2,1,7]]},{d:'R₂ ← R₂ − 2R₁.',m:[[1,3,11],[0,-5,-15]]},{d:'R₂ ← R₂ / −5.',m:[[1,3,11],[0,1,3]]},{d:'R₁ ← R₁ − 3R₂.',m:[[1,0,2],[0,1,3]]}], elim=0;
+function drawElim(){let M=elimSteps[elim].m;$('elimDesc').textContent=elimSteps[elim].d;let html='<tr><th>x₁</th><th>x₂</th><th>|</th><th>b</th></tr>';for(let r of M){html+=`<tr><td>${fmt(r[0])}</td><td>${fmt(r[1])}</td><td>|</td><td>${fmt(r[2])}</td></tr>`}$('elimTable').innerHTML=html}
+function nextElim(){elim=Math.min(elim+1,elimSteps.length-1);drawElim()}function resetElim(){elim=0;drawElim()}
+function updateSens(){let e=+$('eps').value,noise=+$('noise').value;$('epsv').textContent=fmt(e);$('noisev').textContent=fmt(noise);let A=[[1,1],[1,1+e]],b=[2,2+e+noise];let x=solve2(A,b);let base=solve2(A,[2,2+e]);let dx=Math.hypot(x[0]-base[0],x[1]-base[1]);let db=Math.abs(noise);$('sensx').textContent=`(${fmt(x[0])}, ${fmt(x[1])})`;$('amp').textContent=db>0?fmt(dx/db):'0.00';let c=$('sensCanvas'),ctx=c.getContext('2d');axes(ctx,c.width,c.height,30);line(ctx,[1,1],2,'#2563eb');line(ctx,[1,1+e],2+e+noise,'#7c3aed');dot(ctx,x[0],x[1],'#ef4444')}
+['x1','x2'].forEach(id=>$(id).addEventListener('input',updateMachine));['lb1','lb2'].forEach(id=>$(id).addEventListener('input',updateLines));['cx1','cx2'].forEach(id=>$(id).addEventListener('input',updateCols));['eps','noise'].forEach(id=>$(id).addEventListener('input',updateSens));
+updateMachine();updateLines();updateCols();drawCase();drawElim();updateSens();
+</script>
+</body>
+</html>

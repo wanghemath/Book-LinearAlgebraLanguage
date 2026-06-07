@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 22: Text as Vectors</title>
+<style>
+:root{--bg:#f6f8fb;--card:#ffffff;--ink:#182231;--muted:#607086;--accent:#3b65d8;--accent2:#16a085;--border:#d9e1ee;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(135deg,#13294b,#3b65d8);color:white;padding:48px 20px} header .wrap{max-width:1100px;margin:auto} h1{font-size:clamp(2rem,4vw,3.7rem);margin:0 0 10px} .subtitle{font-size:1.25rem;opacity:.92;max-width:850px}
+main{max-width:1100px;margin:28px auto;padding:0 18px}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;margin:22px 0;box-shadow:0 8px 24px rgba(20,35,70,.08)}
+h2{margin-top:0;color:#13294b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.pill{display:inline-block;background:#eef3ff;color:#274ba8;padding:5px 10px;border-radius:999px;font-weight:700;font-size:.88rem;margin:3px}
+textarea,input,select,button{font:inherit} textarea{width:100%;min-height:90px;border:1px solid var(--border);border-radius:12px;padding:12px} input[type=text]{width:100%;border:1px solid var(--border);border-radius:12px;padding:10px} button{border:0;border-radius:12px;background:var(--accent);color:#fff;padding:10px 14px;cursor:pointer;font-weight:700} button.secondary{background:#16a085} button:hover{filter:brightness(.95)}
+table{border-collapse:collapse;width:100%;margin-top:12px;font-size:.95rem} th,td{border:1px solid var(--border);padding:8px;text-align:center} th{background:#eef3ff}.small{color:var(--muted);font-size:.95rem}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.bar{height:18px;background:#e8edf7;border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#3b65d8,#16a085)}
+canvas{width:100%;max-width:760px;height:360px;border:1px solid var(--border);border-radius:14px;background:#fff}.scoreRow{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center;margin:8px 0}.token{display:inline-block;background:#f1f5f9;border:1px solid #dbe3ee;border-radius:8px;padding:3px 7px;margin:3px}.warn{background:#fff8e6;border-left:5px solid #f0b429;padding:12px;border-radius:10px}.ok{background:#effaf6;border-left:5px solid #16a085;padding:12px;border-radius:10px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Lab 22: Text as Vectors</h1><div class="subtitle">Turn words into coordinates, documents into points, search into cosine similarity, and hidden themes into SVD directions.</div></div></header>
+<main>
+<section class="card"><h2>1. Big idea</h2><p>A vocabulary is a coordinate system. A document is a vector in that coordinate system. Once text becomes vectors, linear algebra can compare, search, classify, compress, and discover patterns in language.</p><span class="pill">bag of words</span><span class="pill">cosine similarity</span><span class="pill">TF-IDF</span><span class="pill">SVD topics</span><span class="pill">embeddings</span></section>
+
+<section class="card"><h2>2. Build document vectors</h2><p>Enter short documents. The page will tokenize them, build a vocabulary, and create a document-term matrix.</p><textarea id="docs">linear algebra data matrix vector model ai
+neural network model data ai learning
+matrix factorization vector data model
+guitar melody song music rhythm
+music guitar piano melody song
+basketball team score player game
+soccer team player goal score game</textarea><br><br><button onclick="buildMatrix()">Build matrix</button><div id="vocabBox" class="small"></div><div id="matrixBox"></div></section>
+
+<section class="card"><h2>3. Search by cosine similarity</h2><p>Type a query. It becomes a vector in the same vocabulary. Documents are ranked by cosine similarity.</p><input id="query" type="text" value="matrix data ai model"/><br><br><button onclick="runSearch()">Search</button><div id="searchBox"></div></section>
+
+<section class="card"><h2>4. Raw counts versus TF-IDF</h2><p>TF-IDF stretches rare informative word axes and shrinks common word axes. Compare the ranking from raw counts and TF-IDF.</p><button class="secondary" onclick="compareTFIDF()">Compare rankings</button><div class="grid"><div id="rawRank"></div><div id="tfidfRank"></div></div></section>
+
+<section class="card"><h2>5. Visualize document similarity</h2><p>The heatmap below shows cosine similarity between all pairs of documents.</p><button onclick="drawHeatmap()">Draw similarity heatmap</button><br><br><canvas id="heat" width="760" height="360"></canvas></section>
+
+<section class="card"><h2>6. Toy embeddings</h2><p>Bag-of-words needs exact word overlap. Embeddings place related meanings close together, even when the exact words differ.</p><canvas id="embed" width="760" height="360"></canvas><br><button onclick="drawEmbeddings()">Draw toy word embeddings</button><p class="small">Notice that “car,” “automobile,” and “truck” cluster together, while “guitar,” “piano,” and “music” cluster together.</p></section>
+
+<section class="card"><h2>7. Sparse high-dimensional intuition</h2><p>Real text vectors may have 50,000 dimensions, but one document uses only a few hundred words. Move the sliders to estimate sparsity.</p><div class="grid"><label>Vocabulary size <input type="range" id="V" min="100" max="50000" step="100" value="10000" oninput="sparseCalc()"></label><label>Words used <input type="range" id="K" min="5" max="1000" step="5" value="200" oninput="sparseCalc()"></label></div><div id="sparseBox"></div></section>
+
+<section class="card"><h2>Reflection prompts</h2><ol><li>What does a vocabulary do geometrically?</li><li>Why is cosine similarity useful for text?</li><li>What does TF-IDF change?</li><li>Why can SVD reveal topics?</li><li>What do embeddings add beyond word counts?</li></ol></section>
+</main>
+<script>
+let vocab=[], X=[], docs=[];
+function tok(s){return (s.toLowerCase().match(/[a-z]+/g)||[])}
+function dot(a,b){return a.reduce((s,x,i)=>s+x*b[i],0)}
+function norm(a){return Math.sqrt(dot(a,a))}
+function cos(a,b){let na=norm(a), nb=norm(b); return na&&nb ? dot(a,b)/(na*nb):0}
+function buildMatrix(){docs=document.getElementById('docs').value.trim().split(/\n+/).filter(Boolean); let tokenized=docs.map(tok); vocab=[...new Set(tokenized.flat())].sort(); let idx=Object.fromEntries(vocab.map((w,i)=>[w,i])); X=tokenized.map(ts=>{let row=Array(vocab.length).fill(0); ts.forEach(w=>row[idx[w]]++); return row}); document.getElementById('vocabBox').innerHTML='<p><b>Vocabulary ('+vocab.length+'):</b> '+vocab.map(w=>'<span class="token">'+w+'</span>').join('')+'</p>'; let html='<table><tr><th>doc</th>'+vocab.map(w=>'<th>'+w+'</th>').join('')+'</tr>'; X.forEach((r,i)=>{html+='<tr><th>D'+(i+1)+'</th>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>'}); html+='</table>'; document.getElementById('matrixBox').innerHTML=html;}
+function vectorize(text){let idx=Object.fromEntries(vocab.map((w,i)=>[w,i])); let v=Array(vocab.length).fill(0); tok(text).forEach(w=>{if(idx[w]!==undefined)v[idx[w]]++}); return v}
+function rankRows(matrix, q){return matrix.map((r,i)=>({i,score:cos(q,r)})).sort((a,b)=>b.score-a.score)}
+function rankingHTML(ranks, title){let html='<h3>'+title+'</h3>'; ranks.forEach(o=>{let pct=Math.round(100*o.score); html+='<div class="scoreRow"><div>D'+(o.i+1)+': '+docs[o.i]+'<div class="bar"><div class="fill" style="width:'+pct+'%"></div></div></div><b>'+o.score.toFixed(3)+'</b></div>'}); return html}
+function runSearch(){if(!X.length)buildMatrix(); let q=vectorize(document.getElementById('query').value); document.getElementById('searchBox').innerHTML=rankingHTML(rankRows(X,q).slice(0,5),'Raw count cosine ranking')}
+function tfidfMatrix(){let N=X.length, M=vocab.length; let df=Array(M).fill(0); for(let j=0;j<M;j++){for(let i=0;i<N;i++) if(X[i][j]>0) df[j]++} let idf=df.map(d=>Math.log((N+1)/(d+1))+1); return X.map(row=>{let s=row.reduce((a,b)=>a+b,0)||1; return row.map((v,j)=>v/s*idf[j])})}
+function tfidfQuery(){let q=vectorize(document.getElementById('query').value); let N=X.length, M=vocab.length; let df=Array(M).fill(0); for(let j=0;j<M;j++){for(let i=0;i<N;i++) if(X[i][j]>0) df[j]++} let idf=df.map(d=>Math.log((N+1)/(d+1))+1); let s=q.reduce((a,b)=>a+b,0)||1; return q.map((v,j)=>v/s*idf[j])}
+function compareTFIDF(){if(!X.length)buildMatrix(); let q=vectorize(document.getElementById('query').value); document.getElementById('rawRank').innerHTML=rankingHTML(rankRows(X,q).slice(0,5),'Raw counts'); let Xt=tfidfMatrix(), qt=tfidfQuery(); document.getElementById('tfidfRank').innerHTML=rankingHTML(rankRows(Xt,qt).slice(0,5),'TF-IDF')}
+function drawHeatmap(){if(!X.length)buildMatrix(); let c=document.getElementById('heat'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); let n=X.length, size=Math.min(300/n, 42), ox=120, oy=35; ctx.font='13px sans-serif'; for(let i=0;i<n;i++){for(let j=0;j<n;j++){let s=cos(X[i],X[j]); let blue=Math.floor(245-145*s); ctx.fillStyle='rgb('+blue+','+blue+',255)'; ctx.fillRect(ox+j*size,oy+i*size,size,size); ctx.strokeStyle='#ffffff'; ctx.strokeRect(ox+j*size,oy+i*size,size,size); if(size>26){ctx.fillStyle='#13294b'; ctx.fillText(s.toFixed(1),ox+j*size+6,oy+i*size+size/2+4)}} ctx.fillStyle='#222'; ctx.fillText('D'+(i+1),ox-35,oy+i*size+size/2+4); ctx.fillText('D'+(i+1),ox+i*size+8,oy-10)} ctx.fillStyle='#222'; ctx.fillText('Cosine similarity heatmap', ox, oy+n*size+35)}
+function drawEmbeddings(){let c=document.getElementById('embed'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); let words={car:[1,.1],automobile:[.95,.15],truck:[.9,.25],guitar:[-.2,1],piano:[-.1,.95],music:[-.15,.9],matrix:[.7,-.55],vector:[.65,-.5],algebra:[.75,-.45]}; function map(p){return [c.width/2+p[0]*240, c.height/2-p[1]*130]} ctx.strokeStyle='#d9e1ee'; ctx.beginPath(); ctx.moveTo(0,c.height/2); ctx.lineTo(c.width,c.height/2); ctx.moveTo(c.width/2,0); ctx.lineTo(c.width/2,c.height); ctx.stroke(); ctx.font='15px sans-serif'; Object.entries(words).forEach(([w,p])=>{let [x,y]=map(p); ctx.fillStyle='#3b65d8'; ctx.beginPath(); ctx.arc(x,y,7,0,7); ctx.fill(); ctx.fillStyle='#182231'; ctx.fillText(w,x+10,y-8)})}
+function sparseCalc(){let V=+document.getElementById('V').value, K=+document.getElementById('K').value; if(K>V)K=V; let zero=(1-K/V)*100; document.getElementById('sparseBox').innerHTML='<p><b>Vocabulary size:</b> '+V.toLocaleString()+' &nbsp; <b>active words:</b> '+K.toLocaleString()+'</p><div class="bar"><div class="fill" style="width:'+(100-zero)+'%"></div></div><p class="small">Only '+(100-zero).toFixed(2)+'% of coordinates are nonzero. About '+zero.toFixed(2)+'% are zero.</p>'}
+buildMatrix(); runSearch(); drawHeatmap(); drawEmbeddings(); sparseCalc();
+</script>
+</body>
+</html>

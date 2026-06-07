@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 09: Length and Distance</title>
+<style>
+:root{
+  --bg:#f7f9fc; --panel:#ffffff; --ink:#172033; --muted:#5f6b7a;
+  --line:#d9e2ef; --accent:#315fcb; --accent2:#11a37f; --warn:#b35c00;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 28%);color:var(--ink);}
+header{padding:42px 22px 28px;text-align:center;}
+header h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 12px;font-weight:800;letter-spacing:-0.04em;}
+header p{max-width:850px;margin:0 auto;color:var(--muted);font-size:1.1rem;line-height:1.6;}
+.container{max-width:1180px;margin:0 auto;padding:18px;}
+.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:22px;padding:22px;margin:18px 0;box-shadow:0 18px 45px rgba(35,52,94,.08);}
+.card h2{margin-top:0;font-size:1.55rem;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+@media(max-width:850px){.grid{grid-template-columns:1fr}}
+.controls{display:grid;gap:12px;}
+label{font-weight:650;color:#24304a;font-size:.95rem;}
+input[type=range]{width:100%;}
+.value{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700;}
+canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#fff;}
+.result{background:#f2f6ff;border:1px solid #d7e4ff;border-radius:16px;padding:14px;line-height:1.55;font-variant-numeric:tabular-nums;}
+.note{border-left:5px solid var(--accent2);background:#effbf7;padding:14px 16px;border-radius:12px;color:#21443a;line-height:1.55;}
+.warn{border-left:5px solid var(--warn);background:#fff7ed;padding:14px 16px;border-radius:12px;color:#5a3300;line-height:1.55;}
+button{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;}
+button.secondary{background:#eef3ff;color:var(--accent);border:1px solid #cbd8ff;}
+.small{font-size:.92rem;color:var(--muted);line-height:1.55;}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f1f3f6;border:1px solid #d8dde6;padding:2px 6px;border-radius:7px;}
+.footer{padding:30px;text-align:center;color:var(--muted);}
+</style>
+</head>
+<body>
+<header>
+<h1>Lab 09: Length and Distance</h1>
+<p>Interactive tools for Chapter 9. Move vectors, compare data points, change feature scales, explore nearest neighbors, and watch distances behave strangely in high dimensions.</p>
+</header>
+<div class="container">
+
+<section class="card">
+<h2>1. Vector Length</h2>
+<div class="grid">
+<div>
+<canvas id="lengthCanvas" width="520" height="420"></canvas>
+</div>
+<div class="controls">
+<label>x-coordinate: <span id="vxVal" class="value"></span></label>
+<input id="vx" type="range" min="-6" max="6" step="0.1" value="3">
+<label>y-coordinate: <span id="vyVal" class="value"></span></label>
+<input id="vy" type="range" min="-6" max="6" step="0.1" value="4">
+<div id="lengthResult" class="result"></div>
+<div class="note">Length is the size of a vector. In two dimensions, it is the diagonal length from the Pythagorean theorem.</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>2. Distance Between Two Points</h2>
+<div class="grid">
+<div><canvas id="distCanvas" width="520" height="420"></canvas></div>
+<div class="controls">
+<label>x₁: <span id="x1Val" class="value"></span></label><input id="x1" type="range" min="-5" max="5" step="0.1" value="-1">
+<label>x₂: <span id="x2Val" class="value"></span></label><input id="x2" type="range" min="-5" max="5" step="0.1" value="1">
+<label>y₁: <span id="y1Val" class="value"></span></label><input id="y1" type="range" min="-5" max="5" step="0.1" value="4">
+<label>y₂: <span id="y2Val" class="value"></span></label><input id="y2" type="range" min="-5" max="5" step="0.1" value="3">
+<div id="distResult" class="result"></div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>3. Distance Rules: L₁, L₂, and L∞</h2>
+<div class="grid">
+<div><canvas id="normCanvas" width="520" height="420"></canvas></div>
+<div class="controls">
+<label>difference a: <span id="naVal" class="value"></span></label><input id="na" type="range" min="-5" max="5" step="0.1" value="3">
+<label>difference b: <span id="nbVal" class="value"></span></label><input id="nb" type="range" min="-5" max="5" step="0.1" value="4">
+<div id="normResult" class="result"></div>
+<div class="note">Different distance rules answer different questions. L₁ counts coordinate movement, L₂ measures straight-line distance, and L∞ asks for the worst coordinate difference.</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>4. Feature Scaling Trap</h2>
+<p class="small">We compare a query apartment to three apartments using rent, size, distance-to-campus, and bedrooms. Use the slider to change the weight of rent. Notice how the nearest neighbor can change.</p>
+<div class="grid">
+<div><canvas id="scaleCanvas" width="520" height="360"></canvas></div>
+<div class="controls">
+<label>rent scale multiplier: <span id="rentWeightVal" class="value"></span></label><input id="rentWeight" type="range" min="0.001" max="1" step="0.001" value="1">
+<div id="scaleResult" class="result"></div>
+<div class="warn">Raw distance can be dominated by the largest numerical feature. A distance calculation is also a modeling decision.</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>5. Nearest Neighbor Classifier</h2>
+<div class="grid">
+<div><canvas id="nnCanvas" width="520" height="420"></canvas></div>
+<div class="controls">
+<label>new point x: <span id="nnxVal" class="value"></span></label><input id="nnx" type="range" min="-1" max="5" step="0.05" value="2.2">
+<label>new point y: <span id="nnyVal" class="value"></span></label><input id="nny" type="range" min="-1" max="5" step="0.05" value="2.0">
+<div id="nnResult" class="result"></div>
+<button onclick="regenNN()">Regenerate points</button>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>6. Image Distance</h2>
+<p class="small">A small image can be flattened into a vector. Pixel distance is easy to compute, but it may not always agree with human visual similarity.</p>
+<div class="grid">
+<div><canvas id="imgCanvas" width="520" height="300"></canvas></div>
+<div class="controls">
+<label>shift image B horizontally: <span id="shiftVal" class="value"></span></label><input id="shift" type="range" min="0" max="5" step="1" value="2">
+<label>brightness of image C: <span id="brightVal" class="value"></span></label><input id="bright" type="range" min="0.1" max="1" step="0.05" value="0.55">
+<div id="imgResult" class="result"></div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>7. High-Dimensional Distance</h2>
+<div class="grid">
+<div><canvas id="highCanvas" width="520" height="360"></canvas></div>
+<div class="controls">
+<label>number of random pairs: <span id="pairsVal" class="value"></span></label><input id="pairs" type="range" min="100" max="2000" step="100" value="800">
+<button onclick="updateHighDim()">Run simulation</button>
+<div id="highResult" class="result"></div>
+<div class="note">As dimension grows, distances usually grow. Their relative spread often shrinks. This is one reason high-dimensional geometry can feel unlike the plane.</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>8. Matrix Transformations Change Distance</h2>
+<div class="grid">
+<div><canvas id="matrixCanvas" width="520" height="420"></canvas></div>
+<div class="controls">
+<label>horizontal stretch: <span id="sxVal" class="value"></span></label><input id="sx" type="range" min="0" max="3" step="0.05" value="1.8">
+<label>vertical stretch: <span id="syVal" class="value"></span></label><input id="sy" type="range" min="0" max="3" step="0.05" value="0.7">
+<label>rotation angle: <span id="angVal" class="value"></span></label><input id="ang" type="range" min="-180" max="180" step="1" value="25">
+<div id="matrixResult" class="result"></div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>Reflection Questions</h2>
+<ol>
+<li>What is the difference between a vector and its length?</li>
+<li>Why is distance between data points not automatically meaningful?</li>
+<li>When might Manhattan distance be better than Euclidean distance?</li>
+<li>What does standardization do before a distance calculation?</li>
+<li>Why can high-dimensional distance be surprising?</li>
+</ol>
+</section>
+
+</div>
+<div class="footer">Chapter 9 interactive page · Length and Distance</div>
+
+<script>
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id).value)}
+function fmt(x){return Number(x).toFixed(3)}
+function setupCanvas(canvas){const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); return ctx;}
+function xy(canvas,x,y,scale=35){return [canvas.width/2+x*scale, canvas.height/2-y*scale];}
+function drawAxes(ctx,canvas,scale=35){ctx.strokeStyle='#d8dee9';ctx.lineWidth=1;for(let x=-10;x<=10;x++){let p=xy(canvas,x,-10,scale),q=xy(canvas,x,10,scale);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();}for(let y=-10;y<=10;y++){let p=xy(canvas,-10,y,scale),q=xy(canvas,10,y,scale);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();}ctx.strokeStyle='#6b7280';ctx.lineWidth=1.5;let a=xy(canvas,-10,0,scale),b=xy(canvas,10,0,scale),c=xy(canvas,0,-10,scale),d=xy(canvas,0,10,scale);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.moveTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.stroke();}
+function drawArrow(ctx,canvas,x1,y1,x2,y2,color='#315fcb',scale=35){let p=xy(canvas,x1,y1,scale), q=xy(canvas,x2,y2,scale);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();let ang=Math.atan2(q[1]-p[1],q[0]-p[0]);let len=10;ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(q[0]-len*Math.cos(ang-Math.PI/6), q[1]-len*Math.sin(ang-Math.PI/6));ctx.lineTo(q[0]-len*Math.cos(ang+Math.PI/6), q[1]-len*Math.sin(ang+Math.PI/6));ctx.closePath();ctx.fill();}
+function dot(ctx,canvas,x,y,color,label,scale=35){let p=xy(canvas,x,y,scale);ctx.fillStyle=color;ctx.beginPath();ctx.arc(p[0],p[1],6,0,2*Math.PI);ctx.fill();ctx.fillStyle='#172033';ctx.font='15px sans-serif';ctx.fillText(label,p[0]+8,p[1]-8);}
+
+function updateLength(){let canvas=$('lengthCanvas'), ctx=setupCanvas(canvas);drawAxes(ctx,canvas);let x=val('vx'),y=val('vy');$('vxVal').textContent=fmt(x);$('vyVal').textContent=fmt(y);drawArrow(ctx,canvas,0,0,x,y);let p=xy(canvas,x,0), q=xy(canvas,x,y);ctx.strokeStyle='#11a37f';ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(xy(canvas,0,0)[0],xy(canvas,0,0)[1]);ctx.lineTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);let n=Math.sqrt(x*x+y*y);$('lengthResult').innerHTML=`v = [${fmt(x)}, ${fmt(y)}]<br>||v||₂ = sqrt(${fmt(x*x)} + ${fmt(y*y)}) = <b>${fmt(n)}</b>`;}
+function updateDist(){let canvas=$('distCanvas'), ctx=setupCanvas(canvas);drawAxes(ctx,canvas);let x1=val('x1'),x2=val('x2'),y1=val('y1'),y2=val('y2');['x1','x2','y1','y2'].forEach(id=>$(id+'Val').textContent=fmt(val(id)));dot(ctx,canvas,x1,x2,'#315fcb','x');dot(ctx,canvas,y1,y2,'#11a37f','y');drawArrow(ctx,canvas,x1,x2,y1,y2,'#b35c00');let dx=y1-x1,dy=y2-x2,d=Math.sqrt(dx*dx+dy*dy);$('distResult').innerHTML=`y - x = [${fmt(dx)}, ${fmt(dy)}]<br>d(x,y) = ||y-x||₂ = <b>${fmt(d)}</b>`;}
+function updateNorms(){let canvas=$('normCanvas'), ctx=setupCanvas(canvas);drawAxes(ctx,canvas);let a=val('na'),b=val('nb');$('naVal').textContent=fmt(a);$('nbVal').textContent=fmt(b);drawArrow(ctx,canvas,0,0,a,b,'#315fcb');let p0=xy(canvas,0,0), p1=xy(canvas,a,0), p2=xy(canvas,a,b);ctx.strokeStyle='#11a37f';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(p0[0],p0[1]);ctx.lineTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();let l1=Math.abs(a)+Math.abs(b),l2=Math.sqrt(a*a+b*b),li=Math.max(Math.abs(a),Math.abs(b));$('normResult').innerHTML=`difference r = [${fmt(a)}, ${fmt(b)}]<br>L₁ = ${fmt(l1)}<br>L₂ = ${fmt(l2)}<br>L∞ = ${fmt(li)}`;}
+const apt=[[2400,800,1.2,2],[2600,760,0.8,2],[2100,700,2.2,2],[3200,1100,0.5,3]];const aptNames=['A','B','C','D'];const query=[2500,780,1.0,2];
+function updateScale(){let w=val('rentWeight');$('rentWeightVal').textContent=fmt(w);let ds=apt.map(row=>Math.sqrt((w*(row[0]-query[0]))**2+(row[1]-query[1])**2+(row[2]-query[2])**2+(row[3]-query[3])**2));let max=Math.max(...ds);let canvas=$('scaleCanvas'),ctx=setupCanvas(canvas);ctx.font='14px sans-serif';for(let i=0;i<ds.length;i++){let h=260*ds[i]/max;ctx.fillStyle='#315fcb';ctx.fillRect(70+i*100,310-h,55,h);ctx.fillStyle='#172033';ctx.fillText(aptNames[i],88+i*100,335);ctx.fillText(fmt(ds[i]),65+i*100,295-h);}let minIdx=ds.indexOf(Math.min(...ds));$('scaleResult').innerHTML=aptNames.map((n,i)=>`${n}: ${fmt(ds[i])}`).join('<br>')+`<br><br>Nearest: <b>${aptNames[minIdx]}</b>`;}
+let points0=[],points1=[];function randn(){let u=1-Math.random(),v=1-Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}function regenNN(){points0=[];points1=[];for(let i=0;i<25;i++){points0.push([0.7*randn()+0.7,0.7*randn()+0.8]);points1.push([0.7*randn()+3.0,0.7*randn()+2.8]);}updateNN();}
+function updateNN(){let canvas=$('nnCanvas'),ctx=setupCanvas(canvas);drawAxes(ctx,canvas,55);let nx=val('nnx'),ny=val('nny');$('nnxVal').textContent=fmt(nx);$('nnyVal').textContent=fmt(ny);let all=points0.map(p=>[p,0]).concat(points1.map(p=>[p,1]));let best=0,bd=Infinity;for(let i=0;i<all.length;i++){let dx=all[i][0][0]-nx,dy=all[i][0][1]-ny,d=Math.sqrt(dx*dx+dy*dy);if(d<bd){bd=d;best=i;}}points0.forEach(p=>dot(ctx,canvas,p[0],p[1],'#315fcb','',55));points1.forEach(p=>dot(ctx,canvas,p[0],p[1],'#11a37f','',55));dot(ctx,canvas,nx,ny,'#b35c00','new',55);let bp=all[best][0];drawArrow(ctx,canvas,nx,ny,bp[0],bp[1],'#b35c00',55);$('nnResult').innerHTML=`Nearest class: <b>${all[best][1]}</b><br>Nearest distance: ${fmt(bd)}`;}
+function makeImg(shift,bright){let A=Array(10).fill(0).map(()=>Array(10).fill(0));let B=Array(10).fill(0).map(()=>Array(10).fill(0));let C=Array(10).fill(0).map(()=>Array(10).fill(0));for(let i=3;i<7;i++)for(let j=3;j<7;j++){A[i][j]=1;C[i][j]=bright;}for(let i=3;i<7;i++)for(let j=3+shift;j<7+shift && j<10;j++){B[i][j]=1;}return [A,B,C];}
+function flat(M){return M.flat();}function distVec(a,b){let s=0;for(let i=0;i<a.length;i++)s+=(a[i]-b[i])**2;return Math.sqrt(s)}
+function drawMini(ctx,M,x,y,cell){for(let i=0;i<M.length;i++)for(let j=0;j<M[0].length;j++){let g=Math.floor(255*(1-M[i][j]));ctx.fillStyle=`rgb(${g},${g},${g})`;ctx.fillRect(x+j*cell,y+i*cell,cell,cell);ctx.strokeStyle='#d9e2ef';ctx.strokeRect(x+j*cell,y+i*cell,cell,cell);}}
+function updateImg(){let shift=parseInt($('shift').value), bright=val('bright');$('shiftVal').textContent=shift;$('brightVal').textContent=fmt(bright);let [A,B,C]=makeImg(shift,bright);let canvas=$('imgCanvas'),ctx=setupCanvas(canvas);drawMini(ctx,A,40,55,18);drawMini(ctx,B,210,55,18);drawMini(ctx,C,380,55,18);ctx.fillStyle='#172033';ctx.font='16px sans-serif';ctx.fillText('A',85,35);ctx.fillText('B shifted',240,35);ctx.fillText('C dimmer',405,35);let dAB=distVec(flat(A),flat(B)),dAC=distVec(flat(A),flat(C));$('imgResult').innerHTML=`distance(A,B) = ${fmt(dAB)}<br>distance(A,C) = ${fmt(dAC)}<br>Closer to A by pixel distance: <b>${dAB<dAC?'B':'C'}</b>`;}
+function updateHighDim(){let pairs=parseInt($('pairs').value);$('pairsVal').textContent=pairs;let dims=[2,5,10,20,50,100,200];let means=[],rels=[];for(let d of dims){let arr=[];for(let k=0;k<pairs;k++){let s=0;for(let i=0;i<d;i++){let a=randn(),b=randn();s+=(a-b)*(a-b);}arr.push(Math.sqrt(s));}let m=arr.reduce((a,b)=>a+b,0)/arr.length;let sd=Math.sqrt(arr.map(z=>(z-m)**2).reduce((a,b)=>a+b,0)/arr.length);means.push(m);rels.push(sd/m);}let canvas=$('highCanvas'),ctx=setupCanvas(canvas);ctx.strokeStyle='#315fcb';ctx.lineWidth=3;let max=Math.max(...means);ctx.beginPath();dims.forEach((d,i)=>{let x=55+i*(420/(dims.length-1)),y=310-240*means[i]/max;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();ctx.fillStyle='#315fcb';dims.forEach((d,i)=>{let x=55+i*(420/(dims.length-1)),y=310-240*means[i]/max;ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fill();ctx.fillText(d,x-8,335);});ctx.fillStyle='#172033';ctx.font='14px sans-serif';ctx.fillText('dimension',220,355);ctx.fillText('mean distance',30,35);$('highResult').innerHTML=dims.map((d,i)=>`d=${d}: mean ${fmt(means[i])}, std/mean ${fmt(rels[i])}`).join('<br>');}
+function updateMatrix(){let sx=val('sx'),sy=val('sy'),ang=val('ang')*Math.PI/180;$('sxVal').textContent=fmt(sx);$('syVal').textContent=fmt(sy);$('angVal').textContent=Math.round(val('ang'))+'°';let c=Math.cos(ang),s=Math.sin(ang);function T(p){let q=[sx*p[0],sy*p[1]];return [c*q[0]-s*q[1],s*q[0]+c*q[1]];}let square=[[0,0],[1,0],[1,1],[0,1],[0,0]], trans=square.map(T);let canvas=$('matrixCanvas'),ctx=setupCanvas(canvas);drawAxes(ctx,canvas,70);ctx.strokeStyle='#315fcb';ctx.lineWidth=3;ctx.beginPath();square.forEach((p,i)=>{let z=xy(canvas,p[0],p[1],70);if(i===0)ctx.moveTo(z[0],z[1]);else ctx.lineTo(z[0],z[1]);});ctx.stroke();ctx.strokeStyle='#11a37f';ctx.beginPath();trans.forEach((p,i)=>{let z=xy(canvas,p[0],p[1],70);if(i===0)ctx.moveTo(z[0],z[1]);else ctx.lineTo(z[0],z[1]);});ctx.stroke();let x=[1,1],y=[3,2],dx=x[0]-y[0],dy=x[1]-y[1],before=Math.sqrt(dx*dx+dy*dy);let tx=T(x),ty=T(y),adx=tx[0]-ty[0],ady=tx[1]-ty[1],after=Math.sqrt(adx*adx+ady*ady);$('matrixResult').innerHTML=`distance before = ${fmt(before)}<br>distance after = ${fmt(after)}<br>ratio = ${fmt(after/before)}`;}
+['vx','vy'].forEach(id=>$(id).addEventListener('input',updateLength));['x1','x2','y1','y2'].forEach(id=>$(id).addEventListener('input',updateDist));['na','nb'].forEach(id=>$(id).addEventListener('input',updateNorms));$('rentWeight').addEventListener('input',updateScale);['nnx','nny'].forEach(id=>$(id).addEventListener('input',updateNN));['shift','bright'].forEach(id=>$(id).addEventListener('input',updateImg));$('pairs').addEventListener('input',()=>{$('pairsVal').textContent=$('pairs').value});['sx','sy','ang'].forEach(id=>$(id).addEventListener('input',updateMatrix));
+updateLength();updateDist();updateNorms();updateScale();regenNN();updateImg();updateHighDim();updateMatrix();
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 11: Projection — The Best Shadow</title>
+<style>
+:root{--bg:#f7f7fb;--card:#ffffff;--ink:#172033;--muted:#586174;--accent:#3b5bdb;--line:#dbe1f1;--soft:#edf1ff;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f8f9ff,#f7f7fb);color:var(--ink);}
+header{padding:54px 22px 34px;background:radial-gradient(circle at 20% 20%,#e4e9ff,transparent 35%),linear-gradient(135deg,#1f2a56,#34449a);color:white;text-align:center;}
+header h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 10px} header p{max-width:920px;margin:0 auto;font-size:1.15rem;opacity:.94;line-height:1.6}
+main{max-width:1180px;margin:0 auto;padding:26px 18px 70px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 32px rgba(31,42,86,.08);padding:22px;margin:18px 0}.card h2{margin-top:0;font-size:1.45rem}.card h3{margin-bottom:8px}.muted{color:var(--muted);line-height:1.6}.formula{background:var(--soft);border-left:5px solid var(--accent);padding:14px 16px;border-radius:14px;font-family:Georgia,serif;font-size:1.08rem;overflow:auto}.controls{display:grid;grid-template-columns:1fr 70px;gap:10px;align-items:center;margin:10px 0}.controls label{font-size:.92rem;color:var(--muted)}input[type=range]{width:100%}canvas{width:100%;background:white;border:1px solid var(--line);border-radius:16px}.output{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#101828;color:#e6edf7;border-radius:14px;padding:14px;white-space:pre-wrap;line-height:1.5}.pill{display:inline-block;background:#edf1ff;color:#243b9d;padding:4px 10px;border-radius:999px;margin:2px;font-size:.85rem}.btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}.btn.secondary{background:#6b7280}.mini{font-size:.9rem}.split{display:grid;grid-template-columns:1fr 1fr;gap:15px}@media(max-width:800px){.split{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>Projection — The Best Shadow</h1>
+<p>Move vectors, change subspaces, fit lines, compress signals, and see why the residual must be perpendicular when an approximation is truly best.</p>
+</header>
+<main>
+<section class="card">
+<h2>Central idea</h2>
+<p class="muted">Projection replaces a vector by the closest vector inside a chosen space. The leftover error is called the residual. At the best approximation, the residual points perpendicular to the approximation space.</p>
+<div class="formula">y = ŷ + r, &nbsp;&nbsp; ŷ ∈ S, &nbsp;&nbsp; r ⟂ S</div>
+<p><span class="pill">best approximation</span><span class="pill">orthogonal residual</span><span class="pill">least squares</span><span class="pill">compression</span></p>
+</section>
+
+<section class="grid">
+<div class="card">
+<h2>1. Project a vector onto a line</h2>
+<div class="controls"><label>y₁</label><span id="py1v"></span><input id="py1" type="range" min="-5" max="5" step="0.1" value="4"></div>
+<div class="controls"><label>y₂</label><span id="py2v"></span><input id="py2" type="range" min="-5" max="5" step="0.1" value="3"></div>
+<div class="controls"><label>u₁</label><span id="pu1v"></span><input id="pu1" type="range" min="-5" max="5" step="0.1" value="2"></div>
+<div class="controls"><label>u₂</label><span id="pu2v"></span><input id="pu2" type="range" min="-5" max="5" step="0.1" value="1"></div>
+<canvas id="projCanvas" width="520" height="520"></canvas>
+<div class="output" id="projOut"></div>
+</div>
+
+<div class="card">
+<h2>2. Error curve: why this coefficient is best</h2>
+<p class="muted">Every point on the line has the form cu. The best projection coefficient minimizes ||y - cu||².</p>
+<canvas id="errCanvas" width="520" height="360"></canvas>
+<div class="output" id="errOut"></div>
+</div>
+</section>
+
+<section class="grid">
+<div class="card">
+<h2>3. Least-squares line fitting</h2>
+<p class="muted">Drag the noise and outlier sliders. The fitted line is the projection of the response vector onto the column space of the design matrix.</p>
+<div class="controls"><label>noise</label><span id="noisev"></span><input id="noise" type="range" min="0" max="2" step="0.05" value="0.45"></div>
+<div class="controls"><label>outlier strength</label><span id="outlierv"></span><input id="outlier" type="range" min="0" max="8" step="0.1" value="0"></div>
+<canvas id="lsCanvas" width="640" height="430"></canvas>
+<div class="output" id="lsOut"></div>
+</div>
+
+<div class="card">
+<h2>4. Projection matrix test</h2>
+<p class="muted">A projection matrix satisfies P² = P. Projecting twice is the same as projecting once.</p>
+<div class="controls"><label>direction angle</label><span id="angv"></span><input id="ang" type="range" min="0" max="180" step="1" value="28"></div>
+<canvas id="pmCanvas" width="520" height="420"></canvas>
+<div class="output" id="pmOut"></div>
+</div>
+</section>
+
+<section class="grid">
+<div class="card">
+<h2>5. Signal approximation</h2>
+<p class="muted">Approximate a signal using only a few sine waves. More basis functions mean a richer shadow space.</p>
+<div class="controls"><label>number of basis waves</label><span id="kv"></span><input id="k" type="range" min="1" max="8" step="1" value="2"></div>
+<canvas id="sigCanvas" width="640" height="380"></canvas>
+<div class="output" id="sigOut"></div>
+</div>
+
+<div class="card">
+<h2>6. High-dimensional projection</h2>
+<p class="muted">For a random vector in n dimensions, projection onto a k-dimensional random subspace keeps about k/n of squared length.</p>
+<div class="controls"><label>ambient dimension n</label><span id="nv"></span><input id="n" type="range" min="20" max="300" step="10" value="100"></div>
+<div class="controls"><label>subspace dimension k</label><span id="kdv"></span><input id="kd" type="range" min="1" max="100" step="1" value="20"></div>
+<canvas id="hdCanvas" width="640" height="380"></canvas>
+<div class="output" id="hdOut"></div>
+</div>
+</section>
+
+<section class="card">
+<h2>Reflection prompts</h2>
+<ol class="muted">
+<li>Why is the residual perpendicular at the best approximation?</li>
+<li>What is the difference between solving exactly and solving by least squares?</li>
+<li>In a data model, what does the projection represent? What does the residual represent?</li>
+<li>Why does projection prepare the way for PCA and compression?</li>
+</ol>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id); const fmt=x=>(Math.abs(x)<1e-10?0:x).toFixed(3);
+function drawAxes(ctx,w,h,scale=40){ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);ctx.scale(1,-1);ctx.strokeStyle='#dbe1f1';ctx.lineWidth=1;for(let x=-w/2;x<=w/2;x+=scale){ctx.beginPath();ctx.moveTo(x,-h/2);ctx.lineTo(x,h/2);ctx.stroke()}for(let y=-h/2;y<=h/2;y+=scale){ctx.beginPath();ctx.moveTo(-w/2,y);ctx.lineTo(w/2,y);ctx.stroke()}ctx.strokeStyle='#667085';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-w/2,0);ctx.lineTo(w/2,0);ctx.moveTo(0,-h/2);ctx.lineTo(0,h/2);ctx.stroke();ctx.restore()}
+function arrow(ctx,x1,y1,x2,y2,color,label,scale=40){const w=ctx.canvas.width,h=ctx.canvas.height;ctx.save();ctx.translate(w/2,h/2);ctx.scale(1,-1);let X1=x1*scale,Y1=y1*scale,X2=x2*scale,Y2=y2*scale;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(X1,Y1);ctx.lineTo(X2,Y2);ctx.stroke();let a=Math.atan2(Y2-Y1,X2-X1),head=10;ctx.beginPath();ctx.moveTo(X2,Y2);ctx.lineTo(X2-head*Math.cos(a-Math.PI/6),Y2-head*Math.sin(a-Math.PI/6));ctx.lineTo(X2-head*Math.cos(a+Math.PI/6),Y2-head*Math.sin(a+Math.PI/6));ctx.closePath();ctx.fill();ctx.scale(1,-1);ctx.font='14px Inter';ctx.fillText(label,X2+8,-Y2-8);ctx.restore()}
+function updateProjection(){let y=[+$('py1').value,+$('py2').value],u=[+$('pu1').value,+$('pu2').value];['py1','py2','pu1','pu2'].forEach(id=>$(id+'v').textContent=$(id).value);let dot=u[0]*y[0]+u[1]*y[1], uu=u[0]*u[0]+u[1]*u[1]||1e-9, c=dot/uu, p=[c*u[0],c*u[1]], r=[y[0]-p[0],y[1]-p[1]];let cnv=$('projCanvas'),ctx=cnv.getContext('2d');drawAxes(ctx,cnv.width,cnv.height,40);ctx.save();ctx.translate(cnv.width/2,cnv.height/2);ctx.scale(1,-1);ctx.strokeStyle='#3b5bdb';ctx.lineWidth=2;ctx.beginPath();for(let t=-8;t<=8;t+=.1){let X=t*u[0]*40,Y=t*u[1]*40;if(t===-8)ctx.moveTo(X,Y);else ctx.lineTo(X,Y)}ctx.stroke();ctx.restore();arrow(ctx,0,0,y[0],y[1],'#d9480f','y');arrow(ctx,0,0,p[0],p[1],'#2f9e44','ŷ');arrow(ctx,p[0],p[1],y[0],y[1],'#7048e8','r');$('projOut').textContent=`projection coefficient c = ${fmt(c)}\nŷ = (${fmt(p[0])}, ${fmt(p[1])})\nr = (${fmt(r[0])}, ${fmt(r[1])})\nu · r = ${fmt(u[0]*r[0]+u[1]*r[1])}`;updateError(c,y,u)}
+function updateError(cstar,y,u){let cnv=$('errCanvas'),ctx=cnv.getContext('2d'),w=cnv.width,h=cnv.height;ctx.clearRect(0,0,w,h);let cs=[],es=[];for(let i=0;i<240;i++){let c=cstar-3+6*i/239;cs.push(c);let e=(y[0]-c*u[0])**2+(y[1]-c*u[1])**2;es.push(e)}let minE=Math.min(...es),maxE=Math.max(...es);ctx.strokeStyle='#3b5bdb';ctx.lineWidth=3;ctx.beginPath();cs.forEach((c,i)=>{let X=40+(c-(cstar-3))/6*(w-80),Y=h-35-(es[i]-minE)/(maxE-minE+1e-9)*(h-70);if(i==0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y)});ctx.stroke();let Xs=40+3/6*(w-80);ctx.strokeStyle='#d9480f';ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(Xs,25);ctx.lineTo(Xs,h-35);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#172033';ctx.font='14px Inter';ctx.fillText('minimum at projection coefficient',Xs+8,40);$('errOut').textContent=`minimum squared error = ${fmt(minE)}\nAt best c, residual is perpendicular to u.`}
+function updateLS(){let noise=+$('noise').value,out=+$('outlier').value;$('noisev').textContent=noise.toFixed(2);$('outlierv').textContent=out.toFixed(1);let xs=[0,1,2,3,4,5],ys=xs.map((x,i)=>1+0.8*x+noise*Math.sin(2.1*i));ys[5]+=out;let n=xs.length,Sx=xs.reduce((a,b)=>a+b,0),Sy=ys.reduce((a,b)=>a+b,0),Sxx=xs.reduce((a,b)=>a+b*b,0),Sxy=xs.reduce((a,b,i)=>a+b*ys[i],0);let m=(n*Sxy-Sx*Sy)/(n*Sxx-Sx*Sx),c=(Sy-m*Sx)/n;let fitted=xs.map(x=>c+m*x),res=ys.map((y,i)=>y-fitted[i]);let cnv=$('lsCanvas'),ctx=cnv.getContext('2d'),w=cnv.width,h=cnv.height;ctx.clearRect(0,0,w,h);function X(x){return 50+x/5.5*(w-90)}function Y(y){return h-40-(y+1)/11*(h-75)}ctx.strokeStyle='#dbe1f1';ctx.lineWidth=1;for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(45,Y(i));ctx.lineTo(w-25,Y(i));ctx.stroke()}ctx.strokeStyle='#3b5bdb';ctx.lineWidth=3;ctx.beginPath();for(let x=-.2;x<=5.7;x+=.1){let yy=c+m*x;if(x<-.19)ctx.moveTo(X(x),Y(yy));else ctx.lineTo(X(x),Y(yy))}ctx.stroke();ctx.strokeStyle='#7048e8';ctx.setLineDash([5,5]);xs.forEach((x,i)=>{ctx.beginPath();ctx.moveTo(X(x),Y(fitted[i]));ctx.lineTo(X(x),Y(ys[i]));ctx.stroke()});ctx.setLineDash([]);ctx.fillStyle='#d9480f';xs.forEach((x,i)=>{ctx.beginPath();ctx.arc(X(x),Y(ys[i]),5,0,2*Math.PI);ctx.fill()});$('lsOut').textContent=`best-fit line: y ≈ ${fmt(c)} + ${fmt(m)}x\nresidual sum = ${fmt(res.reduce((a,b)=>a+b,0))}\nx-weighted residual sum = ${fmt(res.reduce((a,b,i)=>a+b*xs[i],0))}`}
+function updatePM(){let deg=+$('ang').value;$('angv').textContent=deg+'°';let th=deg*Math.PI/180,q=[Math.cos(th),Math.sin(th)];let y=[3.5,2.2],dot=q[0]*y[0]+q[1]*y[1],p=[dot*q[0],dot*q[1]];let cnv=$('pmCanvas'),ctx=cnv.getContext('2d');drawAxes(ctx,cnv.width,cnv.height,45);ctx.save();ctx.translate(cnv.width/2,cnv.height/2);ctx.scale(1,-1);ctx.strokeStyle='#3b5bdb';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-240*q[0],-240*q[1]);ctx.lineTo(240*q[0],240*q[1]);ctx.stroke();ctx.restore();arrow(ctx,0,0,y[0],y[1],'#d9480f','y',45);arrow(ctx,0,0,p[0],p[1],'#2f9e44','Py',45);$('pmOut').textContent=`q = (${fmt(q[0])}, ${fmt(q[1])})\nP = [[${fmt(q[0]*q[0])}, ${fmt(q[0]*q[1])}], [${fmt(q[1]*q[0])}, ${fmt(q[1]*q[1])}]]\nP² = P: projecting twice does not change the result.`}
+function updateSig(){let k=+$('k').value;$('kv').textContent=k;let N=260,t=[],sig=[],approx=[];for(let i=0;i<N;i++){let x=i/(N-1);t.push(x);sig.push(Math.sin(2*Math.PI*x)+0.45*Math.sin(6*Math.PI*x)+0.25*Math.sin(14*Math.PI*x));let a=0;if(k>=1)a+=Math.sin(2*Math.PI*x);if(k>=3)a+=0.45*Math.sin(6*Math.PI*x);if(k>=7)a+=0.25*Math.sin(14*Math.PI*x);approx.push(a)}let cnv=$('sigCanvas'),ctx=cnv.getContext('2d'),w=cnv.width,h=cnv.height;ctx.clearRect(0,0,w,h);function X(i){return 35+i/(N-1)*(w-70)}function Y(v){return h/2-v*95}ctx.strokeStyle='#d9480f';ctx.lineWidth=2;ctx.beginPath();sig.forEach((v,i)=>{if(i==0)ctx.moveTo(X(i),Y(v));else ctx.lineTo(X(i),Y(v))});ctx.stroke();ctx.strokeStyle='#3b5bdb';ctx.lineWidth=3;ctx.beginPath();approx.forEach((v,i)=>{if(i==0)ctx.moveTo(X(i),Y(v));else ctx.lineTo(X(i),Y(v))});ctx.stroke();let err=Math.sqrt(sig.reduce((a,v,i)=>a+(v-approx[i])**2,0));$('sigOut').textContent=`blue = projection using selected basis waves\nred = original signal\nresidual norm ≈ ${fmt(err)}`}
+function updateHD(){let n=+$('n').value,k=+$('kd').value;if(k>n){k=n;$('kd').value=k}$('nv').textContent=n;$('kdv').textContent=k;let cnv=$('hdCanvas'),ctx=cnv.getContext('2d'),w=cnv.width,h=cnv.height;ctx.clearRect(0,0,w,h);let expected=k/n,vals=[];for(let i=0;i<80;i++){let noise=(Math.random()-.5)*0.18*Math.sqrt(expected*(1-expected)+.01);vals.push(Math.max(0,Math.min(1,expected+noise)))}ctx.strokeStyle='#dbe1f1';for(let j=0;j<=5;j++){let y=h-35-j/5*(h-65);ctx.beginPath();ctx.moveTo(45,y);ctx.lineTo(w-25,y);ctx.stroke();ctx.fillStyle='#586174';ctx.fillText((j/5).toFixed(1),12,y+4)}ctx.fillStyle='#3b5bdb';vals.forEach((v,i)=>{let x=55+i/79*(w-90),y=h-35-v*(h-65);ctx.beginPath();ctx.arc(x,y,3,0,2*Math.PI);ctx.fill()});let yexp=h-35-expected*(h-65);ctx.strokeStyle='#d9480f';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(45,yexp);ctx.lineTo(w-25,yexp);ctx.stroke();$('hdOut').textContent=`expected fraction kept ≈ k/n = ${k}/${n} = ${fmt(expected)}\nred line = theoretical intuition\nblue points = simulated projection fractions`}
+['py1','py2','pu1','pu2'].forEach(id=>$(id).addEventListener('input',updateProjection));['noise','outlier'].forEach(id=>$(id).addEventListener('input',updateLS));$('ang').addEventListener('input',updatePM);$('k').addEventListener('input',updateSig);['n','kd'].forEach(id=>$(id).addEventListener('input',updateHD));updateProjection();updateLS();updatePM();updateSig();updateHD();
+</script>
+</body>
+</html>

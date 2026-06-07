@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 17 Interactive — Image Compression with SVD</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#f7fafc;--card:#ffffff;--ink:#172033;--muted:#5f6c80;--accent:#3158d4;--accent2:#0f9d8f;--soft:#e8eefc;--border:#d8e0ef;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f8fbff,#eef4fb);color:var(--ink);line-height:1.55}
+header{padding:48px 20px 32px;text-align:center;background:linear-gradient(135deg,#203c86,#0f9d8f);color:white}
+header h1{margin:0;font-size:clamp(2rem,5vw,4rem);letter-spacing:-.03em}
+header p{max-width:860px;margin:16px auto 0;font-size:1.15rem;opacity:.95}
+main{max-width:1180px;margin:0 auto;padding:26px 18px 60px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;box-shadow:0 12px 28px rgba(25,47,89,.08);padding:24px;margin:22px 0}
+h2{margin-top:0;font-size:1.65rem;letter-spacing:-.02em}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.controls{background:#f8fbff;border:1px solid var(--border);padding:16px;border-radius:18px}.control{margin:14px 0}label{display:block;font-weight:700;margin-bottom:6px}.value{font-weight:800;color:var(--accent)}input[type=range]{width:100%}canvas{max-width:100%;background:#fff;border-radius:14px;border:1px solid var(--border)}.note{background:var(--soft);border-left:5px solid var(--accent);padding:14px 16px;border-radius:14px;margin:14px 0}.formula{font-family:Georgia,serif;background:#fbfcff;border:1px solid var(--border);border-radius:16px;padding:14px;text-align:center;font-size:1.1rem}.pill{display:inline-block;background:#eefaf8;color:#075c54;padding:5px 10px;border-radius:999px;font-weight:700;margin:4px 4px 4px 0}.stat{font-size:1.05rem;margin:8px 0}.prompt{background:#fff8e8;border:1px solid #f2d28c;border-radius:14px;padding:14px 16px;margin-top:12px}button{border:none;border-radius:12px;background:var(--accent);color:white;padding:10px 14px;font-weight:800;cursor:pointer}button.secondary{background:var(--accent2)}.small{font-size:.92rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+<h1>Lab 17 Interactive: Image Compression</h1>
+<p>Explore how a digital image becomes a matrix, how SVD breaks it into ordered layers, and how rank controls the tradeoff between quality, storage, and information loss.</p>
+</header>
+<main>
+<section class="card">
+<h2>1. The central idea</h2>
+<p>A grayscale image is a matrix. SVD writes it as a sum of rank-one visual layers:</p>
+<div class="formula">A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + ⋯</div>
+<p>Compression keeps only the first <strong>k</strong> layers:</p>
+<div class="formula">A<sub>k</sub> = σ₁u₁v₁ᵀ + ⋯ + σ<sub>k</sub>u<sub>k</sub>v<sub>k</sub>ᵀ</div>
+<div class="note">The first layers often capture broad structure. Later layers add details, texture, and sometimes noise.</div>
+</section>
+
+<section class="card">
+<h2>2. Rank-k image compression simulator</h2>
+<div class="grid">
+<div>
+<canvas id="imgCanvas" width="320" height="320"></canvas>
+<div class="controls">
+<div class="control"><label>Rank k: <span class="value" id="kVal">8</span></label><input id="kSlider" type="range" min="1" max="50" value="8"></div>
+<div class="control"><label>Image type</label><button onclick="setImageType('smooth')">Smooth</button> <button onclick="setImageType('edges')" class="secondary">Edges</button> <button onclick="setImageType('texture')">Texture</button></div>
+<p class="small">This uses a precomputed low-rank-style synthetic construction in the browser. It demonstrates the same rank-layer idea as SVD compression.</p>
+</div>
+</div>
+<div>
+<p class="stat">Storage ratio: <span class="value" id="storageStat"></span></p>
+<p class="stat">Approximate energy captured: <span class="value" id="energyStat"></span></p>
+<p class="stat">Visual lesson: <span id="lessonStat"></span></p>
+<canvas id="energyChart" height="230"></canvas>
+<div class="prompt"><strong>Reflection:</strong> At what value of k does the main structure appear? At what value do smaller details appear?</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>3. Singular values: fast decay versus slow decay</h2>
+<div class="controls">
+<div class="control"><label>Decay speed: <span class="value" id="decayVal">medium</span></label><input id="decaySlider" type="range" min="1" max="100" value="45"></div>
+</div>
+<div class="grid"><canvas id="svChart" height="260"></canvas><div><p>If singular values decay quickly, a small rank can capture most of the image. If they decay slowly, information is spread across many layers.</p><p class="stat">Rank needed for 90% energy: <span class="value" id="rank90"></span></p><p class="stat">Rank needed for 99% energy: <span class="value" id="rank99"></span></p><div class="note">Smooth images usually have faster decay than random or highly textured images.</div></div></div>
+</section>
+
+<section class="card">
+<h2>4. Compression versus denoising</h2>
+<div class="grid">
+<div><canvas id="noiseCanvas" width="320" height="320"></canvas></div>
+<div class="controls"><div class="control"><label>Noise level: <span class="value" id="noiseVal">25%</span></label><input id="noiseSlider" type="range" min="0" max="60" value="25"></div><div class="control"><label>Denoising rank k: <span class="value" id="denoiseKVal">12</span></label><input id="denoiseK" type="range" min="1" max="50" value="12"></div><p>Small k removes noise but may oversmooth. Large k restores detail but may restore noise too.</p></div>
+</div>
+</section>
+
+<section class="card">
+<h2>5. Storage calculator</h2>
+<div class="grid">
+<div class="controls"><div class="control"><label>Rows m: <span class="value" id="mVal">800</span></label><input id="mSlider" type="range" min="100" max="2000" step="50" value="800"></div><div class="control"><label>Columns n: <span class="value" id="nVal">600</span></label><input id="nSlider" type="range" min="100" max="2000" step="50" value="600"></div><div class="control"><label>Rank k: <span class="value" id="storeKVal">50</span></label><input id="storeK" type="range" min="1" max="500" value="50"></div></div>
+<div><p class="stat">Full storage: <span class="value" id="fullStore"></span> numbers</p><p class="stat">SVD storage: <span class="value" id="svdStore"></span> numbers</p><p class="stat">Storage fraction: <span class="value" id="storeFrac"></span></p><p class="stat">Compression worthwhile? <span class="value" id="worth"></span></p><div class="formula">SVD storage = k(m+n+1)</div></div>
+</div>
+</section>
+
+<section class="card">
+<h2>6. Final learning questions</h2>
+<p><span class="pill">SVD</span><span class="pill">rank</span><span class="pill">energy</span><span class="pill">compression</span><span class="pill">denoising</span></p>
+<ol>
+<li>Why does the first singular layer often look like a broad shadow of the image?</li>
+<li>Why can a smaller k denoise an image but also remove fine detail?</li>
+<li>Why is a random image hard to compress with low-rank SVD?</li>
+<li>How does this chapter prepare for PCA?</li>
+</ol>
+</section>
+</main>
+<script>
+const N=80; let imageType='edges';
+function baseLayers(type){
+  let layers=[];
+  for(let r=0;r<50;r++){
+    let layer=[];
+    for(let i=0;i<N;i++){
+      layer[i]=[];
+      const y=(i-N/2)/(N/2);
+      for(let j=0;j<N;j++){
+        const x=(j-N/2)/(N/2);
+        let v=0;
+        if(type==='smooth') v=Math.cos((r+1)*Math.PI*(x+0.2))*Math.cos((Math.floor(r/2)+1)*Math.PI*(y-0.1));
+        if(type==='edges') v=(x+y>0.25?1:-1)*Math.cos((r+1)*Math.PI*x*0.5)*Math.cos((r+1)*Math.PI*y*0.35);
+        if(type==='texture') v=Math.sin((r+2)*Math.PI*x)*Math.cos((r+3)*Math.PI*y);
+        layer[i][j]=v;
+      }
+    }
+    layers.push(layer);
+  }
+  return layers;
+}
+let layers=baseLayers(imageType);
+function singulars(type){let a= type==='smooth'?0.78:(type==='edges'?0.90:0.965); return Array.from({length:50},(_,i)=>Math.pow(a,i)*(type==='texture'?(1+0.1*Math.sin(i)):1));}
+function drawCompressed(){
+  let k=+document.getElementById('kSlider').value; document.getElementById('kVal').textContent=k;
+  let s=singulars(imageType); let data=[]; let min=1e9,max=-1e9;
+  for(let i=0;i<N;i++){data[i]=[]; for(let j=0;j<N;j++){let val=0; for(let r=0;r<k;r++) val+=s[r]*layers[r][i][j]; data[i][j]=val; if(val<min)min=val;if(val>max)max=val;}}
+  const canvas=document.getElementById('imgCanvas'),ctx=canvas.getContext('2d'),scale=canvas.width/N;
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){let c=Math.floor(255*(data[i][j]-min)/(max-min+1e-9));ctx.fillStyle=`rgb(${c},${c},${c})`;ctx.fillRect(j*scale,i*scale,scale,scale);}
+  let energy=s.slice(0,k).reduce((a,b)=>a+b*b,0)/s.reduce((a,b)=>a+b*b,0);
+  let storage=k*(N+N+1)/(N*N);
+  document.getElementById('energyStat').textContent=(100*energy).toFixed(1)+'%';
+  document.getElementById('storageStat').textContent=(100*storage).toFixed(1)+'%';
+  document.getElementById('lessonStat').textContent=k<5?'main shadow only':k<20?'main structure plus edges':'many details restored';
+  updateEnergyChart(s,k);
+}
+function setImageType(t){imageType=t; layers=baseLayers(t); drawCompressed();}
+let energyChart,svChart;
+function updateEnergyChart(s,k){let labels=s.map((_,i)=>i+1);let cum=[],sum=s.reduce((a,b)=>a+b*b,0),c=0;for(let v of s){c+=v*v;cum.push(c/sum)} if(energyChart)energyChart.destroy(); energyChart=new Chart(document.getElementById('energyChart'),{type:'line',data:{labels:labels,datasets:[{label:'cumulative energy',data:cum,borderWidth:2,pointRadius:0},{label:'current k',data:labels.map(x=>x===k?cum[k-1]:null),pointRadius:5,showLine:false}]},options:{plugins:{legend:{display:true}},scales:{y:{min:0,max:1}}}})}
+function updateSV(){let d=+document.getElementById('decaySlider').value; let alpha=0.72+0.0027*d; let s=Array.from({length:80},(_,i)=>Math.pow(alpha,i)); let cum=[],sum=s.reduce((a,b)=>a+b*b,0),c=0; for(let v of s){c+=v*v;cum.push(c/sum)} let r90=cum.findIndex(x=>x>=.9)+1, r99=cum.findIndex(x=>x>=.99)+1; document.getElementById('rank90').textContent=r90; document.getElementById('rank99').textContent=r99; document.getElementById('decayVal').textContent=d<30?'fast':d<70?'medium':'slow'; if(svChart)svChart.destroy(); svChart=new Chart(document.getElementById('svChart'),{type:'line',data:{labels:s.map((_,i)=>i+1),datasets:[{label:'singular values',data:s,borderWidth:2,pointRadius:0},{label:'energy',data:cum,borderWidth:2,pointRadius:0}]},options:{scales:{y:{min:0,max:1}}}})}
+function drawNoise(){let noise=+document.getElementById('noiseSlider').value/100; let k=+document.getElementById('denoiseK').value; document.getElementById('noiseVal').textContent=Math.round(noise*100)+'%'; document.getElementById('denoiseKVal').textContent=k; const canvas=document.getElementById('noiseCanvas'),ctx=canvas.getContext('2d'),scale=canvas.width/N; for(let i=0;i<N;i++)for(let j=0;j<N;j++){let x=(j-N/2)/(N/2), y=(i-N/2)/(N/2); let clean=.45+.2*x+.2*y+(((x+.25)**2+(y-.1)**2)<.22? .35:0); let smoothNoise=noise*(Math.sin(k*x*2)+Math.cos(k*y*2))*0.5; let c=Math.max(0,Math.min(1,clean+smoothNoise)); let cc=Math.floor(255*c); ctx.fillStyle=`rgb(${cc},${cc},${cc})`;ctx.fillRect(j*scale,i*scale,scale,scale)}}
+function updateStorage(){let m=+mSlider.value,n=+nSlider.value,k=+storeK.value; mVal.textContent=m;nVal.textContent=n;storeKVal.textContent=k;let full=m*n,svd=k*(m+n+1);fullStore.textContent=full.toLocaleString();svdStore.textContent=svd.toLocaleString();storeFrac.textContent=(100*svd/full).toFixed(1)+'%';worth.textContent=svd<full?'yes':'no'}
+['kSlider'].forEach(id=>document.getElementById(id).addEventListener('input',drawCompressed)); decaySlider.addEventListener('input',updateSV); noiseSlider.addEventListener('input',drawNoise); denoiseK.addEventListener('input',drawNoise); [mSlider,nSlider,storeK].forEach(el=>el.addEventListener('input',updateStorage));
+drawCompressed(); updateSV(); drawNoise(); updateStorage();
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Linear Algebra Language in the AI Age"
+  subtitle: "How Vectors and Matrices Describe the World"
+  author: "He Wang"
+  date: "2026-06-06"
+  site-url: "https://wanghemath.github.io/Book-linear-algebra-language/"
+  repo-url: "https://github.com/wanghemath/Book-linear-algebra-language"
+  repo-actions: [edit, issue]
+  page-navigation: true
+  search: true
+  sharing: [twitter, facebook, linkedin]
+  chapters:
+    - index.qmd
+    - preface.qmd
+    - introduction-overview.qmd
+    - labs-overview.qmd
+# # Part I. Seeing Data as Geometry (chapter 1-4)
+    - chapters/chapter-01-world-as-numbers.qmd
+    - htmls/lab-01-world-as-numbers-interactive.html
+    - chapters/chapter-02-vectors-numbers-with-meaning.qmd
+    - htmls/lab-02-vectors-numbers-with-meaning-interactive.html
+    - chapters/chapter-03-combining-ideas.qmd
+    - htmls/lab-03-combining-ideas-interactive.html
+    - chapters/chapter-04-data-as-points.qmd
+    - htmls/lab-04-data-as-points-interactive.html
+# # Part II. Matrices as Machines (chapter 5-8)
+    - chapters/chapter-05-matrix-machine.qmd
+    - htmls/lab-05-matrix-machine-interactive.html
+    - chapters/chapter-06-stretching-rotating-shearing.qmd
+    - htmls/lab-06-stretching-rotating-shearing-interactive.html
+    - chapters/chapter-07-solving-backwards.qmd 
+    - htmls/lab-07-solving-backwards-interactive.html
+    - chapters/chapter-08-when-information-is-lost.qmd
+    - htmls/lab-08-when-information-is-lost-interactive.html
+# # Part III. The Geometry of Similarity (chapter 9-12)
+    - chapters/chapter-09-length-and-distance.qmd
+    - htmls/lab-09-length-and-distance-interactive.html
+    - chapters/chapter-10-angles-and-similarity.qmd
+    - htmls/lab-10-angles-and-similarity-interactive.html
+    - chapters/chapter-11-projection-best-shadow.qmd
+    - htmls/lab-11-projection-best-shadow-interactive.html
+    - chapters/chapter-12-orthogonality.qmd
+    - htmls/lab-12-orthogonality-interactive.html
+# # Part IV. Hidden Directions (chapter 13-15)
+    - chapters/chapter-13-eigenvectors.qmd
+    - htmls/lab-13-eigenvectors-interactive.html
+    - chapters/chapter-14-stability-ranking-iteration.qmd
+    - htmls/lab-14-stability-ranking-iteration-interactive.html
+    - chapters/chapter-15-energy-landscapes.qmd
+    - htmls/lab-15-energy-landscapes-interactive.html
+# # Part V. The Data Microscope (chapter 16-20)
+    - chapters/chapter-16-svd-matrix-microscope.qmd
+    - htmls/lab-16-svd-matrix-microscope-interactive.html
+    - chapters/chapter-17-image-compression.qmd
+    - htmls/lab-17-image-compression-interactive.html
+    - chapters/chapter-18-pca.qmd
+    - htmls/lab-18-pca-interactive.html
+    - chapters/chapter-19-fourier.qmd
+    - htmls/lab-19-fourier-interactive.html
+    - chapters/chapter-20-haar.qmd
+    - htmls/lab-20-haar-interactive.html
+# # Part VI. Linear Algebra and AI (chapter 21-25)
+    - chapters/chapter-21-images-as-matrices.qmd
+    - htmls/lab-21-images-as-matrices-interactive.html
+    - chapters/chapter-22-text-as-vectors.qmd
+    - htmls/lab-22-text-as-vectors-interactive.html
+    - chapters/chapter-23-neural-networks-as-matrix-machines.qmd
+    - htmls/lab-23-neural-networks-as-matrix-machines-interactive.html
+    - chapters/chapter-24-recommendation-systems.qmd
+    - htmls/lab-24-recommendation-systems-interactive.html
+    - chapters/chapter-25-grammar-of-ai.qmd
+    - htmls/lab-25-grammar-of-ai-interactive.html
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    fig-align: center
+    smooth-scroll: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: auto
+
+jupyter: python3
+
+#bibliography: references.bib

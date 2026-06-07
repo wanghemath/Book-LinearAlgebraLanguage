@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>24&nbsp; Chapter 24: Recommendation Systems – Linear Algebra Language in the AI Age</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../htmls/lab-24-recommendation-systems-interactive.html" rel="next">
+<link href="../htmls/lab-23-neural-networks-as-matrix-machines-interactive.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-367522ac618891c39d4b2ae87ea7600e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c5491cb7295b3d79f070a3ccf938a403.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-367522ac618891c39d4b2ae87ea7600e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter-24-recommendation-systems.html"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Chapter 24: Recommendation Systems</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Linear Algebra Language in the AI Age</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/wanghemath/Book-linear-algebra-language" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.facebook.com/sharer/sharer.php?u=|url|">
+              <i class="bi bi-facebook pe-1"></i>
+            Facebook
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../introduction-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction: Linear Algebra as a Language</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../labs-overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-01-world-as-numbers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Chapter 1: The World as Numbers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-02-vectors-numbers-with-meaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Chapter 2: Vectors — Numbers with Meaning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-03-combining-ideas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Chapter 3: Combining Ideas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-04-data-as-points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Chapter 4: Data as Points</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-05-matrix-machine.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Chapter 5: The Matrix Machine</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-06-stretching-rotating-shearing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Chapter 6: Stretching, Rotating, and Shearing</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-07-solving-backwards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Chapter 7: Solving Backwards</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-08-when-information-is-lost.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Chapter 8: When Information Is Lost</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-09-length-and-distance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Chapter 9: Length and Distance</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-10-angles-and-similarity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Chapter 10: Angles and Similarity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-11-projection-best-shadow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 11: Projection — The Best Shadow</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-12-orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 12: Orthogonality</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-13-eigenvectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 13: Eigenvectors</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-14-stability-ranking-iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Chapter 14: Stability, Ranking, and Iteration</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-15-energy-landscapes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Chapter 15: Energy Landscapes</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-16-svd-matrix-microscope.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Chapter 16: SVD — The Matrix Microscope</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-17-image-compression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Chapter 17: Image Compression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-18-pca.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Chapter 18: Principal Component Analysis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-19-fourier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Chapter 19: Fourier</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-20-haar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Chapter 20: Haar Wavelets</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-21-images-as-matrices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Chapter 21: Images as Matrices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-22-text-as-vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Chapter 22: Text as Vectors</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-23-neural-networks-as-matrix-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Chapter 23: Neural Networks as Matrix Machines</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-24-recommendation-systems.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Chapter 24: Recommendation Systems</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter-25-grammar-of-ai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Chapter 25: The Grammar of AI</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#chapter-24-recommendation-systems" id="toc-chapter-24-recommendation-systems" class="nav-link active" data-scroll-target="#chapter-24-recommendation-systems"><span class="header-section-number">25</span> Chapter 24: Recommendation Systems</a>
+  <ul class="collapse">
+  <li><a href="#opening-story-how-does-a-platform-know-what-you-might-like" id="toc-opening-story-how-does-a-platform-know-what-you-might-like" class="nav-link" data-scroll-target="#opening-story-how-does-a-platform-know-what-you-might-like"><span class="header-section-number">25.1</span> Opening Story: How Does a Platform Know What You Might Like?</a></li>
+  <li><a href="#learning-goals" id="toc-learning-goals" class="nav-link" data-scroll-target="#learning-goals"><span class="header-section-number">25.2</span> Learning Goals</a></li>
+  <li><a href="#from-preference-to-matrix" id="toc-from-preference-to-matrix" class="nav-link" data-scroll-target="#from-preference-to-matrix"><span class="header-section-number">25.3</span> 24.1 From Preference to Matrix</a></li>
+  <li><a href="#three-views-of-recommendation" id="toc-three-views-of-recommendation" class="nav-link" data-scroll-target="#three-views-of-recommendation"><span class="header-section-number">25.4</span> 24.2 Three Views of Recommendation</a>
+  <ul class="collapse">
+  <li><a href="#content-based-filtering" id="toc-content-based-filtering" class="nav-link" data-scroll-target="#content-based-filtering"><span class="header-section-number">25.4.1</span> Content-based filtering</a></li>
+  <li><a href="#collaborative-filtering" id="toc-collaborative-filtering" class="nav-link" data-scroll-target="#collaborative-filtering"><span class="header-section-number">25.4.2</span> Collaborative filtering</a></li>
+  <li><a href="#hybrid-systems" id="toc-hybrid-systems" class="nav-link" data-scroll-target="#hybrid-systems"><span class="header-section-number">25.4.3</span> Hybrid systems</a></li>
+  </ul></li>
+  <li><a href="#users-as-vectors" id="toc-users-as-vectors" class="nav-link" data-scroll-target="#users-as-vectors"><span class="header-section-number">25.5</span> 24.3 Users as Vectors</a></li>
+  <li><a href="#centering-ratings-taste-versus-generosity" id="toc-centering-ratings-taste-versus-generosity" class="nav-link" data-scroll-target="#centering-ratings-taste-versus-generosity"><span class="header-section-number">25.6</span> 24.4 Centering Ratings: Taste versus Generosity</a>
+  <ul class="collapse">
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example"><span class="header-section-number">25.6.1</span> Example</a></li>
+  </ul></li>
+  <li><a href="#user-based-collaborative-filtering" id="toc-user-based-collaborative-filtering" class="nav-link" data-scroll-target="#user-based-collaborative-filtering"><span class="header-section-number">25.7</span> 24.5 User-Based Collaborative Filtering</a></li>
+  <li><a href="#item-based-collaborative-filtering" id="toc-item-based-collaborative-filtering" class="nav-link" data-scroll-target="#item-based-collaborative-filtering"><span class="header-section-number">25.8</span> 24.6 Item-Based Collaborative Filtering</a></li>
+  <li><a href="#recommendation-as-matrix-completion" id="toc-recommendation-as-matrix-completion" class="nav-link" data-scroll-target="#recommendation-as-matrix-completion"><span class="header-section-number">25.9</span> 24.7 Recommendation as Matrix Completion</a></li>
+  <li><a href="#latent-factor-models" id="toc-latent-factor-models" class="nav-link" data-scroll-target="#latent-factor-models"><span class="header-section-number">25.10</span> 24.8 Latent Factor Models</a></li>
+  <li><a href="#where-svd-helps-and-where-it-does-not" id="toc-where-svd-helps-and-where-it-does-not" class="nav-link" data-scroll-target="#where-svd-helps-and-where-it-does-not"><span class="header-section-number">25.11</span> 24.9 Where SVD Helps, and Where It Does Not</a></li>
+  <li><a href="#learning-latent-factors-by-optimization" id="toc-learning-latent-factors-by-optimization" class="nav-link" data-scroll-target="#learning-latent-factors-by-optimization"><span class="header-section-number">25.12</span> 24.10 Learning Latent Factors by Optimization</a></li>
+  <li><a href="#bias-terms-some-users-rate-high-some-items-are-popular" id="toc-bias-terms-some-users-rate-high-some-items-are-popular" class="nav-link" data-scroll-target="#bias-terms-some-users-rate-high-some-items-are-popular"><span class="header-section-number">25.13</span> 24.11 Bias Terms: Some Users Rate High, Some Items Are Popular</a></li>
+  <li><a href="#evaluation-do-recommendations-actually-work" id="toc-evaluation-do-recommendations-actually-work" class="nav-link" data-scroll-target="#evaluation-do-recommendations-actually-work"><span class="header-section-number">25.14</span> 24.12 Evaluation: Do Recommendations Actually Work?</a></li>
+  <li><a href="#cold-start-and-sparse-data" id="toc-cold-start-and-sparse-data" class="nav-link" data-scroll-target="#cold-start-and-sparse-data"><span class="header-section-number">25.15</span> 24.13 Cold Start and Sparse Data</a></li>
+  <li><a href="#feedback-loops-and-bias" id="toc-feedback-loops-and-bias" class="nav-link" data-scroll-target="#feedback-loops-and-bias"><span class="header-section-number">25.16</span> 24.14 Feedback Loops and Bias</a></li>
+  <li><a href="#worked-example-a-tiny-movie-recommender" id="toc-worked-example-a-tiny-movie-recommender" class="nav-link" data-scroll-target="#worked-example-a-tiny-movie-recommender"><span class="header-section-number">25.17</span> 24.15 Worked Example: A Tiny Movie Recommender</a></li>
+  <li><a href="#python-example-similarity-and-matrix-factorization" id="toc-python-example-similarity-and-matrix-factorization" class="nav-link" data-scroll-target="#python-example-similarity-and-matrix-factorization"><span class="header-section-number">25.18</span> 24.16 Python Example: Similarity and Matrix Factorization</a></li>
+  <li><a href="#practice-problems" id="toc-practice-problems" class="nav-link" data-scroll-target="#practice-problems"><span class="header-section-number">25.19</span> 24.17 Practice Problems</a>
+  <ul class="collapse">
+  <li><a href="#problem-1" id="toc-problem-1" class="nav-link" data-scroll-target="#problem-1"><span class="header-section-number">25.19.1</span> Problem 1</a></li>
+  <li><a href="#problem-2" id="toc-problem-2" class="nav-link" data-scroll-target="#problem-2"><span class="header-section-number">25.19.2</span> Problem 2</a></li>
+  <li><a href="#problem-3" id="toc-problem-3" class="nav-link" data-scroll-target="#problem-3"><span class="header-section-number">25.19.3</span> Problem 3</a></li>
+  <li><a href="#problem-4" id="toc-problem-4" class="nav-link" data-scroll-target="#problem-4"><span class="header-section-number">25.19.4</span> Problem 4</a></li>
+  <li><a href="#problem-5" id="toc-problem-5" class="nav-link" data-scroll-target="#problem-5"><span class="header-section-number">25.19.5</span> Problem 5</a></li>
+  </ul></li>
+  <li><a href="#challenge-questions" id="toc-challenge-questions" class="nav-link" data-scroll-target="#challenge-questions"><span class="header-section-number">25.20</span> 24.18 Challenge Questions</a></li>
+  <li><a href="#ai-companion-activities" id="toc-ai-companion-activities" class="nav-link" data-scroll-target="#ai-companion-activities"><span class="header-section-number">25.21</span> 24.19 AI Companion Activities</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">25.22</span> 24.20 Summary</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/edit/main/chapters/chapter-24-recommendation-systems.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Chapter 24: Recommendation Systems</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Finding hidden taste with vectors, similarity, and low-rank structure</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="chapter-24-recommendation-systems" class="level1" data-number="25">
+<h1 data-number="25"><span class="header-section-number">25</span> Chapter 24: Recommendation Systems</h1>
+<section id="opening-story-how-does-a-platform-know-what-you-might-like" class="level2" data-number="25.1">
+<h2 data-number="25.1" class="anchored" data-anchor-id="opening-story-how-does-a-platform-know-what-you-might-like"><span class="header-section-number">25.1</span> Opening Story: How Does a Platform Know What You Might Like?</h2>
+<p>You watch a movie. A platform suggests another one.</p>
+<p>You buy a book. The store says, “Readers also liked…”</p>
+<p>You listen to a song. A playlist appears.</p>
+<p>A recommendation system looks personal, but its first language is often linear algebra. It sees a person not as a complete personality, but as a row in a matrix. It sees a movie, book, song, or course not as a cultural object, but as a column in the same matrix. The entries of the matrix record interactions: ratings, clicks, purchases, watch time, likes, skips, enrollments, or reviews.</p>
+<p>The matrix is usually incomplete. Most users have seen only a tiny fraction of all items. The central question is:</p>
+<blockquote class="blockquote">
+<p>From the entries we already know, can we predict the entries we do not know?</p>
+</blockquote>
+<p>This is why recommendation systems belong naturally in a linear algebra book. They combine many ideas we have already met:</p>
+<ul>
+<li>vectors as feature lists;</li>
+<li>dot products and cosine similarity as measures of alignment;</li>
+<li>projections and least squares as best approximation;</li>
+<li>eigenvectors and iteration as ranking tools;</li>
+<li>SVD as a microscope for hidden low-dimensional structure;</li>
+<li>optimization as the process of learning unknown parameters.</li>
+</ul>
+<p>The main message of this chapter is:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Main Idea
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A recommendation system tries to complete a partially observed user–item matrix by discovering similarity and hidden low-dimensional structure.</p>
+</div>
+</div>
+</section>
+<section id="learning-goals" class="level2" data-number="25.2">
+<h2 data-number="25.2" class="anchored" data-anchor-id="learning-goals"><span class="header-section-number">25.2</span> Learning Goals</h2>
+<p>By the end of this chapter, you should be able to:</p>
+<ol type="1">
+<li>Represent users, items, and ratings using vectors and matrices.</li>
+<li>Explain the difference between content-based filtering and collaborative filtering.</li>
+<li>Compute user-user and item-item similarities using cosine similarity.</li>
+<li>Use neighborhood methods to predict missing ratings.</li>
+<li>Interpret recommendation as matrix completion.</li>
+<li>Explain why low-rank structure is a useful model of taste.</li>
+<li>Use SVD ideas to describe latent factors.</li>
+<li>Build a small matrix-factorization recommender using gradient descent.</li>
+<li>Evaluate recommendations using train/test splits and RMSE.</li>
+<li>Discuss limitations such as cold start, popularity bias, feedback loops, and fairness.</li>
+</ol>
+</section>
+<section id="from-preference-to-matrix" class="level2" data-number="25.3">
+<h2 data-number="25.3" class="anchored" data-anchor-id="from-preference-to-matrix"><span class="header-section-number">25.3</span> 24.1 From Preference to Matrix</h2>
+<p>Suppose five users rate six movies. A blank entry means the user has not rated that movie.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>User</th>
+<th style="text-align: right;">Space Quest</th>
+<th style="text-align: right;">Robot Dreams</th>
+<th style="text-align: right;">Love in Paris</th>
+<th style="text-align: right;">City Romance</th>
+<th style="text-align: right;">Dragon War</th>
+<th style="text-align: right;">Castle Magic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ada</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">?</td>
+<td style="text-align: right;">?</td>
+</tr>
+<tr class="even">
+<td>Ben</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">?</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">?</td>
+</tr>
+<tr class="odd">
+<td>Chloe</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">?</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">?</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td>Diego</td>
+<td style="text-align: right;">?</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td>Emma</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">?</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">?</td>
+</tr>
+</tbody>
+</table>
+<p>This table is a matrix. Rows correspond to users. Columns correspond to items. An entry <span class="math inline">\(r_{ui}\)</span> is the rating user <span class="math inline">\(u\)</span> gave item <span class="math inline">\(i\)</span>.</p>
+<p>We write the observed rating matrix as</p>
+<p><span class="math display">\[
+R = (r_{ui}).
+\]</span></p>
+<p>The recommendation problem is not simply to fill every missing number perfectly. Real systems usually want to rank items: among the items a user has not seen, which items should appear first?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prediction versus ranking
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A rating prediction asks: “What number would this user give this item?”</p>
+<p>A ranking problem asks: “Which unseen items should we show first?”</p>
+<p>The mathematics overlaps, but the evaluation can be different.</p>
+</div>
+</div>
+</section>
+<section id="three-views-of-recommendation" class="level2" data-number="25.4">
+<h2 data-number="25.4" class="anchored" data-anchor-id="three-views-of-recommendation"><span class="header-section-number">25.4</span> 24.2 Three Views of Recommendation</h2>
+<p>There are three common ways to build recommendations.</p>
+<section id="content-based-filtering" class="level3" data-number="25.4.1">
+<h3 data-number="25.4.1" class="anchored" data-anchor-id="content-based-filtering"><span class="header-section-number">25.4.1</span> Content-based filtering</h3>
+<p>Content-based filtering uses features of the item itself. A movie may have features such as:</p>
+<p><span class="math display">\[
+\text{movie vector} =
+\begin{bmatrix}
+\text{action} \\
+\text{romance} \\
+\text{comedy} \\
+\text{sci-fi} \\
+\text{animation}
+\end{bmatrix}.
+\]</span></p>
+<p>If a user likes science-fiction and action, we recommend items with large science-fiction and action coordinates.</p>
+</section>
+<section id="collaborative-filtering" class="level3" data-number="25.4.2">
+<h3 data-number="25.4.2" class="anchored" data-anchor-id="collaborative-filtering"><span class="header-section-number">25.4.2</span> Collaborative filtering</h3>
+<p>Collaborative filtering uses behavior of many users. It says:</p>
+<blockquote class="blockquote">
+<p>Users who behaved similarly in the past may behave similarly in the future.</p>
+</blockquote>
+<p>or</p>
+<blockquote class="blockquote">
+<p>Items liked by similar groups of users may be similar items.</p>
+</blockquote>
+<p>This approach may work even without knowing the meaning of the items.</p>
+</section>
+<section id="hybrid-systems" class="level3" data-number="25.4.3">
+<h3 data-number="25.4.3" class="anchored" data-anchor-id="hybrid-systems"><span class="header-section-number">25.4.3</span> Hybrid systems</h3>
+<p>Modern systems often combine both. They may use item metadata, user profiles, text descriptions, images, graph structure, ratings, clicks, and neural embeddings.</p>
+<p>Linear algebra remains the organizing language: all of these objects become vectors, matrices, or tensors.</p>
+</section>
+</section>
+<section id="users-as-vectors" class="level2" data-number="25.5">
+<h2 data-number="25.5" class="anchored" data-anchor-id="users-as-vectors"><span class="header-section-number">25.5</span> 24.3 Users as Vectors</h2>
+<p>A row of the rating matrix is a user vector. For example, if Ada’s ratings are</p>
+<p><span class="math display">\[
+\mathbf r_{Ada} = [5,5,1,1,?,?],
+\]</span></p>
+<p>then Ada is represented by known coordinates in a movie space.</p>
+<p>Two users are similar if their known ratings point in similar directions.</p>
+<p>For two complete rating vectors <span class="math inline">\(x,y \in \mathbb R^n\)</span>, cosine similarity is</p>
+<p><span class="math display">\[
+\cos(x,y)=\frac{x\cdot y}{\|x\|\|y\|}.
+\]</span></p>
+<p>Cosine similarity ignores overall scale and focuses on direction. If one user gives high ratings to everything and another gives lower ratings but follows the same pattern, cosine similarity may still be high.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Missing entries are not zeros
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A missing rating does not mean a rating of zero. It means unknown.</p>
+<p>Treating missing entries as zeros can create misleading similarity scores. In practice, we compute similarity only on co-rated items, or we impute/center ratings carefully.</p>
+</div>
+</div>
+</section>
+<section id="centering-ratings-taste-versus-generosity" class="level2" data-number="25.6">
+<h2 data-number="25.6" class="anchored" data-anchor-id="centering-ratings-taste-versus-generosity"><span class="header-section-number">25.6</span> 24.4 Centering Ratings: Taste versus Generosity</h2>
+<p>Some users rate generously; others rate harshly. Suppose one user rates movies as <span class="math inline">\([5,4,5,4]\)</span> while another rates the same pattern as <span class="math inline">\([3,2,3,2]\)</span>. Their raw ratings differ, but their preferences are aligned.</p>
+<p>A common adjustment is to subtract each user’s mean rating.</p>
+<p>If user <span class="math inline">\(u\)</span> has average rating <span class="math inline">\(\bar r_u\)</span>, define the centered rating</p>
+<p><span class="math display">\[
+\tilde r_{ui} = r_{ui} - \bar r_u.
+\]</span></p>
+<p>Then positive values mean “above this user’s average,” and negative values mean “below this user’s average.”</p>
+<p>This turns rating prediction into preference prediction.</p>
+<section id="example" class="level3" data-number="25.6.1">
+<h3 data-number="25.6.1" class="anchored" data-anchor-id="example"><span class="header-section-number">25.6.1</span> Example</h3>
+<p>Suppose</p>
+<p><span class="math display">\[
+x=[5,4,5,4], \qquad y=[3,2,3,2].
+\]</span></p>
+<p>The means are <span class="math inline">\(\bar x=4.5\)</span> and <span class="math inline">\(\bar y=2.5\)</span>. The centered vectors are</p>
+<p><span class="math display">\[
+\tilde x=[0.5,-0.5,0.5,-0.5], \qquad
+\tilde y=[0.5,-0.5,0.5,-0.5].
+\]</span></p>
+<p>After centering, the two users have exactly the same preference pattern.</p>
+</section>
+</section>
+<section id="user-based-collaborative-filtering" class="level2" data-number="25.7">
+<h2 data-number="25.7" class="anchored" data-anchor-id="user-based-collaborative-filtering"><span class="header-section-number">25.7</span> 24.5 User-Based Collaborative Filtering</h2>
+<p>User-based collaborative filtering predicts a missing rating by looking at similar users.</p>
+<p>Suppose we want to predict user <span class="math inline">\(u\)</span>’s rating for item <span class="math inline">\(i\)</span>. Let <span class="math inline">\(N(u)\)</span> be a set of users similar to <span class="math inline">\(u\)</span> who have rated item <span class="math inline">\(i\)</span>. A simple weighted prediction is</p>
+<p><span class="math display">\[
+\hat r_{ui}
+= \bar r_u
++ \frac{\sum_{v\in N(u)} s(u,v)(r_{vi}-\bar r_v)}
+{\sum_{v\in N(u)} |s(u,v)|},
+\]</span></p>
+<p>where <span class="math inline">\(s(u,v)\)</span> is a similarity score between users <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>.</p>
+<p>The formula says:</p>
+<ol type="1">
+<li>Start with user <span class="math inline">\(u\)</span>’s average rating.</li>
+<li>Look at how similar users felt about item <span class="math inline">\(i\)</span> relative to their own averages.</li>
+<li>Combine those deviations using similarity weights.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The term <span class="math inline">\(r_{vi}-\bar r_v\)</span> is not simply “Did user <span class="math inline">\(v\)</span> like this item?”</p>
+<p>It means “Did user <span class="math inline">\(v\)</span> like this item more or less than they usually like items?”</p>
+</div>
+</div>
+</section>
+<section id="item-based-collaborative-filtering" class="level2" data-number="25.8">
+<h2 data-number="25.8" class="anchored" data-anchor-id="item-based-collaborative-filtering"><span class="header-section-number">25.8</span> 24.6 Item-Based Collaborative Filtering</h2>
+<p>Item-based collaborative filtering compares columns instead of rows.</p>
+<p>Two movies are similar if the same users tend to rate them similarly. If a user liked one movie, we recommend similar movies.</p>
+<p>If <span class="math inline">\(s(i,j)\)</span> is the similarity between items <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>, a simple prediction is</p>
+<p><span class="math display">\[
+\hat r_{ui}
+= \frac{\sum_{j\in I(u)} s(i,j) r_{uj}}
+{\sum_{j\in I(u)} |s(i,j)|},
+\]</span></p>
+<p>where <span class="math inline">\(I(u)\)</span> is the set of items user <span class="math inline">\(u\)</span> has rated.</p>
+<p>Item-based methods are often stable because item similarities may change more slowly than user behavior.</p>
+</section>
+<section id="recommendation-as-matrix-completion" class="level2" data-number="25.9">
+<h2 data-number="25.9" class="anchored" data-anchor-id="recommendation-as-matrix-completion"><span class="header-section-number">25.9</span> 24.7 Recommendation as Matrix Completion</h2>
+<p>The rating matrix is incomplete. Matrix completion asks:</p>
+<blockquote class="blockquote">
+<p>Can we infer missing entries from observed entries?</p>
+</blockquote>
+<p>This is impossible without assumptions. If the missing entries are arbitrary, no method can know them.</p>
+<p>A powerful assumption is low-rank structure.</p>
+<p>The idea is that user preferences may be driven by a small number of hidden factors:</p>
+<ul>
+<li>action versus romance;</li>
+<li>serious versus funny;</li>
+<li>old versus new;</li>
+<li>mainstream versus niche;</li>
+<li>theoretical versus applied;</li>
+<li>beginner-friendly versus advanced.</li>
+</ul>
+<p>If there are only <span class="math inline">\(k\)</span> major hidden factors, then a large rating matrix may be approximately rank <span class="math inline">\(k\)</span>.</p>
+</section>
+<section id="latent-factor-models" class="level2" data-number="25.10">
+<h2 data-number="25.10" class="anchored" data-anchor-id="latent-factor-models"><span class="header-section-number">25.10</span> 24.8 Latent Factor Models</h2>
+<p>A latent factor model gives each user a vector and each item a vector in a hidden <span class="math inline">\(k\)</span>-dimensional taste space.</p>
+<p>Let</p>
+<p><span class="math display">\[
+p_u \in \mathbb R^k
+\]</span></p>
+<p>be the latent vector for user <span class="math inline">\(u\)</span>, and</p>
+<p><span class="math display">\[
+q_i \in \mathbb R^k
+\]</span></p>
+<p>be the latent vector for item <span class="math inline">\(i\)</span>.</p>
+<p>The predicted rating is</p>
+<p><span class="math display">\[
+\hat r_{ui} = p_u \cdot q_i.
+\]</span></p>
+<p>This formula is simple and deep. It says:</p>
+<blockquote class="blockquote">
+<p>A user likes an item when the user’s hidden taste vector aligns with the item’s hidden feature vector.</p>
+</blockquote>
+<p>If we place all user vectors as rows of a matrix <span class="math inline">\(P\)</span> and all item vectors as rows of a matrix <span class="math inline">\(Q\)</span>, then the predicted rating matrix is</p>
+<p><span class="math display">\[
+\hat R = P Q^T.
+\]</span></p>
+<p>Since <span class="math inline">\(P\)</span> has only <span class="math inline">\(k\)</span> columns and <span class="math inline">\(Q\)</span> has only <span class="math inline">\(k\)</span> columns, the matrix <span class="math inline">\(PQ^T\)</span> has rank at most <span class="math inline">\(k\)</span>.</p>
+<p>Thus latent factor recommendation is low-rank matrix approximation with missing entries.</p>
+</section>
+<section id="where-svd-helps-and-where-it-does-not" class="level2" data-number="25.11">
+<h2 data-number="25.11" class="anchored" data-anchor-id="where-svd-helps-and-where-it-does-not"><span class="header-section-number">25.11</span> 24.9 Where SVD Helps, and Where It Does Not</h2>
+<p>If the full rating matrix were known, SVD would give a best rank-<span class="math inline">\(k\)</span> approximation:</p>
+<p><span class="math display">\[
+R \approx U_k \Sigma_k V_k^T.
+\]</span></p>
+<p>This would be an elegant way to find hidden taste coordinates.</p>
+<p>But recommendation matrices are usually missing most entries. Standard SVD expects a complete matrix. Filling missing entries with zeros can distort the result.</p>
+<p>So in practice, we often learn <span class="math inline">\(P\)</span> and <span class="math inline">\(Q\)</span> only from observed entries by solving an optimization problem.</p>
+</section>
+<section id="learning-latent-factors-by-optimization" class="level2" data-number="25.12">
+<h2 data-number="25.12" class="anchored" data-anchor-id="learning-latent-factors-by-optimization"><span class="header-section-number">25.12</span> 24.10 Learning Latent Factors by Optimization</h2>
+<p>Let <span class="math inline">\(\Omega\)</span> be the set of observed user–item pairs. We want predicted ratings <span class="math inline">\(p_u\cdot q_i\)</span> to match observed ratings <span class="math inline">\(r_{ui}\)</span>.</p>
+<p>A common objective is</p>
+<p><span class="math display">\[
+\min_{P,Q}
+\sum_{(u,i)\in \Omega}
+(r_{ui}-p_u\cdot q_i)^2
++ \lambda \left(\sum_u \|p_u\|^2 + \sum_i \|q_i\|^2\right).
+\]</span></p>
+<p>The first term measures prediction error. The second term is regularization. It discourages very large latent vectors and helps prevent overfitting.</p>
+<p>For one observed rating, define the error</p>
+<p><span class="math display">\[
+e_{ui}=r_{ui}-p_u\cdot q_i.
+\]</span></p>
+<p>Gradient descent updates have the form</p>
+<p><span class="math display">\[
+p_u \leftarrow p_u + \eta(e_{ui}q_i - \lambda p_u),
+\]</span></p>
+<p><span class="math display">\[
+q_i \leftarrow q_i + \eta(e_{ui}p_u - \lambda q_i),
+\]</span></p>
+<p>where <span class="math inline">\(\eta\)</span> is the learning rate.</p>
+<p>This is one of the clearest places where the book’s story comes together:</p>
+<ul>
+<li>dot products predict alignment;</li>
+<li>squared error measures mismatch;</li>
+<li>gradients tell us how to adjust;</li>
+<li>low-rank matrices model hidden structure;</li>
+<li>optimization learns the representation.</li>
+</ul>
+</section>
+<section id="bias-terms-some-users-rate-high-some-items-are-popular" class="level2" data-number="25.13">
+<h2 data-number="25.13" class="anchored" data-anchor-id="bias-terms-some-users-rate-high-some-items-are-popular"><span class="header-section-number">25.13</span> 24.11 Bias Terms: Some Users Rate High, Some Items Are Popular</h2>
+<p>A better model includes baseline effects:</p>
+<p><span class="math display">\[
+\hat r_{ui}=\mu + b_u + c_i + p_u\cdot q_i.
+\]</span></p>
+<p>Here:</p>
+<ul>
+<li><span class="math inline">\(\mu\)</span> is the global average rating;</li>
+<li><span class="math inline">\(b_u\)</span> is the user bias;</li>
+<li><span class="math inline">\(c_i\)</span> is the item bias;</li>
+<li><span class="math inline">\(p_u\cdot q_i\)</span> is the personalized interaction.</li>
+</ul>
+<p>For example, some movies are widely liked, so they have positive item bias. Some users rate everything highly, so they have positive user bias.</p>
+<p>The latent factor term captures what remains after baseline popularity and generosity are considered.</p>
+</section>
+<section id="evaluation-do-recommendations-actually-work" class="level2" data-number="25.14">
+<h2 data-number="25.14" class="anchored" data-anchor-id="evaluation-do-recommendations-actually-work"><span class="header-section-number">25.14</span> 24.12 Evaluation: Do Recommendations Actually Work?</h2>
+<p>To evaluate a recommender, we hide some known ratings as a test set. We train the model on the remaining observed ratings and predict the hidden ones.</p>
+<p>A common metric is root mean squared error:</p>
+<p><span class="math display">\[
+\operatorname{RMSE} =
+\sqrt{\frac{1}{m}\sum_{(u,i)\in T}(r_{ui}-\hat r_{ui})^2}.
+\]</span></p>
+<p>For ranking, other metrics are often used, such as precision@k, recall@k, hit rate, mean average precision, or normalized discounted cumulative gain.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Accuracy is not the only goal
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A recommendation system may also need diversity, novelty, fairness, transparency, privacy, and user control.</p>
+</div>
+</div>
+</section>
+<section id="cold-start-and-sparse-data" class="level2" data-number="25.15">
+<h2 data-number="25.15" class="anchored" data-anchor-id="cold-start-and-sparse-data"><span class="header-section-number">25.15</span> 24.13 Cold Start and Sparse Data</h2>
+<p>Recommendation systems face a major problem: what should we recommend for a new user or a new item?</p>
+<p>This is called the cold-start problem.</p>
+<ul>
+<li>A new user has no interaction history.</li>
+<li>A new item has no ratings.</li>
+<li>A niche item may be hidden because few people have interacted with it.</li>
+</ul>
+<p>Content information can help. If a new movie has genre, actors, keywords, images, and text descriptions, we can recommend it even before many users rate it.</p>
+<p>This is why modern recommenders often combine collaborative filtering with content embeddings.</p>
+</section>
+<section id="feedback-loops-and-bias" class="level2" data-number="25.16">
+<h2 data-number="25.16" class="anchored" data-anchor-id="feedback-loops-and-bias"><span class="header-section-number">25.16</span> 24.14 Feedback Loops and Bias</h2>
+<p>Recommendation systems do not merely observe preferences. They can shape preferences.</p>
+<p>If a system recommends popular items, popular items get more attention. If they get more attention, they become even more popular. This creates a feedback loop.</p>
+<p>A system may also trap users in narrow regions of content. This is sometimes called a filter bubble.</p>
+<p>Mathematically, recommendation is a prediction problem. Socially, it is an intervention problem: the system changes what data will be observed next.</p>
+<p>Responsible recommendation requires asking:</p>
+<ul>
+<li>What is being optimized?</li>
+<li>Who benefits from the recommendation?</li>
+<li>What choices are hidden from the user?</li>
+<li>Does the system reinforce unfair patterns?</li>
+<li>Does it encourage exploration?</li>
+</ul>
+</section>
+<section id="worked-example-a-tiny-movie-recommender" class="level2" data-number="25.17">
+<h2 data-number="25.17" class="anchored" data-anchor-id="worked-example-a-tiny-movie-recommender"><span class="header-section-number">25.17</span> 24.15 Worked Example: A Tiny Movie Recommender</h2>
+<p>Suppose we have a partially observed matrix:</p>
+<p><span class="math display">\[
+R=\begin{bmatrix}
+5&amp;5&amp;1&amp;1&amp;?\\
+4&amp;5&amp;1&amp;?&amp;2\\
+1&amp;?&amp;5&amp;5&amp;4\\
+?&amp;2&amp;4&amp;5&amp;5
+\end{bmatrix}.
+\]</span></p>
+<p>The first two users prefer the first two movies. The last two users prefer the last three movies. A rank-2 model is natural: perhaps one hidden factor is “science-fiction/action” and another is “romance/fantasy.”</p>
+<p>A matrix factorization model tries to learn</p>
+<p><span class="math display">\[
+R \approx P Q^T,
+\]</span></p>
+<p>where each user and movie gets two hidden coordinates.</p>
+<p>After training, an unknown entry such as Ada’s rating for Movie 5 is predicted by</p>
+<p><span class="math display">\[
+\hat r_{Ada,5}=p_{Ada}\cdot q_5.
+\]</span></p>
+<p>The recommendation is not based on a single rule. It comes from the geometry of hidden vectors.</p>
+</section>
+<section id="python-example-similarity-and-matrix-factorization" class="level2" data-number="25.18">
+<h2 data-number="25.18" class="anchored" data-anchor-id="python-example-similarity-and-matrix-factorization"><span class="header-section-number">25.18</span> 24.16 Python Example: Similarity and Matrix Factorization</h2>
+<div id="f5f248b6" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>R <span class="op">=</span> np.array([</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">1</span>, np.nan],</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">1</span>, np.nan, <span class="dv">2</span>],</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, np.nan, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">4</span>],</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    [np.nan, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>R</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>array([[ 5.,  5.,  1.,  1., nan],
+       [ 4.,  5.,  1., nan,  2.],
+       [ 1., nan,  5.,  5.,  4.],
+       [nan,  2.,  4.,  5.,  5.]])</code></pre>
+</div>
+</div>
+<p>Compute user means while ignoring missing values:</p>
+<div id="f48d9ede" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>user_means <span class="op">=</span> np.nanmean(R, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>user_means</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>array([3.  , 3.  , 3.75, 4.  ])</code></pre>
+</div>
+</div>
+<p>A simple baseline prediction for each user is their average rating:</p>
+<div id="8547f14b" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> np.where(np.isnan(R), user_means[:, <span class="va">None</span>], R)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>baseline</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>array([[5.  , 5.  , 1.  , 1.  , 3.  ],
+       [4.  , 5.  , 1.  , 3.  , 2.  ],
+       [1.  , 3.75, 5.  , 5.  , 4.  ],
+       [4.  , 2.  , 4.  , 5.  , 5.  ]])</code></pre>
+</div>
+</div>
+<p>A more serious model learns hidden user and item factors from observed entries.</p>
+<div id="1a3dd0d3" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>num_users, num_items <span class="op">=</span> R.shape</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(num_users, k))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>Q <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(num_items, k))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>observed <span class="op">=</span> np.argwhere(<span class="op">~</span>np.isnan(R))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>eta <span class="op">=</span> <span class="fl">0.03</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>lam <span class="op">=</span> <span class="fl">0.02</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3000</span>):</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    rng.shuffle(observed)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> u, i <span class="kw">in</span> observed:</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> P[u] <span class="op">@</span> Q[i]</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> R[u, i] <span class="op">-</span> pred</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        old_p <span class="op">=</span> P[u].copy()</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        P[u] <span class="op">+=</span> eta <span class="op">*</span> (err <span class="op">*</span> Q[i] <span class="op">-</span> lam <span class="op">*</span> P[u])</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        Q[i] <span class="op">+=</span> eta <span class="op">*</span> (err <span class="op">*</span> old_p <span class="op">-</span> lam <span class="op">*</span> Q[i])</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>R_hat <span class="op">=</span> P <span class="op">@</span> Q.T</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">round</span>(R_hat, <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>array([[ 4.7 ,  5.15,  0.97,  1.15,  2.4 ],
+       [ 4.25,  4.74,  0.76,  0.92,  2.08],
+       [ 1.  , -2.27,  4.72,  5.15,  4.07],
+       [ 4.19,  2.02,  4.32,  4.79,  4.87]])</code></pre>
+</div>
+</div>
+<p>The completed matrix gives predictions for missing entries. The largest predicted unknown entries are candidates for recommendation.</p>
+</section>
+<section id="practice-problems" class="level2" data-number="25.19">
+<h2 data-number="25.19" class="anchored" data-anchor-id="practice-problems"><span class="header-section-number">25.19</span> 24.17 Practice Problems</h2>
+<section id="problem-1" class="level3" data-number="25.19.1">
+<h3 data-number="25.19.1" class="anchored" data-anchor-id="problem-1"><span class="header-section-number">25.19.1</span> Problem 1</h3>
+<p>Explain why a rating matrix is usually sparse.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Most users interact with only a small fraction of all available items. For example, a streaming platform may have thousands of movies, but a user may have rated only tens of them. Therefore most entries are unknown.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="problem-2" class="level3" data-number="25.19.2">
+<h3 data-number="25.19.2" class="anchored" data-anchor-id="problem-2"><span class="header-section-number">25.19.2</span> Problem 2</h3>
+<p>Why is a missing rating different from a zero rating?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A zero rating is an observed negative value. A missing rating means no information was recorded. Treating missing values as zeros can incorrectly imply dislike.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="problem-3" class="level3" data-number="25.19.3">
+<h3 data-number="25.19.3" class="anchored" data-anchor-id="problem-3"><span class="header-section-number">25.19.3</span> Problem 3</h3>
+<p>Let</p>
+<p><span class="math display">\[
+x=[5,4,1], \qquad y=[4,5,1].
+\]</span></p>
+<p>Compute the cosine similarity between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>We have</p>
+<p><span class="math display">\[
+x\cdot y = 5\cdot 4 + 4\cdot 5 + 1\cdot 1 = 41.
+\]</span></p>
+<p>Also</p>
+<p><span class="math display">\[
+\|x\|=\sqrt{25+16+1}=\sqrt{42}, \qquad
+\|y\|=\sqrt{16+25+1}=\sqrt{42}.
+\]</span></p>
+<p>Thus</p>
+<p><span class="math display">\[
+\cos(x,y)=\frac{41}{42}\approx 0.976.
+\]</span></p>
+<p>The users are very similar.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="problem-4" class="level3" data-number="25.19.4">
+<h3 data-number="25.19.4" class="anchored" data-anchor-id="problem-4"><span class="header-section-number">25.19.4</span> Problem 4</h3>
+<p>Suppose <span class="math inline">\(P\)</span> is <span class="math inline">\(1000\times 20\)</span> and <span class="math inline">\(Q\)</span> is <span class="math inline">\(500\times 20\)</span>. What is the size of <span class="math inline">\(PQ^T\)</span>? What does this matrix represent in a recommendation system?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(PQ^T\)</span> has size <span class="math inline">\(1000\times 500\)</span>. It represents predicted ratings or scores for 1000 users and 500 items.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="problem-5" class="level3" data-number="25.19.5">
+<h3 data-number="25.19.5" class="anchored" data-anchor-id="problem-5"><span class="header-section-number">25.19.5</span> Problem 5</h3>
+<p>Why does regularization help matrix factorization?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regularization discourages very large user and item vectors. This helps prevent overfitting to the observed ratings and usually improves prediction on unseen ratings.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="challenge-questions" class="level2" data-number="25.20">
+<h2 data-number="25.20" class="anchored" data-anchor-id="challenge-questions"><span class="header-section-number">25.20</span> 24.18 Challenge Questions</h2>
+<ol type="1">
+<li>Build a small rating matrix for courses instead of movies. What hidden factors might explain student preferences?</li>
+<li>Compare user-based and item-based recommendations. When might one be more stable than the other?</li>
+<li>Create a rank-1 rating matrix. What kind of world does rank 1 represent?</li>
+<li>Explain why recommendation is related to projection and least squares.</li>
+<li>Explain how a recommender can create a feedback loop.</li>
+<li>Design a recommendation system that balances accuracy and exploration.</li>
+</ol>
+</section>
+<section id="ai-companion-activities" class="level2" data-number="25.21">
+<h2 data-number="25.21" class="anchored" data-anchor-id="ai-companion-activities"><span class="header-section-number">25.21</span> 24.19 AI Companion Activities</h2>
+<p>Use an AI assistant as a mathematical discussion partner.</p>
+<ol type="1">
+<li>Ask it to explain collaborative filtering using only a <span class="math inline">\(4\times 5\)</span> matrix.</li>
+<li>Ask it to create three different rating matrices: rank 1, approximately rank 2, and full rank.</li>
+<li>Ask it to compare cosine similarity and Euclidean distance for recommendation.</li>
+<li>Ask it to write pseudocode for matrix factorization by gradient descent.</li>
+<li>Ask it to critique a recommender from the viewpoint of fairness and feedback loops.</li>
+<li>Ask it to explain how recommendation systems connect to embeddings in modern AI.</li>
+</ol>
+</section>
+<section id="summary" class="level2" data-number="25.22">
+<h2 data-number="25.22" class="anchored" data-anchor-id="summary"><span class="header-section-number">25.22</span> 24.20 Summary</h2>
+<p>A recommendation system begins with a simple table: users by items. But that table quickly becomes a rich linear algebra object.</p>
+<p>In this chapter:</p>
+<ul>
+<li>users and items became vectors;</li>
+<li>ratings became entries of a matrix;</li>
+<li>similarity used dot products and cosine similarity;</li>
+<li>missing ratings became a matrix completion problem;</li>
+<li>hidden tastes became latent vectors;</li>
+<li>low-rank structure connected recommendation to SVD;</li>
+<li>gradient descent learned user and item factors;</li>
+<li>evaluation measured prediction quality;</li>
+<li>ethical issues reminded us that recommendation systems shape behavior, not just predict it.</li>
+</ul>
+<p>The central lesson is:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Final Message
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Recommendation systems use linear algebra to turn partial behavior into geometric prediction. A good recommendation is not magic; it is a learned relationship between user vectors, item vectors, and hidden structure.</p>
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/wanghemath\.github\.io\/Book-linear-algebra-language\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../htmls/lab-23-neural-networks-as-matrix-machines-interactive.html" class="pagination-link" aria-label="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../htmls/lab-24-recommendation-systems-interactive.html" class="pagination-link" aria-label="">
+        <span class="nav-page-text"></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Chapter 24: Recommendation Systems"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Finding hidden taste with vectors, similarity, and low-rank structure"</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## Opening Story: How Does a Platform Know What You Might Like?</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>You watch a movie. A platform suggests another one.</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>You buy a book. The store says, "Readers also liked..."</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>You listen to a song. A playlist appears.</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>A recommendation system looks personal, but its first language is often linear algebra. It sees a person not as a complete personality, but as a row in a matrix. It sees a movie, book, song, or course not as a cultural object, but as a column in the same matrix. The entries of the matrix record interactions: ratings, clicks, purchases, watch time, likes, skips, enrollments, or reviews.</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>The matrix is usually incomplete. Most users have seen only a tiny fraction of all items. The central question is:</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; From the entries we already know, can we predict the entries we do not know?</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>This is why recommendation systems belong naturally in a linear algebra book. They combine many ideas we have already met:</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>vectors as feature lists;</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>dot products and cosine similarity as measures of alignment;</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>projections and least squares as best approximation;</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>eigenvectors and iteration as ranking tools;</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>SVD as a microscope for hidden low-dimensional structure;</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>optimization as the process of learning unknown parameters.</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>The main message of this chapter is:</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Main Idea</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>A recommendation system tries to complete a partially observed user--item matrix by discovering similarity and hidden low-dimensional structure.</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning Goals</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>By the end of this chapter, you should be able to:</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Represent users, items, and ratings using vectors and matrices.</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Explain the difference between content-based filtering and collaborative filtering.</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Compute user-user and item-item similarities using cosine similarity.</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Use neighborhood methods to predict missing ratings.</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Interpret recommendation as matrix completion.</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Explain why low-rank structure is a useful model of taste.</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>Use SVD ideas to describe latent factors.</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>Build a small matrix-factorization recommender using gradient descent.</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>Evaluate recommendations using train/test splits and RMSE.</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>Discuss limitations such as cold start, popularity bias, feedback loops, and fairness.</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.1 From Preference to Matrix</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>Suppose five users rate six movies. A blank entry means the user has not rated that movie.</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> User <span class="pp">|</span> Space Quest <span class="pp">|</span> Robot Dreams <span class="pp">|</span> Love in Paris <span class="pp">|</span> City Romance <span class="pp">|</span> Dragon War <span class="pp">|</span> Castle Magic <span class="pp">|</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|---:|---:|</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ada <span class="pp">|</span> 5 <span class="pp">|</span> 5 <span class="pp">|</span> 1 <span class="pp">|</span> 1 <span class="pp">|</span> ? <span class="pp">|</span> ? <span class="pp">|</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ben <span class="pp">|</span> 4 <span class="pp">|</span> 5 <span class="pp">|</span> 1 <span class="pp">|</span> ? <span class="pp">|</span> 2 <span class="pp">|</span> ? <span class="pp">|</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Chloe <span class="pp">|</span> 1 <span class="pp">|</span> ? <span class="pp">|</span> 5 <span class="pp">|</span> 5 <span class="pp">|</span> ? <span class="pp">|</span> 4 <span class="pp">|</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Diego <span class="pp">|</span> ? <span class="pp">|</span> 2 <span class="pp">|</span> 4 <span class="pp">|</span> 5 <span class="pp">|</span> 1 <span class="pp">|</span> 5 <span class="pp">|</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Emma <span class="pp">|</span> 5 <span class="pp">|</span> 4 <span class="pp">|</span> ? <span class="pp">|</span> 1 <span class="pp">|</span> 5 <span class="pp">|</span> ? <span class="pp">|</span></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>This table is a matrix. Rows correspond to users. Columns correspond to items. An entry $r_{ui}$ is the rating user $u$ gave item $i$.</span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>We write the observed rating matrix as</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>R = (r_{ui}).</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>The recommendation problem is not simply to fill every missing number perfectly. Real systems usually want to rank items: among the items a user has not seen, which items should appear first?</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## Prediction versus ranking</span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>A rating prediction asks: "What number would this user give this item?"</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>A ranking problem asks: "Which unseen items should we show first?"</span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>The mathematics overlaps, but the evaluation can be different.</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.2 Three Views of Recommendation</span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>There are three common ways to build recommendations.</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Content-based filtering</span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>Content-based filtering uses features of the item itself. A movie may have features such as:</span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>\text{movie vector} =</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>\text{action} <span class="sc">\\</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>\text{romance} <span class="sc">\\</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>\text{comedy} <span class="sc">\\</span></span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>\text{sci-fi} <span class="sc">\\</span></span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>\text{animation}</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}.</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>If a user likes science-fiction and action, we recommend items with large science-fiction and action coordinates.</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a><span class="fu">### Collaborative filtering</span></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>Collaborative filtering uses behavior of many users. It says:</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Users who behaved similarly in the past may behave similarly in the future.</span></span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>or</span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Items liked by similar groups of users may be similar items.</span></span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>This approach may work even without knowing the meaning of the items.</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Hybrid systems</span></span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>Modern systems often combine both. They may use item metadata, user profiles, text descriptions, images, graph structure, ratings, clicks, and neural embeddings.</span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>Linear algebra remains the organizing language: all of these objects become vectors, matrices, or tensors.</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.3 Users as Vectors</span></span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>A row of the rating matrix is a user vector. For example, if Ada's ratings are</span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>\mathbf r_{Ada} = <span class="co">[</span><span class="ot">5,5,1,1,?,?</span><span class="co">]</span>,</span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>then Ada is represented by known coordinates in a movie space.</span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>Two users are similar if their known ratings point in similar directions.</span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>For two complete rating vectors $x,y \in \mathbb R^n$, cosine similarity is</span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>\cos(x,y)=\frac{x\cdot y}{<span class="sc">\|</span>x<span class="sc">\|\|</span>y<span class="sc">\|</span>}.</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>Cosine similarity ignores overall scale and focuses on direction. If one user gives high ratings to everything and another gives lower ratings but follows the same pattern, cosine similarity may still be high.</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a><span class="fu">## Missing entries are not zeros</span></span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>A missing rating does not mean a rating of zero. It means unknown.</span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>Treating missing entries as zeros can create misleading similarity scores. In practice, we compute similarity only on co-rated items, or we impute/center ratings carefully.</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.4 Centering Ratings: Taste versus Generosity</span></span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a>Some users rate generously; others rate harshly. Suppose one user rates movies as $<span class="co">[</span><span class="ot">5,4,5,4</span><span class="co">]</span>$ while another rates the same pattern as $<span class="co">[</span><span class="ot">3,2,3,2</span><span class="co">]</span>$. Their raw ratings differ, but their preferences are aligned.</span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>A common adjustment is to subtract each user's mean rating.</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>If user $u$ has average rating $\bar r_u$, define the centered rating</span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>\tilde r_{ui} = r_{ui} - \bar r_u.</span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>Then positive values mean "above this user's average," and negative values mean "below this user's average."</span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a>This turns rating prediction into preference prediction.</span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example</span></span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>Suppose</span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>x=<span class="co">[</span><span class="ot">5,4,5,4</span><span class="co">]</span>, \qquad y=<span class="co">[</span><span class="ot">3,2,3,2</span><span class="co">]</span>.</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a>The means are $\bar x=4.5$ and $\bar y=2.5$. The centered vectors are</span>
+<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-186"><a href="#cb9-186" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-187"><a href="#cb9-187" aria-hidden="true" tabindex="-1"></a>\tilde x=<span class="co">[</span><span class="ot">0.5,-0.5,0.5,-0.5</span><span class="co">]</span>, \qquad</span>
+<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a>\tilde y=<span class="co">[</span><span class="ot">0.5,-0.5,0.5,-0.5</span><span class="co">]</span>.</span>
+<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a>After centering, the two users have exactly the same preference pattern.</span>
+<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.5 User-Based Collaborative Filtering</span></span>
+<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a>User-based collaborative filtering predicts a missing rating by looking at similar users.</span>
+<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>Suppose we want to predict user $u$'s rating for item $i$. Let $N(u)$ be a set of users similar to $u$ who have rated item $i$. A simple weighted prediction is</span>
+<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a>\hat r_{ui}</span>
+<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a>= \bar r_u</span>
+<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>\frac{\sum_{v\in N(u)} s(u,v)(r_{vi}-\bar r_v)}</span>
+<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a>{\sum_{v\in N(u)} |s(u,v)|},</span>
+<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a>where $s(u,v)$ is a similarity score between users $u$ and $v$.</span>
+<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>The formula says:</span>
+<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start with user $u$'s average rating.</span>
+<span id="cb9-211"><a href="#cb9-211" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Look at how similar users felt about item $i$ relative to their own averages.</span>
+<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Combine those deviations using similarity weights.</span>
+<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb9-215"><a href="#cb9-215" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation</span></span>
+<span id="cb9-216"><a href="#cb9-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-217"><a href="#cb9-217" aria-hidden="true" tabindex="-1"></a>The term $r_{vi}-\bar r_v$ is not simply "Did user $v$ like this item?"</span>
+<span id="cb9-218"><a href="#cb9-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-219"><a href="#cb9-219" aria-hidden="true" tabindex="-1"></a>It means "Did user $v$ like this item more or less than they usually like items?"</span>
+<span id="cb9-220"><a href="#cb9-220" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-221"><a href="#cb9-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-222"><a href="#cb9-222" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.6 Item-Based Collaborative Filtering</span></span>
+<span id="cb9-223"><a href="#cb9-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-224"><a href="#cb9-224" aria-hidden="true" tabindex="-1"></a>Item-based collaborative filtering compares columns instead of rows.</span>
+<span id="cb9-225"><a href="#cb9-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-226"><a href="#cb9-226" aria-hidden="true" tabindex="-1"></a>Two movies are similar if the same users tend to rate them similarly. If a user liked one movie, we recommend similar movies.</span>
+<span id="cb9-227"><a href="#cb9-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-228"><a href="#cb9-228" aria-hidden="true" tabindex="-1"></a>If $s(i,j)$ is the similarity between items $i$ and $j$, a simple prediction is</span>
+<span id="cb9-229"><a href="#cb9-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-230"><a href="#cb9-230" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-231"><a href="#cb9-231" aria-hidden="true" tabindex="-1"></a>\hat r_{ui}</span>
+<span id="cb9-232"><a href="#cb9-232" aria-hidden="true" tabindex="-1"></a>= \frac{\sum_{j\in I(u)} s(i,j) r_{uj}}</span>
+<span id="cb9-233"><a href="#cb9-233" aria-hidden="true" tabindex="-1"></a>{\sum_{j\in I(u)} |s(i,j)|},</span>
+<span id="cb9-234"><a href="#cb9-234" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-235"><a href="#cb9-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-236"><a href="#cb9-236" aria-hidden="true" tabindex="-1"></a>where $I(u)$ is the set of items user $u$ has rated.</span>
+<span id="cb9-237"><a href="#cb9-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-238"><a href="#cb9-238" aria-hidden="true" tabindex="-1"></a>Item-based methods are often stable because item similarities may change more slowly than user behavior.</span>
+<span id="cb9-239"><a href="#cb9-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-240"><a href="#cb9-240" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.7 Recommendation as Matrix Completion</span></span>
+<span id="cb9-241"><a href="#cb9-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-242"><a href="#cb9-242" aria-hidden="true" tabindex="-1"></a>The rating matrix is incomplete. Matrix completion asks:</span>
+<span id="cb9-243"><a href="#cb9-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-244"><a href="#cb9-244" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Can we infer missing entries from observed entries?</span></span>
+<span id="cb9-245"><a href="#cb9-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-246"><a href="#cb9-246" aria-hidden="true" tabindex="-1"></a>This is impossible without assumptions. If the missing entries are arbitrary, no method can know them.</span>
+<span id="cb9-247"><a href="#cb9-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-248"><a href="#cb9-248" aria-hidden="true" tabindex="-1"></a>A powerful assumption is low-rank structure.</span>
+<span id="cb9-249"><a href="#cb9-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-250"><a href="#cb9-250" aria-hidden="true" tabindex="-1"></a>The idea is that user preferences may be driven by a small number of hidden factors:</span>
+<span id="cb9-251"><a href="#cb9-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-252"><a href="#cb9-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>action versus romance;</span>
+<span id="cb9-253"><a href="#cb9-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>serious versus funny;</span>
+<span id="cb9-254"><a href="#cb9-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>old versus new;</span>
+<span id="cb9-255"><a href="#cb9-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>mainstream versus niche;</span>
+<span id="cb9-256"><a href="#cb9-256" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>theoretical versus applied;</span>
+<span id="cb9-257"><a href="#cb9-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>beginner-friendly versus advanced.</span>
+<span id="cb9-258"><a href="#cb9-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-259"><a href="#cb9-259" aria-hidden="true" tabindex="-1"></a>If there are only $k$ major hidden factors, then a large rating matrix may be approximately rank $k$.</span>
+<span id="cb9-260"><a href="#cb9-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-261"><a href="#cb9-261" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.8 Latent Factor Models</span></span>
+<span id="cb9-262"><a href="#cb9-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-263"><a href="#cb9-263" aria-hidden="true" tabindex="-1"></a>A latent factor model gives each user a vector and each item a vector in a hidden $k$-dimensional taste space.</span>
+<span id="cb9-264"><a href="#cb9-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-265"><a href="#cb9-265" aria-hidden="true" tabindex="-1"></a>Let</span>
+<span id="cb9-266"><a href="#cb9-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-267"><a href="#cb9-267" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-268"><a href="#cb9-268" aria-hidden="true" tabindex="-1"></a>p_u \in \mathbb R^k</span>
+<span id="cb9-269"><a href="#cb9-269" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-270"><a href="#cb9-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-271"><a href="#cb9-271" aria-hidden="true" tabindex="-1"></a>be the latent vector for user $u$, and</span>
+<span id="cb9-272"><a href="#cb9-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-273"><a href="#cb9-273" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-274"><a href="#cb9-274" aria-hidden="true" tabindex="-1"></a>q_i \in \mathbb R^k</span>
+<span id="cb9-275"><a href="#cb9-275" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-276"><a href="#cb9-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-277"><a href="#cb9-277" aria-hidden="true" tabindex="-1"></a>be the latent vector for item $i$.</span>
+<span id="cb9-278"><a href="#cb9-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-279"><a href="#cb9-279" aria-hidden="true" tabindex="-1"></a>The predicted rating is</span>
+<span id="cb9-280"><a href="#cb9-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-281"><a href="#cb9-281" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-282"><a href="#cb9-282" aria-hidden="true" tabindex="-1"></a>\hat r_{ui} = p_u \cdot q_i.</span>
+<span id="cb9-283"><a href="#cb9-283" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-284"><a href="#cb9-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-285"><a href="#cb9-285" aria-hidden="true" tabindex="-1"></a>This formula is simple and deep. It says:</span>
+<span id="cb9-286"><a href="#cb9-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-287"><a href="#cb9-287" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; A user likes an item when the user's hidden taste vector aligns with the item's hidden feature vector.</span></span>
+<span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a>If we place all user vectors as rows of a matrix $P$ and all item vectors as rows of a matrix $Q$, then the predicted rating matrix is</span>
+<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a>\hat R = P Q^T.</span>
+<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a>Since $P$ has only $k$ columns and $Q$ has only $k$ columns, the matrix $PQ^T$ has rank at most $k$.</span>
+<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a>Thus latent factor recommendation is low-rank matrix approximation with missing entries.</span>
+<span id="cb9-298"><a href="#cb9-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-299"><a href="#cb9-299" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.9 Where SVD Helps, and Where It Does Not</span></span>
+<span id="cb9-300"><a href="#cb9-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-301"><a href="#cb9-301" aria-hidden="true" tabindex="-1"></a>If the full rating matrix were known, SVD would give a best rank-$k$ approximation:</span>
+<span id="cb9-302"><a href="#cb9-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-304"><a href="#cb9-304" aria-hidden="true" tabindex="-1"></a>R \approx U_k \Sigma_k V_k^T.</span>
+<span id="cb9-305"><a href="#cb9-305" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-306"><a href="#cb9-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-307"><a href="#cb9-307" aria-hidden="true" tabindex="-1"></a>This would be an elegant way to find hidden taste coordinates.</span>
+<span id="cb9-308"><a href="#cb9-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-309"><a href="#cb9-309" aria-hidden="true" tabindex="-1"></a>But recommendation matrices are usually missing most entries. Standard SVD expects a complete matrix. Filling missing entries with zeros can distort the result.</span>
+<span id="cb9-310"><a href="#cb9-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-311"><a href="#cb9-311" aria-hidden="true" tabindex="-1"></a>So in practice, we often learn $P$ and $Q$ only from observed entries by solving an optimization problem.</span>
+<span id="cb9-312"><a href="#cb9-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-313"><a href="#cb9-313" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.10 Learning Latent Factors by Optimization</span></span>
+<span id="cb9-314"><a href="#cb9-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-315"><a href="#cb9-315" aria-hidden="true" tabindex="-1"></a>Let $\Omega$ be the set of observed user--item pairs. We want predicted ratings $p_u\cdot q_i$ to match observed ratings $r_{ui}$.</span>
+<span id="cb9-316"><a href="#cb9-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-317"><a href="#cb9-317" aria-hidden="true" tabindex="-1"></a>A common objective is</span>
+<span id="cb9-318"><a href="#cb9-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-319"><a href="#cb9-319" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-320"><a href="#cb9-320" aria-hidden="true" tabindex="-1"></a>\min_{P,Q}</span>
+<span id="cb9-321"><a href="#cb9-321" aria-hidden="true" tabindex="-1"></a>\sum_{(u,i)\in \Omega}</span>
+<span id="cb9-322"><a href="#cb9-322" aria-hidden="true" tabindex="-1"></a>(r_{ui}-p_u\cdot q_i)^2</span>
+<span id="cb9-323"><a href="#cb9-323" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>\lambda \left(\sum_u <span class="sc">\|</span>p_u<span class="sc">\|</span>^2 + \sum_i <span class="sc">\|</span>q_i<span class="sc">\|</span>^2\right).</span>
+<span id="cb9-324"><a href="#cb9-324" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-325"><a href="#cb9-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-326"><a href="#cb9-326" aria-hidden="true" tabindex="-1"></a>The first term measures prediction error. The second term is regularization. It discourages very large latent vectors and helps prevent overfitting.</span>
+<span id="cb9-327"><a href="#cb9-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-328"><a href="#cb9-328" aria-hidden="true" tabindex="-1"></a>For one observed rating, define the error</span>
+<span id="cb9-329"><a href="#cb9-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-330"><a href="#cb9-330" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-331"><a href="#cb9-331" aria-hidden="true" tabindex="-1"></a>e_{ui}=r_{ui}-p_u\cdot q_i.</span>
+<span id="cb9-332"><a href="#cb9-332" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-333"><a href="#cb9-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-334"><a href="#cb9-334" aria-hidden="true" tabindex="-1"></a>Gradient descent updates have the form</span>
+<span id="cb9-335"><a href="#cb9-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-336"><a href="#cb9-336" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-337"><a href="#cb9-337" aria-hidden="true" tabindex="-1"></a>p_u \leftarrow p_u + \eta(e_{ui}q_i - \lambda p_u),</span>
+<span id="cb9-338"><a href="#cb9-338" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-339"><a href="#cb9-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-340"><a href="#cb9-340" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-341"><a href="#cb9-341" aria-hidden="true" tabindex="-1"></a>q_i \leftarrow q_i + \eta(e_{ui}p_u - \lambda q_i),</span>
+<span id="cb9-342"><a href="#cb9-342" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-343"><a href="#cb9-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-344"><a href="#cb9-344" aria-hidden="true" tabindex="-1"></a>where $\eta$ is the learning rate.</span>
+<span id="cb9-345"><a href="#cb9-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-346"><a href="#cb9-346" aria-hidden="true" tabindex="-1"></a>This is one of the clearest places where the book's story comes together:</span>
+<span id="cb9-347"><a href="#cb9-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-348"><a href="#cb9-348" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>dot products predict alignment;</span>
+<span id="cb9-349"><a href="#cb9-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>squared error measures mismatch;</span>
+<span id="cb9-350"><a href="#cb9-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>gradients tell us how to adjust;</span>
+<span id="cb9-351"><a href="#cb9-351" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>low-rank matrices model hidden structure;</span>
+<span id="cb9-352"><a href="#cb9-352" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>optimization learns the representation.</span>
+<span id="cb9-353"><a href="#cb9-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-354"><a href="#cb9-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.11 Bias Terms: Some Users Rate High, Some Items Are Popular</span></span>
+<span id="cb9-355"><a href="#cb9-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-356"><a href="#cb9-356" aria-hidden="true" tabindex="-1"></a>A better model includes baseline effects:</span>
+<span id="cb9-357"><a href="#cb9-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-358"><a href="#cb9-358" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-359"><a href="#cb9-359" aria-hidden="true" tabindex="-1"></a>\hat r_{ui}=\mu + b_u + c_i + p_u\cdot q_i.</span>
+<span id="cb9-360"><a href="#cb9-360" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-361"><a href="#cb9-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-362"><a href="#cb9-362" aria-hidden="true" tabindex="-1"></a>Here:</span>
+<span id="cb9-363"><a href="#cb9-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-364"><a href="#cb9-364" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\mu$ is the global average rating;</span>
+<span id="cb9-365"><a href="#cb9-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$b_u$ is the user bias;</span>
+<span id="cb9-366"><a href="#cb9-366" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$c_i$ is the item bias;</span>
+<span id="cb9-367"><a href="#cb9-367" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$p_u\cdot q_i$ is the personalized interaction.</span>
+<span id="cb9-368"><a href="#cb9-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-369"><a href="#cb9-369" aria-hidden="true" tabindex="-1"></a>For example, some movies are widely liked, so they have positive item bias. Some users rate everything highly, so they have positive user bias.</span>
+<span id="cb9-370"><a href="#cb9-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-371"><a href="#cb9-371" aria-hidden="true" tabindex="-1"></a>The latent factor term captures what remains after baseline popularity and generosity are considered.</span>
+<span id="cb9-372"><a href="#cb9-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-373"><a href="#cb9-373" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.12 Evaluation: Do Recommendations Actually Work?</span></span>
+<span id="cb9-374"><a href="#cb9-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-375"><a href="#cb9-375" aria-hidden="true" tabindex="-1"></a>To evaluate a recommender, we hide some known ratings as a test set. We train the model on the remaining observed ratings and predict the hidden ones.</span>
+<span id="cb9-376"><a href="#cb9-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-377"><a href="#cb9-377" aria-hidden="true" tabindex="-1"></a>A common metric is root mean squared error:</span>
+<span id="cb9-378"><a href="#cb9-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-379"><a href="#cb9-379" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-380"><a href="#cb9-380" aria-hidden="true" tabindex="-1"></a>\operatorname{RMSE} =</span>
+<span id="cb9-381"><a href="#cb9-381" aria-hidden="true" tabindex="-1"></a>\sqrt{\frac{1}{m}\sum_{(u,i)\in T}(r_{ui}-\hat r_{ui})^2}.</span>
+<span id="cb9-382"><a href="#cb9-382" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-383"><a href="#cb9-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-384"><a href="#cb9-384" aria-hidden="true" tabindex="-1"></a>For ranking, other metrics are often used, such as precision@k, recall@k, hit rate, mean average precision, or normalized discounted cumulative gain.</span>
+<span id="cb9-385"><a href="#cb9-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-386"><a href="#cb9-386" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb9-387"><a href="#cb9-387" aria-hidden="true" tabindex="-1"></a><span class="fu">## Accuracy is not the only goal</span></span>
+<span id="cb9-388"><a href="#cb9-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-389"><a href="#cb9-389" aria-hidden="true" tabindex="-1"></a>A recommendation system may also need diversity, novelty, fairness, transparency, privacy, and user control.</span>
+<span id="cb9-390"><a href="#cb9-390" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-391"><a href="#cb9-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-392"><a href="#cb9-392" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.13 Cold Start and Sparse Data</span></span>
+<span id="cb9-393"><a href="#cb9-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-394"><a href="#cb9-394" aria-hidden="true" tabindex="-1"></a>Recommendation systems face a major problem: what should we recommend for a new user or a new item?</span>
+<span id="cb9-395"><a href="#cb9-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-396"><a href="#cb9-396" aria-hidden="true" tabindex="-1"></a>This is called the cold-start problem.</span>
+<span id="cb9-397"><a href="#cb9-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-398"><a href="#cb9-398" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A new user has no interaction history.</span>
+<span id="cb9-399"><a href="#cb9-399" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A new item has no ratings.</span>
+<span id="cb9-400"><a href="#cb9-400" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A niche item may be hidden because few people have interacted with it.</span>
+<span id="cb9-401"><a href="#cb9-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-402"><a href="#cb9-402" aria-hidden="true" tabindex="-1"></a>Content information can help. If a new movie has genre, actors, keywords, images, and text descriptions, we can recommend it even before many users rate it.</span>
+<span id="cb9-403"><a href="#cb9-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-404"><a href="#cb9-404" aria-hidden="true" tabindex="-1"></a>This is why modern recommenders often combine collaborative filtering with content embeddings.</span>
+<span id="cb9-405"><a href="#cb9-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-406"><a href="#cb9-406" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.14 Feedback Loops and Bias</span></span>
+<span id="cb9-407"><a href="#cb9-407" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-408"><a href="#cb9-408" aria-hidden="true" tabindex="-1"></a>Recommendation systems do not merely observe preferences. They can shape preferences.</span>
+<span id="cb9-409"><a href="#cb9-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-410"><a href="#cb9-410" aria-hidden="true" tabindex="-1"></a>If a system recommends popular items, popular items get more attention. If they get more attention, they become even more popular. This creates a feedback loop.</span>
+<span id="cb9-411"><a href="#cb9-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-412"><a href="#cb9-412" aria-hidden="true" tabindex="-1"></a>A system may also trap users in narrow regions of content. This is sometimes called a filter bubble.</span>
+<span id="cb9-413"><a href="#cb9-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-414"><a href="#cb9-414" aria-hidden="true" tabindex="-1"></a>Mathematically, recommendation is a prediction problem. Socially, it is an intervention problem: the system changes what data will be observed next.</span>
+<span id="cb9-415"><a href="#cb9-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-416"><a href="#cb9-416" aria-hidden="true" tabindex="-1"></a>Responsible recommendation requires asking:</span>
+<span id="cb9-417"><a href="#cb9-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-418"><a href="#cb9-418" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>What is being optimized?</span>
+<span id="cb9-419"><a href="#cb9-419" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Who benefits from the recommendation?</span>
+<span id="cb9-420"><a href="#cb9-420" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>What choices are hidden from the user?</span>
+<span id="cb9-421"><a href="#cb9-421" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Does the system reinforce unfair patterns?</span>
+<span id="cb9-422"><a href="#cb9-422" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Does it encourage exploration?</span>
+<span id="cb9-423"><a href="#cb9-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-424"><a href="#cb9-424" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.15 Worked Example: A Tiny Movie Recommender</span></span>
+<span id="cb9-425"><a href="#cb9-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-426"><a href="#cb9-426" aria-hidden="true" tabindex="-1"></a>Suppose we have a partially observed matrix:</span>
+<span id="cb9-427"><a href="#cb9-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-428"><a href="#cb9-428" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-429"><a href="#cb9-429" aria-hidden="true" tabindex="-1"></a>R=\begin{bmatrix}</span>
+<span id="cb9-430"><a href="#cb9-430" aria-hidden="true" tabindex="-1"></a>5&amp;5&amp;1&amp;1&amp;?<span class="sc">\\</span></span>
+<span id="cb9-431"><a href="#cb9-431" aria-hidden="true" tabindex="-1"></a>4&amp;5&amp;1&amp;?&amp;2<span class="sc">\\</span></span>
+<span id="cb9-432"><a href="#cb9-432" aria-hidden="true" tabindex="-1"></a>1&amp;?&amp;5&amp;5&amp;4<span class="sc">\\</span></span>
+<span id="cb9-433"><a href="#cb9-433" aria-hidden="true" tabindex="-1"></a>?&amp;2&amp;4&amp;5&amp;5</span>
+<span id="cb9-434"><a href="#cb9-434" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}.</span>
+<span id="cb9-435"><a href="#cb9-435" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-436"><a href="#cb9-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-437"><a href="#cb9-437" aria-hidden="true" tabindex="-1"></a>The first two users prefer the first two movies. The last two users prefer the last three movies. A rank-2 model is natural: perhaps one hidden factor is "science-fiction/action" and another is "romance/fantasy."</span>
+<span id="cb9-438"><a href="#cb9-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-439"><a href="#cb9-439" aria-hidden="true" tabindex="-1"></a>A matrix factorization model tries to learn</span>
+<span id="cb9-440"><a href="#cb9-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-441"><a href="#cb9-441" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-442"><a href="#cb9-442" aria-hidden="true" tabindex="-1"></a>R \approx P Q^T,</span>
+<span id="cb9-443"><a href="#cb9-443" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-444"><a href="#cb9-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-445"><a href="#cb9-445" aria-hidden="true" tabindex="-1"></a>where each user and movie gets two hidden coordinates.</span>
+<span id="cb9-446"><a href="#cb9-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-447"><a href="#cb9-447" aria-hidden="true" tabindex="-1"></a>After training, an unknown entry such as Ada's rating for Movie 5 is predicted by</span>
+<span id="cb9-448"><a href="#cb9-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-449"><a href="#cb9-449" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-450"><a href="#cb9-450" aria-hidden="true" tabindex="-1"></a>\hat r_{Ada,5}=p_{Ada}\cdot q_5.</span>
+<span id="cb9-451"><a href="#cb9-451" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-452"><a href="#cb9-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-453"><a href="#cb9-453" aria-hidden="true" tabindex="-1"></a>The recommendation is not based on a single rule. It comes from the geometry of hidden vectors.</span>
+<span id="cb9-454"><a href="#cb9-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-455"><a href="#cb9-455" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.16 Python Example: Similarity and Matrix Factorization</span></span>
+<span id="cb9-456"><a href="#cb9-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-459"><a href="#cb9-459" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-460"><a href="#cb9-460" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-461"><a href="#cb9-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-462"><a href="#cb9-462" aria-hidden="true" tabindex="-1"></a>R <span class="op">=</span> np.array([</span>
+<span id="cb9-463"><a href="#cb9-463" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">1</span>, np.nan],</span>
+<span id="cb9-464"><a href="#cb9-464" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">1</span>, np.nan, <span class="dv">2</span>],</span>
+<span id="cb9-465"><a href="#cb9-465" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, np.nan, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">4</span>],</span>
+<span id="cb9-466"><a href="#cb9-466" aria-hidden="true" tabindex="-1"></a>    [np.nan, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>]</span>
+<span id="cb9-467"><a href="#cb9-467" aria-hidden="true" tabindex="-1"></a>], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb9-468"><a href="#cb9-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-469"><a href="#cb9-469" aria-hidden="true" tabindex="-1"></a>R</span>
+<span id="cb9-470"><a href="#cb9-470" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-471"><a href="#cb9-471" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-472"><a href="#cb9-472" aria-hidden="true" tabindex="-1"></a>Compute user means while ignoring missing values:</span>
+<span id="cb9-473"><a href="#cb9-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-476"><a href="#cb9-476" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-477"><a href="#cb9-477" aria-hidden="true" tabindex="-1"></a>user_means <span class="op">=</span> np.nanmean(R, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb9-478"><a href="#cb9-478" aria-hidden="true" tabindex="-1"></a>user_means</span>
+<span id="cb9-479"><a href="#cb9-479" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-480"><a href="#cb9-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-481"><a href="#cb9-481" aria-hidden="true" tabindex="-1"></a>A simple baseline prediction for each user is their average rating:</span>
+<span id="cb9-482"><a href="#cb9-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-485"><a href="#cb9-485" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-486"><a href="#cb9-486" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> np.where(np.isnan(R), user_means[:, <span class="va">None</span>], R)</span>
+<span id="cb9-487"><a href="#cb9-487" aria-hidden="true" tabindex="-1"></a>baseline</span>
+<span id="cb9-488"><a href="#cb9-488" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-489"><a href="#cb9-489" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-490"><a href="#cb9-490" aria-hidden="true" tabindex="-1"></a>A more serious model learns hidden user and item factors from observed entries.</span>
+<span id="cb9-491"><a href="#cb9-491" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-494"><a href="#cb9-494" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-495"><a href="#cb9-495" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb9-496"><a href="#cb9-496" aria-hidden="true" tabindex="-1"></a>num_users, num_items <span class="op">=</span> R.shape</span>
+<span id="cb9-497"><a href="#cb9-497" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb9-498"><a href="#cb9-498" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(num_users, k))</span>
+<span id="cb9-499"><a href="#cb9-499" aria-hidden="true" tabindex="-1"></a>Q <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(num_items, k))</span>
+<span id="cb9-500"><a href="#cb9-500" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-501"><a href="#cb9-501" aria-hidden="true" tabindex="-1"></a>observed <span class="op">=</span> np.argwhere(<span class="op">~</span>np.isnan(R))</span>
+<span id="cb9-502"><a href="#cb9-502" aria-hidden="true" tabindex="-1"></a>eta <span class="op">=</span> <span class="fl">0.03</span></span>
+<span id="cb9-503"><a href="#cb9-503" aria-hidden="true" tabindex="-1"></a>lam <span class="op">=</span> <span class="fl">0.02</span></span>
+<span id="cb9-504"><a href="#cb9-504" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-505"><a href="#cb9-505" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3000</span>):</span>
+<span id="cb9-506"><a href="#cb9-506" aria-hidden="true" tabindex="-1"></a>    rng.shuffle(observed)</span>
+<span id="cb9-507"><a href="#cb9-507" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> u, i <span class="kw">in</span> observed:</span>
+<span id="cb9-508"><a href="#cb9-508" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> P[u] <span class="op">@</span> Q[i]</span>
+<span id="cb9-509"><a href="#cb9-509" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> R[u, i] <span class="op">-</span> pred</span>
+<span id="cb9-510"><a href="#cb9-510" aria-hidden="true" tabindex="-1"></a>        old_p <span class="op">=</span> P[u].copy()</span>
+<span id="cb9-511"><a href="#cb9-511" aria-hidden="true" tabindex="-1"></a>        P[u] <span class="op">+=</span> eta <span class="op">*</span> (err <span class="op">*</span> Q[i] <span class="op">-</span> lam <span class="op">*</span> P[u])</span>
+<span id="cb9-512"><a href="#cb9-512" aria-hidden="true" tabindex="-1"></a>        Q[i] <span class="op">+=</span> eta <span class="op">*</span> (err <span class="op">*</span> old_p <span class="op">-</span> lam <span class="op">*</span> Q[i])</span>
+<span id="cb9-513"><a href="#cb9-513" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-514"><a href="#cb9-514" aria-hidden="true" tabindex="-1"></a>R_hat <span class="op">=</span> P <span class="op">@</span> Q.T</span>
+<span id="cb9-515"><a href="#cb9-515" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">round</span>(R_hat, <span class="dv">2</span>)</span>
+<span id="cb9-516"><a href="#cb9-516" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-517"><a href="#cb9-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-518"><a href="#cb9-518" aria-hidden="true" tabindex="-1"></a>The completed matrix gives predictions for missing entries. The largest predicted unknown entries are candidates for recommendation.</span>
+<span id="cb9-519"><a href="#cb9-519" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-520"><a href="#cb9-520" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.17 Practice Problems</span></span>
+<span id="cb9-521"><a href="#cb9-521" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-522"><a href="#cb9-522" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 1</span></span>
+<span id="cb9-523"><a href="#cb9-523" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-524"><a href="#cb9-524" aria-hidden="true" tabindex="-1"></a>Explain why a rating matrix is usually sparse.</span>
+<span id="cb9-525"><a href="#cb9-525" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-526"><a href="#cb9-526" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip collapse="true"}</span>
+<span id="cb9-527"><a href="#cb9-527" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb9-528"><a href="#cb9-528" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-529"><a href="#cb9-529" aria-hidden="true" tabindex="-1"></a>Most users interact with only a small fraction of all available items. For example, a streaming platform may have thousands of movies, but a user may have rated only tens of them. Therefore most entries are unknown.</span>
+<span id="cb9-530"><a href="#cb9-530" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-531"><a href="#cb9-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-532"><a href="#cb9-532" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 2</span></span>
+<span id="cb9-533"><a href="#cb9-533" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-534"><a href="#cb9-534" aria-hidden="true" tabindex="-1"></a>Why is a missing rating different from a zero rating?</span>
+<span id="cb9-535"><a href="#cb9-535" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-536"><a href="#cb9-536" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip collapse="true"}</span>
+<span id="cb9-537"><a href="#cb9-537" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb9-538"><a href="#cb9-538" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-539"><a href="#cb9-539" aria-hidden="true" tabindex="-1"></a>A zero rating is an observed negative value. A missing rating means no information was recorded. Treating missing values as zeros can incorrectly imply dislike.</span>
+<span id="cb9-540"><a href="#cb9-540" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-541"><a href="#cb9-541" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-542"><a href="#cb9-542" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 3</span></span>
+<span id="cb9-543"><a href="#cb9-543" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-544"><a href="#cb9-544" aria-hidden="true" tabindex="-1"></a>Let</span>
+<span id="cb9-545"><a href="#cb9-545" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-546"><a href="#cb9-546" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-547"><a href="#cb9-547" aria-hidden="true" tabindex="-1"></a>x=<span class="co">[</span><span class="ot">5,4,1</span><span class="co">]</span>, \qquad y=<span class="co">[</span><span class="ot">4,5,1</span><span class="co">]</span>.</span>
+<span id="cb9-548"><a href="#cb9-548" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-549"><a href="#cb9-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-550"><a href="#cb9-550" aria-hidden="true" tabindex="-1"></a>Compute the cosine similarity between $x$ and $y$.</span>
+<span id="cb9-551"><a href="#cb9-551" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-552"><a href="#cb9-552" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip collapse="true"}</span>
+<span id="cb9-553"><a href="#cb9-553" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb9-554"><a href="#cb9-554" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-555"><a href="#cb9-555" aria-hidden="true" tabindex="-1"></a>We have</span>
+<span id="cb9-556"><a href="#cb9-556" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-557"><a href="#cb9-557" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-558"><a href="#cb9-558" aria-hidden="true" tabindex="-1"></a>x\cdot y = 5\cdot 4 + 4\cdot 5 + 1\cdot 1 = 41.</span>
+<span id="cb9-559"><a href="#cb9-559" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-560"><a href="#cb9-560" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-561"><a href="#cb9-561" aria-hidden="true" tabindex="-1"></a>Also</span>
+<span id="cb9-562"><a href="#cb9-562" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-563"><a href="#cb9-563" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-564"><a href="#cb9-564" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>x<span class="sc">\|</span>=\sqrt{25+16+1}=\sqrt{42}, \qquad</span>
+<span id="cb9-565"><a href="#cb9-565" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>y<span class="sc">\|</span>=\sqrt{16+25+1}=\sqrt{42}.</span>
+<span id="cb9-566"><a href="#cb9-566" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-567"><a href="#cb9-567" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-568"><a href="#cb9-568" aria-hidden="true" tabindex="-1"></a>Thus</span>
+<span id="cb9-569"><a href="#cb9-569" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-570"><a href="#cb9-570" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-571"><a href="#cb9-571" aria-hidden="true" tabindex="-1"></a>\cos(x,y)=\frac{41}{42}\approx 0.976.</span>
+<span id="cb9-572"><a href="#cb9-572" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-573"><a href="#cb9-573" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-574"><a href="#cb9-574" aria-hidden="true" tabindex="-1"></a>The users are very similar.</span>
+<span id="cb9-575"><a href="#cb9-575" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-576"><a href="#cb9-576" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-577"><a href="#cb9-577" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 4</span></span>
+<span id="cb9-578"><a href="#cb9-578" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-579"><a href="#cb9-579" aria-hidden="true" tabindex="-1"></a>Suppose $P$ is $1000\times 20$ and $Q$ is $500\times 20$. What is the size of $PQ^T$? What does this matrix represent in a recommendation system?</span>
+<span id="cb9-580"><a href="#cb9-580" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-581"><a href="#cb9-581" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip collapse="true"}</span>
+<span id="cb9-582"><a href="#cb9-582" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb9-583"><a href="#cb9-583" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-584"><a href="#cb9-584" aria-hidden="true" tabindex="-1"></a>$PQ^T$ has size $1000\times 500$. It represents predicted ratings or scores for 1000 users and 500 items.</span>
+<span id="cb9-585"><a href="#cb9-585" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-586"><a href="#cb9-586" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-587"><a href="#cb9-587" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem 5</span></span>
+<span id="cb9-588"><a href="#cb9-588" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-589"><a href="#cb9-589" aria-hidden="true" tabindex="-1"></a>Why does regularization help matrix factorization?</span>
+<span id="cb9-590"><a href="#cb9-590" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-591"><a href="#cb9-591" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip collapse="true"}</span>
+<span id="cb9-592"><a href="#cb9-592" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb9-593"><a href="#cb9-593" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-594"><a href="#cb9-594" aria-hidden="true" tabindex="-1"></a>Regularization discourages very large user and item vectors. This helps prevent overfitting to the observed ratings and usually improves prediction on unseen ratings.</span>
+<span id="cb9-595"><a href="#cb9-595" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-596"><a href="#cb9-596" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-597"><a href="#cb9-597" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.18 Challenge Questions</span></span>
+<span id="cb9-598"><a href="#cb9-598" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-599"><a href="#cb9-599" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Build a small rating matrix for courses instead of movies. What hidden factors might explain student preferences?</span>
+<span id="cb9-600"><a href="#cb9-600" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Compare user-based and item-based recommendations. When might one be more stable than the other?</span>
+<span id="cb9-601"><a href="#cb9-601" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Create a rank-1 rating matrix. What kind of world does rank 1 represent?</span>
+<span id="cb9-602"><a href="#cb9-602" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Explain why recommendation is related to projection and least squares.</span>
+<span id="cb9-603"><a href="#cb9-603" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Explain how a recommender can create a feedback loop.</span>
+<span id="cb9-604"><a href="#cb9-604" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Design a recommendation system that balances accuracy and exploration.</span>
+<span id="cb9-605"><a href="#cb9-605" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-606"><a href="#cb9-606" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.19 AI Companion Activities</span></span>
+<span id="cb9-607"><a href="#cb9-607" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-608"><a href="#cb9-608" aria-hidden="true" tabindex="-1"></a>Use an AI assistant as a mathematical discussion partner.</span>
+<span id="cb9-609"><a href="#cb9-609" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-610"><a href="#cb9-610" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Ask it to explain collaborative filtering using only a $4\times 5$ matrix.</span>
+<span id="cb9-611"><a href="#cb9-611" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Ask it to create three different rating matrices: rank 1, approximately rank 2, and full rank.</span>
+<span id="cb9-612"><a href="#cb9-612" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Ask it to compare cosine similarity and Euclidean distance for recommendation.</span>
+<span id="cb9-613"><a href="#cb9-613" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Ask it to write pseudocode for matrix factorization by gradient descent.</span>
+<span id="cb9-614"><a href="#cb9-614" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Ask it to critique a recommender from the viewpoint of fairness and feedback loops.</span>
+<span id="cb9-615"><a href="#cb9-615" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Ask it to explain how recommendation systems connect to embeddings in modern AI.</span>
+<span id="cb9-616"><a href="#cb9-616" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-617"><a href="#cb9-617" aria-hidden="true" tabindex="-1"></a><span class="fu">## 24.20 Summary</span></span>
+<span id="cb9-618"><a href="#cb9-618" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-619"><a href="#cb9-619" aria-hidden="true" tabindex="-1"></a>A recommendation system begins with a simple table: users by items. But that table quickly becomes a rich linear algebra object.</span>
+<span id="cb9-620"><a href="#cb9-620" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-621"><a href="#cb9-621" aria-hidden="true" tabindex="-1"></a>In this chapter:</span>
+<span id="cb9-622"><a href="#cb9-622" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-623"><a href="#cb9-623" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>users and items became vectors;</span>
+<span id="cb9-624"><a href="#cb9-624" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>ratings became entries of a matrix;</span>
+<span id="cb9-625"><a href="#cb9-625" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>similarity used dot products and cosine similarity;</span>
+<span id="cb9-626"><a href="#cb9-626" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>missing ratings became a matrix completion problem;</span>
+<span id="cb9-627"><a href="#cb9-627" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>hidden tastes became latent vectors;</span>
+<span id="cb9-628"><a href="#cb9-628" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>low-rank structure connected recommendation to SVD;</span>
+<span id="cb9-629"><a href="#cb9-629" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>gradient descent learned user and item factors;</span>
+<span id="cb9-630"><a href="#cb9-630" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>evaluation measured prediction quality;</span>
+<span id="cb9-631"><a href="#cb9-631" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>ethical issues reminded us that recommendation systems shape behavior, not just predict it.</span>
+<span id="cb9-632"><a href="#cb9-632" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-633"><a href="#cb9-633" aria-hidden="true" tabindex="-1"></a>The central lesson is:</span>
+<span id="cb9-634"><a href="#cb9-634" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-635"><a href="#cb9-635" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb9-636"><a href="#cb9-636" aria-hidden="true" tabindex="-1"></a><span class="fu">## Final Message</span></span>
+<span id="cb9-637"><a href="#cb9-637" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-638"><a href="#cb9-638" aria-hidden="true" tabindex="-1"></a>Recommendation systems use linear algebra to turn partial behavior into geometric prediction. A good recommendation is not magic; it is a learned relationship between user vectors, item vectors, and hidden structure.</span>
+<span id="cb9-639"><a href="#cb9-639" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/edit/main/chapters/chapter-24-recommendation-systems.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/wanghemath/Book-linear-algebra-language/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer><script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

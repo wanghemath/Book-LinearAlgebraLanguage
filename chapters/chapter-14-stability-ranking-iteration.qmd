@@ -1,0 +1,894 @@
+---
+title: "Chapter 14: Stability, Ranking, and Iteration"
+subtitle: "How repeated matrix action reveals long-term behavior"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+jupyter: python3
+---
+ 
+
+## Opening Story: When Repetition Reveals Structure
+
+Many systems do not show their true behavior after one step.
+
+A website ranking does not become meaningful after one click.
+A population model does not reveal its long-term structure after one year.
+A rumor does not show its final reach after one share.
+A Markov chain does not reveal its stable pattern after one transition.
+An algorithm does not reveal its answer after one update.
+
+But after many repeated steps, something often appears:
+
+> the system begins to organize itself around a few stable directions.
+
+This is where eigenvectors become powerful.
+
+In Chapter 13, we learned that an eigenvector is a direction that a matrix does not turn. If $Av=\lambda v$, then the vector $v$ may stretch, shrink, reverse, or stay fixed, but it keeps its direction.
+
+In this chapter, we ask a deeper question:
+
+> What happens when a matrix acts again and again?
+
+The answer is one of the most important ideas in applied linear algebra:
+
+> Repeated matrix multiplication amplifies some directions, suppresses others, and often reveals a stable pattern.
+
+This chapter connects eigenvectors to ranking, stability, Markov chains, population models, diffusion, numerical algorithms, and machine learning.
+
+## Learning Goals
+
+By the end of this chapter, you should be able to:
+
+1. Interpret an iteration $x_{k+1}=Ax_k$ as repeated matrix action.
+2. Explain how eigenvalues control growth, decay, oscillation, and stability.
+3. Identify dominant eigenvalues and dominant eigenvectors.
+4. Use the power iteration method to approximate a dominant eigenvector.
+5. Interpret a stochastic matrix as a transition rule for probability.
+6. Find and interpret a stationary distribution.
+7. Build a simple ranking system from a network.
+8. Explain the basic idea behind PageRank-style ranking.
+9. Recognize when iteration is stable, unstable, periodic, or sensitive.
+10. Use Python to simulate repeated matrix processes.
+
+## 14.1 The Basic Iteration
+
+A matrix transformation sends one vector to another:
+
+$$
+x \mapsto Ax.
+$$
+
+An iteration applies the same rule repeatedly:
+
+$$
+x_1=Ax_0,
+$$
+
+$$
+x_2=Ax_1,
+$$
+
+$$
+x_3=Ax_2,
+$$
+
+and so on. Substitution gives
+
+$$
+x_2=A^2x_0, \qquad x_3=A^3x_0.
+$$
+
+After $k$ steps,
+
+$$
+x_k=A^kx_0.
+$$
+
+::: {.callout-important}
+## Matrix Iteration
+
+A matrix iteration is a process of the form
+
+$$
+x_{k+1}=Ax_k.
+$$
+
+Here $x_k$ is the state at step $k$, and $A$ is the rule that updates the state.
+:::
+
+The same equation can describe many different stories:
+
+- $x_k$ is a population vector and $A$ describes birth, survival, and aging.
+- $x_k$ is a probability vector and $A$ describes movement between states.
+- $x_k$ is a ranking vector and $A$ describes how importance flows through a network.
+- $x_k$ is a signal or image and $A$ describes smoothing or diffusion.
+- $x_k$ is an estimate in an algorithm and $A$ describes one update step.
+
+The notation is simple, but the behavior can be rich.
+
+## 14.2 One Step Is Local; Many Steps Are Global
+
+A single multiplication $Ax$ tells us what happens now. The powers $A^k x$ tell us what happens after repeated action.
+
+This is a major shift in perspective:
+
+| One-step question | Long-term question |
+|---|---|
+| What is $Ax$? | What is $A^kx$ when $k$ is large? |
+| Where does this vector go next? | Does the process settle down? |
+| What does the matrix do locally? | What structure does repetition reveal? |
+| What changes immediately? | What survives after many steps? |
+
+The long-term question is often more important than the one-step question.
+
+A search engine does not only ask who links to a page. It asks what ranking becomes stable after importance repeatedly flows through the web.
+
+A Markov chain does not only ask where the system goes in one step. It asks what fraction of time the system spends in each state in the long run.
+
+A population model does not only ask how many individuals exist next year. It asks whether the population grows, declines, or approaches a stable age structure.
+
+## 14.3 Eigenvectors Control Iteration
+
+Suppose $v$ is an eigenvector of $A$ with eigenvalue $\lambda$:
+
+$$
+Av=\lambda v.
+$$
+
+Then applying $A$ twice gives
+
+$$
+A^2v=A(Av)=A(\lambda v)=\lambda Av=\lambda^2 v.
+$$
+
+After $k$ steps,
+
+$$
+A^k v=\lambda^k v.
+$$
+
+::: {.callout-important}
+## Eigenvectors Under Repeated Action
+
+If $Av=\lambda v$, then
+
+$$
+A^k v=\lambda^k v.
+$$
+
+So eigenvectors are the simplest directions for understanding iteration.
+:::
+
+This formula explains why eigenvalues matter:
+
+- If $|\lambda|>1$, the direction grows.
+- If $|\lambda|<1$, the direction decays.
+- If $\lambda=1$, the direction stays fixed.
+- If $\lambda=-1$, the direction flips sign each step.
+- If $\lambda=0$, the direction is killed immediately.
+- If $\lambda$ is complex, the system may rotate or oscillate.
+
+The eigenvalue tells the long-term fate of the eigenvector direction.
+
+## 14.4 Decomposing an Initial State into Eigen-Directions
+
+If a matrix has enough eigenvectors, we can write an initial vector as a combination of eigenvectors:
+
+$$
+x_0=c_1v_1+c_2v_2+\cdots+c_nv_n.
+$$
+
+If $Av_i=\lambda_i v_i$, then
+
+$$
+x_k=A^kx_0
+=c_1\lambda_1^k v_1+c_2\lambda_2^k v_2+\cdots+c_n\lambda_n^k v_n.
+$$
+
+This is the central mechanism of the chapter.
+
+::: {.callout-note}
+## The Long-Term Story
+
+Iteration separates the initial vector into eigen-directions.
+
+Each direction is multiplied by $\lambda_i^k$.
+
+For large $k$, directions with larger $|\lambda_i|$ dominate, and directions with smaller $|\lambda_i|$ fade away.
+:::
+
+This explains why a complicated starting state can eventually look simple.
+
+The matrix is not only transforming the vector. It is filtering directions.
+
+## 14.5 Stable, Unstable, and Neutral Behavior
+
+Consider the iteration
+
+$$
+x_{k+1}=Ax_k.
+$$
+
+The behavior depends on the eigenvalues of $A$.
+
+### Stable decay
+
+If all eigenvalues satisfy $|\lambda_i|<1$, then repeated application tends to shrink vectors toward zero.
+
+The origin is stable.
+
+### Unstable growth
+
+If at least one eigenvalue satisfies $|\lambda_i|>1$, then some direction grows.
+
+The system may become unstable.
+
+### Neutral persistence
+
+If an eigenvalue has $|\lambda|=1$, then the corresponding direction may persist.
+
+If $\lambda=1$, this direction is fixed. If $\lambda=-1$, it flips back and forth. If $\lambda$ is complex with magnitude $1$, the system may rotate.
+
+### Mixed behavior
+
+Most real systems are mixed. Some directions grow, some decay, and some persist.
+
+## 14.6 Example: A Two-Dimensional System
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+1.2 & 0 \\
+0 & 0.5
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+A
+\begin{bmatrix}
+1\\0
+\end{bmatrix}
+=1.2
+\begin{bmatrix}
+1\\0
+\end{bmatrix},
+\qquad
+A
+\begin{bmatrix}
+0\\1
+\end{bmatrix}
+=0.5
+\begin{bmatrix}
+0\\1
+\end{bmatrix}.
+$$
+
+The horizontal direction grows by $1.2$ each step. The vertical direction shrinks by $0.5$ each step.
+
+If
+
+$$
+x_0=
+\begin{bmatrix}
+2\\3
+\end{bmatrix},
+$$
+
+then
+
+$$
+x_k=
+\begin{bmatrix}
+2(1.2)^k\\3(0.5)^k
+\end{bmatrix}.
+$$
+
+As $k$ grows, the vertical component disappears, and the horizontal component dominates.
+
+This is why the dominant eigenvalue matters.
+
+## 14.7 The Dominant Eigenvalue and Dominant Eigenvector
+
+An eigenvalue with the largest absolute value is called a dominant eigenvalue.
+
+::: {.callout-important}
+## Dominant Eigenvalue
+
+An eigenvalue $\lambda_1$ is dominant if
+
+$$
+|\lambda_1|>|\lambda_i|
+$$
+
+for all other eigenvalues $\lambda_i$.
+:::
+
+When a matrix has a unique dominant eigenvalue and the starting vector has some component in its eigenvector direction, the long-term behavior is often controlled by the dominant eigenvector.
+
+This is the reason power iteration works.
+
+## 14.8 Power Iteration
+
+Suppose we want to find the dominant eigenvector of a matrix $A$.
+
+Start with a nonzero vector $x_0$. Repeatedly multiply by $A$ and normalize:
+
+$$
+y_{k+1}=Ax_k,
+$$
+
+$$
+x_{k+1}=\frac{y_{k+1}}{\|y_{k+1}\|}.
+$$
+
+The normalization prevents the vector from exploding or shrinking to zero.
+
+::: {.callout-important}
+## Power Iteration
+
+Power iteration is the algorithm
+
+$$
+x_{k+1}=\frac{Ax_k}{\|Ax_k\|}.
+$$
+
+Under suitable conditions, $x_k$ approaches the dominant eigenvector of $A$.
+:::
+
+Power iteration is simple, but it is one of the most important eigenvector algorithms.
+
+It is especially useful when $A$ is huge and we do not want to compute all eigenvectors.
+
+## 14.9 Ranking as a Stable Vector Problem
+
+Suppose four pages link to each other. We want to assign each page an importance score.
+
+The guiding idea is:
+
+> A page is important if important pages point to it.
+
+This creates a recursive definition. The score vector $r$ should satisfy
+
+$$
+r=Mr.
+$$
+
+This means $r$ is an eigenvector of $M$ with eigenvalue $1$.
+
+So ranking becomes an eigenvector problem.
+
+The matrix $M$ describes how importance flows through the network.
+
+If page $j$ links to page $i$, then some of page $j$'s importance flows to page $i$.
+
+## 14.10 From Links to a Column-Stochastic Matrix
+
+A matrix $M$ is column-stochastic if each column sums to $1$ and all entries are nonnegative.
+
+For a ranking model, column $j$ describes where the importance from page $j$ goes.
+
+For example,
+
+$$
+M=
+\begin{bmatrix}
+0 & 1/2 & 1/2 & 0 \\
+1/2 & 0 & 1/2 & 1/3 \\
+1/2 & 1/2 & 0 & 1/3 \\
+0 & 0 & 0 & 1/3
+\end{bmatrix}.
+$$
+
+If $r_k$ is the ranking vector at step $k$, then
+
+$$
+r_{k+1}=Mr_k.
+$$
+
+Because columns sum to $1$, the total amount of importance is preserved:
+
+$$
+\sum_i (r_{k+1})_i = \sum_i (r_k)_i.
+$$
+
+This is the same idea as probability conservation in Markov chains.
+
+## 14.11 Markov Chains: Iterating Probability
+
+A Markov chain is a process that moves between states with certain probabilities.
+
+If $p_k$ is a probability vector, then $p_{k+1}=Pp_k$ describes one transition step when $P$ is column-stochastic.
+
+::: {.callout-important}
+## Stationary Distribution
+
+A probability vector $\pi$ is stationary for $P$ if
+
+$$
+P\pi=\pi.
+$$
+
+This means that if the system starts with distribution $\pi$, then it remains at $\pi$ after one transition.
+:::
+
+A stationary distribution is an eigenvector with eigenvalue $1$.
+
+The word stationary does not mean individuals stop moving. It means the overall distribution stops changing.
+
+## 14.12 Example: Weather as a Markov Chain
+
+Suppose there are two weather states: sunny and rainy.
+
+Let
+
+$$
+P=
+\begin{bmatrix}
+0.8 & 0.3 \\
+0.2 & 0.7
+\end{bmatrix}.
+$$
+
+Column 1 says that after a sunny day, tomorrow is sunny with probability $0.8$ and rainy with probability $0.2$.
+
+Column 2 says that after a rainy day, tomorrow is sunny with probability $0.3$ and rainy with probability $0.7$.
+
+A stationary distribution $\pi$ satisfies
+
+$$
+P\pi=\pi.
+$$
+
+Solving this gives
+
+$$
+\pi=
+\begin{bmatrix}
+0.6\\0.4
+\end{bmatrix}.
+$$
+
+In the long run, the model spends about $60\%$ of days sunny and $40\%$ rainy.
+
+## 14.13 PageRank-Style Damping
+
+Real networks can have problems:
+
+- Some pages may have no outgoing links.
+- Some groups of pages may trap all importance.
+- Some networks may lead to periodic behavior.
+
+A PageRank-style model solves this by adding a small chance of jumping anywhere.
+
+Let $M$ be a column-stochastic link matrix. Define
+
+$$
+G=\alpha M+(1-\alpha)\frac{1}{n}\mathbf{1}\mathbf{1}^T,
+$$
+
+where $0<\alpha<1$.
+
+Here:
+
+- $\alpha$ is the damping factor,
+- $M$ follows links,
+- $\frac{1}{n}\mathbf{1}\mathbf{1}^T$ spreads importance uniformly,
+- $G$ is the damped ranking matrix.
+
+The ranking vector satisfies
+
+$$
+r=Gr.
+$$
+
+This is again an eigenvector equation with eigenvalue $1$.
+
+::: {.callout-note}
+## Why Damping Helps
+
+Damping prevents the ranking process from getting trapped in isolated parts of the network.
+
+It also makes the iteration more stable and usually ensures convergence to a unique positive ranking vector.
+:::
+
+## 14.14 Iteration and Diffusion
+
+Ranking is not the only place where iteration appears.
+
+Suppose $x_k$ records the amount of heat at each location in a simple one-dimensional object. A smoothing matrix may replace each entry by a weighted average of itself and its neighbors.
+
+Repeated smoothing gives
+
+$$
+x_{k+1}=Sx_k.
+$$
+
+High-frequency noise decays quickly, while slow-changing patterns survive longer.
+
+This is another eigenvector story.
+
+Some eigenvectors represent smooth patterns. Others represent rapidly alternating patterns. The eigenvalues decide which patterns survive repeated smoothing.
+
+## 14.15 Iteration as an Algorithm
+
+Many algorithms are iterative.
+
+They do not solve a problem in one step. Instead, they repeatedly improve an estimate.
+
+Examples include:
+
+- power iteration for eigenvectors,
+- gradient descent for optimization,
+- iterative solvers for linear systems,
+- diffusion algorithms on graphs,
+- neural network training updates,
+- recommendation algorithms.
+
+The main question is always:
+
+> Does the iteration converge, and if so, how fast?
+
+Linear algebra gives a language for answering this question.
+
+The eigenvalues often determine convergence speed.
+
+## 14.16 Convergence Speed
+
+Suppose the dominant eigenvalue is $\lambda_1$ and the second largest eigenvalue in magnitude is $\lambda_2$.
+
+For power iteration, the convergence speed is often controlled by the ratio
+
+$$
+\left|\frac{\lambda_2}{\lambda_1}\right|.
+$$
+
+If this ratio is small, convergence is fast.
+
+If this ratio is close to $1$, convergence is slow.
+
+::: {.callout-important}
+## Spectral Gap Intuition
+
+A large gap between the largest eigenvalue and the second largest eigenvalue usually means faster convergence.
+
+A small gap usually means slower convergence.
+:::
+
+This idea appears in ranking, Markov chains, graph algorithms, optimization, and data science.
+
+## 14.17 What Can Go Wrong?
+
+Iteration does not always converge nicely.
+
+### Growth without bound
+
+If $|\lambda|>1$, some components can explode.
+
+### Oscillation
+
+If $\lambda<0$, signs may flip. If complex eigenvalues are present, the system may rotate.
+
+### Slow convergence
+
+If the dominant eigenvalue is not clearly separated from the others, convergence may be slow.
+
+### Multiple stable directions
+
+If there are multiple eigenvalues with magnitude $1$, the final behavior may depend strongly on the initial vector.
+
+### Defective matrices
+
+Some matrices do not have enough independent eigenvectors. Then the behavior may include polynomial factors such as $k\lambda^k$.
+
+The main lesson is that eigenvalues provide the first map, but the full matrix structure matters too.
+
+## 14.18 Worked Example: Power Iteration by Hand
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+2 & 1 \\
+1 & 2
+\end{bmatrix}.
+$$
+
+Start with
+
+$$
+x_0=
+\begin{bmatrix}
+1\\0
+\end{bmatrix}.
+$$
+
+Then
+
+$$
+Ax_0=
+\begin{bmatrix}
+2\\1
+\end{bmatrix}.
+$$
+
+Normalize:
+
+$$
+x_1=\frac{1}{\sqrt{5}}
+\begin{bmatrix}
+2\\1
+\end{bmatrix}.
+$$
+
+Next,
+
+$$
+Ax_1=\frac{1}{\sqrt{5}}
+\begin{bmatrix}
+5\\4
+\end{bmatrix}.
+$$
+
+After normalization, the vector moves closer to the direction
+
+$$
+\begin{bmatrix}
+1\\1
+\end{bmatrix}.
+$$
+
+Indeed,
+
+$$
+A
+\begin{bmatrix}
+1\\1
+\end{bmatrix}
+=
+3
+\begin{bmatrix}
+1\\1
+\end{bmatrix}.
+$$
+
+The dominant eigenvector is the diagonal direction $[1,1]^T$.
+
+## 14.19 Python Example: Ranking by Iteration
+
+```{python}
+import numpy as np
+
+M = np.array([
+    [0,   1/2, 1/2, 0],
+    [1/2, 0,   1/2, 1/3],
+    [1/2, 1/2, 0,   1/3],
+    [0,   0,   0,   1/3]
+], dtype=float)
+
+r = np.ones(4) / 4
+
+for k in range(30):
+    r = M @ r
+
+r
+```
+
+```{python}
+r / r.sum()
+```
+
+The final ranking vector is a stable pattern of importance.
+
+## 14.20 Python Example: Damped Ranking
+
+```{python}
+alpha = 0.85
+n = M.shape[0]
+G = alpha * M + (1 - alpha) * np.ones((n, n)) / n
+
+r = np.ones(n) / n
+history = [r.copy()]
+
+for k in range(40):
+    r = G @ r
+    history.append(r.copy())
+
+r
+```
+
+```{python}
+np.round(r / r.sum(), 4)
+```
+
+The damping term makes every page reachable from every other page in one random jump.
+
+## 14.21 Practice Problems
+
+### Problem 1
+
+Let
+
+$$
+A=
+\begin{bmatrix}
+0.5 & 0 \\
+0 & 2
+\end{bmatrix}.
+$$
+
+Describe the long-term behavior of $x_{k+1}=Ax_k$.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The eigenvalues are $0.5$ and $2$. The first coordinate decays because $0.5^k \to 0$. The second coordinate grows because $2^k \to \infty$ unless its initial coefficient is zero. Most initial vectors eventually point in the vertical direction and grow rapidly.
+:::
+
+### Problem 2
+
+Let
+
+$$
+P=
+\begin{bmatrix}
+0.9 & 0.4 \\
+0.1 & 0.6
+\end{bmatrix}.
+$$
+
+Check that $P$ is column-stochastic. Then find the stationary distribution.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Each column sums to $1$: $0.9+0.1=1$ and $0.4+0.6=1$.
+
+Solve $P\pi=\pi$ with $\pi_1+\pi_2=1$.
+
+From $0.9\pi_1+0.4\pi_2=\pi_1$, we get $0.4\pi_2=0.1\pi_1$, so $\pi_1=4\pi_2$.
+
+Since $\pi_1+\pi_2=1$, we get $5\pi_2=1$, so $\pi_2=0.2$ and $\pi_1=0.8$.
+
+Thus
+
+$$
+\pi=
+\begin{bmatrix}
+0.8\\0.2
+\end{bmatrix}.
+$$
+:::
+
+### Problem 3
+
+Explain why $x_{k+1}=Ax_k$ may fail to converge if $A$ has eigenvalue $-1$.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+If $Av=-v$, then $A^kv=(-1)^k v$. This alternates between $v$ and $-v$, so it does not approach a single vector unless the coefficient in that direction is zero.
+:::
+
+### Problem 4
+
+Suppose a matrix has eigenvalues $5$, $2$, and $0.1$. Which eigenvector will usually dominate $A^kx_0$ as $k$ grows?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The eigenvalue $5$ has the largest absolute value. Unless the initial vector has no component in the corresponding eigenvector direction, that eigenvector will dominate the long-term behavior.
+:::
+
+### Problem 5
+
+Why does power iteration normalize at every step?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Without normalization, the vector may grow very large if the dominant eigenvalue has magnitude greater than $1$, or shrink toward zero if the dominant eigenvalue has magnitude less than $1$. Normalization keeps the vector at a manageable size while preserving its direction.
+:::
+
+## 14.22 Challenge Questions
+
+1. Build a $3 \times 3$ matrix whose iteration converges to zero from every starting point.
+2. Build a $2 \times 2$ matrix whose iteration alternates forever.
+3. Find a column-stochastic matrix with stationary distribution $[1/3,1/3,1/3]^T$.
+4. Explain why ranking by in-degree alone is different from ranking by eigenvector centrality.
+5. Create a network where one node receives many links from unimportant nodes and another receives one link from an important node. Which should rank higher?
+6. Explain how a smoothing matrix can be interpreted as a repeated averaging process.
+7. Use Python to compare convergence speeds for two matrices with different spectral gaps.
+
+## 14.23 AI Companion Activities
+
+Use an AI assistant as a conversation partner, not as a replacement for your own thinking.
+
+### Activity 1: Explain the story
+
+Ask:
+
+> Explain why eigenvectors matter for repeated matrix multiplication using a population model and a ranking model.
+
+Then check whether the explanation correctly uses $A^kv=\lambda^k v$.
+
+### Activity 2: Build examples
+
+Ask:
+
+> Give me three $2 \times 2$ matrices: one stable, one unstable, and one oscillatory. Explain their eigenvalues.
+
+Verify the answer using Python.
+
+### Activity 3: PageRank intuition
+
+Ask:
+
+> Explain PageRank without using advanced graph theory. Why is it an eigenvector problem?
+
+Then rewrite the explanation in your own words.
+
+### Activity 4: Critique an algorithm
+
+Ask:
+
+> Here is a power iteration algorithm. What could go wrong if the initial vector is poorly chosen?
+
+Use the answer to think about dominant eigenvectors and missing components.
+
+## 14.24 Chapter Summary
+
+This chapter studied what happens when a matrix is applied repeatedly.
+
+The central equation was
+
+$$
+x_{k+1}=Ax_k,
+$$
+
+so that
+
+$$
+x_k=A^kx_0.
+$$
+
+Eigenvectors are important because they behave simply under iteration:
+
+$$
+A^kv=\lambda^k v.
+$$
+
+Eigenvalues control growth, decay, oscillation, and stability.
+
+The dominant eigenvector often controls long-term behavior.
+
+Power iteration uses repeated multiplication and normalization to find a dominant eigenvector.
+
+Ranking systems and Markov chains both lead to stable-vector equations of the form
+
+$$
+Mx=x.
+$$
+
+A stationary distribution or ranking vector is an eigenvector with eigenvalue $1$.
+
+The main message is:
+
+> Repetition reveals structure. Eigenvectors tell us which directions survive.
+
+## 14.25 Looking Ahead
+
+In the next chapter, we move from repeated action to landscapes.
+
+Instead of asking what happens when a matrix acts again and again, we ask how quadratic expressions create hills, valleys, saddles, and energy surfaces.
+
+This leads to optimization, curvature, positive definiteness, and the geometric meaning of symmetric matrices.

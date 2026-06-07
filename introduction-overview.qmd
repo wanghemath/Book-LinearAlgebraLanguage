@@ -1,0 +1,426 @@
+# Introduction: Linear Algebra as a Language {.unnumbered}
+
+Most people first meet linear algebra as a wall of equations.
+
+Rows of numbers.  
+Matrices.  
+Symbols.  
+Rules for multiplication.  
+Instructions for solving systems.
+
+But linear algebra is not a wall.
+
+It is a window.
+
+It lets us see data as geometry, images as matrices, language as vectors, and artificial intelligence as a sequence of transformations.
+
+This book is about learning that way of seeing.
+
+## The Main Idea
+
+Linear algebra is the mathematics of meaningful lists and meaningful transformations.
+
+A vector is not just a column of numbers. It is a way to store information.
+
+A matrix is not just a rectangular table. It is a machine that changes information.
+
+A basis is not just a technical condition. It is a language for describing the same object.
+
+A projection is not just a formula. It is the best shadow of one object on another.
+
+An eigenvector is not just something found by solving an equation. It is a direction that survives change.
+
+The singular value decomposition is not just a factorization. It is a microscope for hidden structure.
+
+The central question of the book is:
+
+> How can information be represented, transformed, compared, approximated, compressed, and learned from?
+
+That question connects the beginning of linear algebra to the mathematics behind data science and AI.
+
+## Who This Book Is For
+
+This book is written for readers who want to understand the mathematics behind data, computation, and artificial intelligence, but who may not have studied linear algebra before.
+
+It is especially designed for:
+
+- first-year college students learning linear algebra for the first time,
+- high school students who want an early view of modern mathematics,
+- data science and AI beginners,
+- students in biology, business, engineering, social science, and computer science,
+- teachers who want a more visual and story-driven approach,
+- general readers who want to understand why vectors and matrices matter.
+
+You do not need calculus. You do not need advanced programming. You need algebra, graphs, and curiosity.
+
+## A First Example: A Person as a Vector
+
+Suppose we want to describe a person using three numbers:
+
+$$
+\text{height}, \quad \text{weight}, \quad \text{age}.
+$$
+
+One person might be represented by
+
+$$
+x =
+\begin{bmatrix}
+68 \\
+150 \\
+20
+\end{bmatrix}.
+$$
+
+At first this looks like a column of numbers. But it is more than that. It is a compact description of an object.
+
+The object could be a person. It could also be a house, a document, a movie, a gene, an image, a customer, or a word.
+
+A house might be represented by
+
+$$
+\begin{bmatrix}
+\text{size} \\
+\text{number of bedrooms} \\
+\text{distance to city center} \\
+\text{price}
+\end{bmatrix}.
+$$
+
+A document might be represented by word counts.
+
+An image might be represented by pixel intensities.
+
+A word might be represented by an embedding vector.
+
+This is the first major idea:
+
+> A vector is a way to store information.
+
+Once information becomes a vector, we can compare it, transform it, combine it, approximate it, and learn from it.
+
+## A First Example: A Matrix as a Machine
+
+Now suppose we want to transform a point
+
+$$
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+$$
+
+into a new point
+
+$$
+\begin{bmatrix}
+2x \\
+3y
+\end{bmatrix}.
+$$
+
+This transformation stretches the horizontal direction by a factor of 2 and the vertical direction by a factor of 3.
+
+We can represent this transformation using a matrix:
+
+$$
+A =
+\begin{bmatrix}
+2 & 0 \\
+0 & 3
+\end{bmatrix}.
+$$
+
+Then the transformation is written as
+
+$$
+A
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+=
+\begin{bmatrix}
+2 & 0 \\
+0 & 3
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+=
+\begin{bmatrix}
+2x \\
+3y
+\end{bmatrix}.
+$$
+
+The matrix is not only a table. It is an action.
+
+It takes an input vector and produces an output vector.
+
+This is the second major idea:
+
+> A matrix is a machine that transforms information.
+
+## Why Linear Algebra Matters Now
+
+Linear algebra is important because modern information is often represented numerically.
+
+A grayscale image is a matrix of pixel values.  
+A color image is several matrices stacked together.  
+A dataset is a table whose rows can be treated as vectors.  
+A search engine compares vectors.  
+A recommendation system searches for hidden patterns in a user-item matrix.  
+A neural network layer applies a matrix-like transformation to input data.  
+A language model represents words, tokens, or sentences as vectors in high-dimensional spaces.
+
+These examples may look different on the surface, but they share the same grammar:
+
+| Modern object | Linear algebra view |
+|---|---|
+| Image | Matrix or tensor of pixel values |
+| Document | Vector of word counts or embeddings |
+| Dataset | Collection of points in high-dimensional space |
+| Search | Similarity between vectors |
+| Recommendation system | Hidden structure in a matrix |
+| Neural network layer | Transformation of vectors |
+| Compression | Approximation by simpler structure |
+| PCA | Finding important directions in data |
+
+Linear algebra is powerful because it gives one language for many situations.
+
+## The Six Big Ideas
+
+This book is organized around six big ideas. They appear again and again, each time in a richer form.
+
+### 1. Representation
+
+Before we can compute with an object, we need to represent it.
+
+A real-world object becomes a vector. A collection of objects becomes a dataset. Representation is the bridge from the world to mathematics.
+
+### 2. Transformation
+
+A matrix transforms vectors.
+
+It can stretch, rotate, reflect, project, mix, filter, rank, compress, and learn. Transformation is the bridge from input to output.
+
+### 3. Similarity
+
+The dot product, length, distance, angle, and cosine similarity help us compare vectors.
+
+Similarity is the beginning of search, clustering, recommendation, classification, and semantic comparison.
+
+### 4. Approximation
+
+Real data is usually imperfect.
+
+Projection and least squares help us find the best approximate answer when exact answers are impossible, unstable, or not useful.
+
+### 5. Compression
+
+Complex data often contains simpler patterns.
+
+Compression means keeping what matters most and discarding what matters least. SVD, PCA, Fourier ideas, and Haar ideas all express this theme.
+
+### 6. Hidden Structure
+
+Some patterns are not visible in the original coordinates.
+
+Eigenvectors, eigenvalues, singular values, and singular vectors help reveal stable directions, dominant patterns, and low-dimensional structure.
+
+## The Main Story of the Book
+
+The story begins with ordinary numbers.
+
+A number becomes meaningful when it measures something.  
+A list of meaningful numbers becomes a vector.  
+A vector becomes a point.  
+A collection of points becomes data.
+
+Then we learn how to combine vectors, create new directions, and understand the spaces they fill.
+
+After that, matrices enter as machines. They move vectors, change shapes, solve systems, and sometimes lose information. This leads naturally to questions about reversibility, dimension, and structure.
+
+Next, geometry becomes the main language. Length, distance, angle, orthogonality, and projection allow us to compare and approximate information.
+
+Then we study special directions. Eigenvectors and eigenvalues reveal what remains stable under repeated transformation. This connects to ranking, dynamical systems, and energy.
+
+Finally, we study decompositions. SVD, PCA, Fourier, and Haar ideas show how complex objects can be broken into simpler parts. The book ends by connecting these ideas to images, text, neural networks, recommendation systems, and AI.
+
+## Roadmap
+
+### Part I. Seeing Data as Geometry
+
+Main question:
+
+> How can objects in the world become points in space?
+
+This part introduces vectors as meaningful lists of numbers, linear combinations as recipes, and datasets as collections of points.
+
+### Part II. Matrices as Machines
+
+Main question:
+
+> How does information change?
+
+This part introduces matrices as transformations. We study stretching, rotating, shearing, solving systems, inverses, and loss of information.
+
+### Part III. The Geometry of Similarity and Approximation
+
+Main question:
+
+> How do we compare and approximate information?
+
+This part studies length, distance, angle, dot product, orthogonality, and projection. These ideas lead naturally to least squares and regression.
+
+### Part IV. Hidden Directions
+
+Main question:
+
+> What directions reveal the structure of a transformation?
+
+This part studies eigenvectors, eigenvalues, repeated transformations, stability, ranking, and energy landscapes.
+
+### Part V. The Matrix Microscope
+
+Main question:
+
+> How can simple structure be found inside complex data?
+
+This part introduces SVD, image compression, PCA, Fourier ideas, and Haar ideas.
+
+### Part VI. Linear Algebra and AI
+
+Main question:
+
+> Why is linear algebra one of the main languages of artificial intelligence?
+
+This part connects linear algebra to images, text, neural networks, recommendation systems, and the grammar of AI.
+
+## How to Read This Book
+
+Read this book as a story, not as a list of disconnected techniques.
+
+When a new idea appears, ask:
+
+- What problem is this idea solving?
+- What does this object represent?
+- What does this operation do?
+- What is being preserved?
+- What is being lost?
+- What structure is being revealed?
+
+Do not rush past the small examples. In linear algebra, small examples carry the meaning of big ideas.
+
+## Using Python
+
+Python examples appear throughout the book. They are not included to replace mathematics. They are included to help you see mathematics.
+
+Use Python to:
+
+- draw vectors and transformations,
+- experiment with matrices,
+- visualize data as points,
+- test formulas numerically,
+- compress images,
+- compute eigenvectors and singular values,
+- explore small machine learning examples.
+
+The most important step is not copying code. The most important step is changing the code and asking what changes in the output.
+
+## Using AI as a Companion
+
+AI can help you learn this subject if you use it actively.
+
+Good uses of AI include:
+
+- asking for another explanation,
+- generating extra examples,
+- checking your reasoning,
+- finding mistakes in a calculation,
+- creating practice questions,
+- connecting an idea to data, images, or AI.
+
+A weak use of AI is to ask for an answer and move on.
+
+A strong use of AI is to ask:
+
+> Help me understand why this answer makes sense.
+
+Throughout the book, AI companion activities invite you to explain ideas, challenge your understanding, and connect linear algebra to modern applications.
+
+## A Small Preview: Similarity
+
+Suppose two documents are represented by vectors.
+
+If the vectors point in similar directions, the documents may discuss similar topics. This is the idea behind cosine similarity.
+
+The dot product becomes more than a formula. It becomes a tool for comparing meaning.
+
+## A Small Preview: Compression
+
+Suppose an image is stored as a large matrix.
+
+The image may contain many pixels, but not all information is equally important. SVD can approximate the image using fewer numbers while keeping the most visible structure.
+
+A matrix factorization becomes more than algebra. It becomes a way to compress information.
+
+## A Small Preview: Learning
+
+Suppose a neural network receives a vector as input.
+
+Each layer transforms the vector into a new representation. Early layers may detect simple patterns. Later layers may combine those patterns into more meaningful features.
+
+A neural network is not magic. It is a sequence of transformations, many of which are built from linear algebra.
+
+## What You Will Be Able to Do
+
+By the end of the book, you should be able to:
+
+- interpret vectors as representations of real-world objects,
+- interpret matrices as transformations and models,
+- use geometry to understand length, distance, angle, similarity, and projection,
+- explain why orthogonality means independent information,
+- solve and interpret systems of linear equations,
+- understand when information is preserved or lost,
+- explain eigenvectors as stable directions,
+- use SVD as a tool for hidden structure,
+- understand PCA as finding important directions in data,
+- see how images, text, recommendation systems, and neural networks use linear algebra.
+
+Most importantly, you should be able to ask better questions about mathematical objects.
+
+## Reflection Questions
+
+Before beginning Chapter 1, think about the following questions.
+
+1. What kinds of real-world objects can be described using numbers?
+2. When does a list of numbers become more than just a list?
+3. What does it mean for two objects to be similar?
+4. What does it mean to lose information?
+5. Why might a complicated dataset have simple hidden structure?
+6. How might a matrix act like a machine?
+
+## AI Companion Activity
+
+Use an AI assistant to explore the following prompt:
+
+> I am beginning a story-driven book on linear algebra. Explain, using three everyday examples, how a vector can represent information and how a matrix can transform information. Do not use advanced formulas.
+
+Then ask a follow-up question:
+
+> In each example, what is being represented, what is being transformed, and what information might be lost?
+
+Write a short paragraph in your own words explaining what you learned.
+
+## Closing Thought
+
+Linear algebra begins with simple objects: vectors and matrices.
+
+But these simple objects become a language for data, images, signals, learning, and intelligence.
+
+The goal of this book is not only to teach you how to calculate.
+
+The goal is to help you see.

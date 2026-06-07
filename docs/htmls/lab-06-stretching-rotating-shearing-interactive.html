@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 06 Interactive: Stretching, Rotating, and Shearing</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#172033; --muted:#5b6478; --line:#d9deea;
+    --accent:#3259d9; --accent2:#0f8b8d; --warn:#b45309;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  header{padding:48px 22px 36px;background:linear-gradient(135deg,#172033,#324376);color:white;text-align:center}
+  header h1{margin:0;font-size:clamp(2rem,5vw,4rem);letter-spacing:-0.04em}
+  header p{max-width:860px;margin:16px auto 0;font-size:1.15rem;opacity:.93}
+  main{max-width:1180px;margin:0 auto;padding:24px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin:22px 0;box-shadow:0 10px 28px rgba(20,30,60,.06)}
+  h2{margin-top:0;font-size:1.65rem;letter-spacing:-.02em}
+  .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  canvas{width:100%;background:#fbfcff;border:1px solid var(--line);border-radius:16px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .control{background:#f8f9fd;border:1px solid var(--line);border-radius:14px;padding:12px}
+  label{display:flex;justify-content:space-between;font-weight:650;font-size:.95rem;margin-bottom:6px}
+  input[type=range]{width:100%}
+  .readout{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#101828;color:#e6edf7;border-radius:14px;padding:14px;white-space:pre-wrap;overflow:auto}
+  .buttons{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  button{border:0;border-radius:999px;padding:9px 13px;background:#e9edff;color:#223b91;font-weight:700;cursor:pointer}
+  button:hover{filter:brightness(.96)}
+  .note{background:#fff7ed;border-left:5px solid var(--warn);padding:14px;border-radius:12px;color:#4a2b08}
+  .task{background:#eefdfd;border-left:5px solid var(--accent2);padding:14px;border-radius:12px;color:#063c3d}
+  .mini{color:var(--muted);font-size:.96rem}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:700px){.two,.controls{grid-template-columns:1fr}}
+  code{background:#eef1f7;padding:.1rem .25rem;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Stretching, Rotating, and Shearing</h1>
+  <p>An interactive visual lab for Chapter 6. Move the sliders, watch the grid, track the basis vectors, and learn to read a matrix as a geometric machine.</p>
+</header>
+<main>
+
+<section>
+  <h2>1. The matrix machine</h2>
+  <div class="grid">
+    <div>
+      <p>A 2 by 2 matrix transforms every point in the plane. The columns tell where the standard basis vectors go.</p>
+      <p>If <code>A = [[a,b],[c,d]]</code>, then the first column is <code>Ae1</code> and the second column is <code>Ae2</code>.</p>
+      <div class="controls">
+        <div class="control"><label>a <span id="aVal"></span></label><input id="a" type="range" min="-3" max="3" step="0.05" value="1.4"></div>
+        <div class="control"><label>b <span id="bVal"></span></label><input id="b" type="range" min="-3" max="3" step="0.05" value="0.8"></div>
+        <div class="control"><label>c <span id="cVal"></span></label><input id="c" type="range" min="-3" max="3" step="0.05" value="0.2"></div>
+        <div class="control"><label>d <span id="dVal"></span></label><input id="d" type="range" min="-3" max="3" step="0.05" value="1.1"></div>
+      </div>
+      <div class="buttons">
+        <button onclick="preset(1,0,0,1)">Identity</button>
+        <button onclick="preset(2,0,0,.6)">Stretch</button>
+        <button onclick="preset(1,1.3,0,1)">Shear</button>
+        <button onclick="preset(0,-1,1,0)">90° Rotation</button>
+        <button onclick="preset(1,0,0,-1)">Reflection</button>
+        <button onclick="preset(1,2,2,4)">Collapse</button>
+      </div>
+      <pre class="readout" id="matrixInfo"></pre>
+    </div>
+    <canvas id="gridCanvas" width="620" height="620"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>2. Transform the unit square and circle</h2>
+  <div class="grid">
+    <div>
+      <p>The unit square becomes the parallelogram spanned by the columns of the matrix. The unit circle shows how the transformation stretches different directions.</p>
+      <p class="note">A rotation keeps the circle circular. A stretch or shear turns it into an ellipse. A collapse turns it into a line segment.</p>
+      <div class="task"><strong>Student task.</strong> Choose a matrix with determinant close to zero. What happens to the square? What happens to the circle?</div>
+    </div>
+    <canvas id="shapeCanvas" width="620" height="620"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>3. Build transformations by sliders</h2>
+  <div class="grid">
+    <div>
+      <p>This panel builds a matrix from a rotation, a horizontal shear, and separate horizontal/vertical scaling:</p>
+      <p><code>A = Rotation × Shear × Scale</code></p>
+      <div class="controls">
+        <div class="control"><label>rotation angle <span id="angVal"></span></label><input id="angle" type="range" min="-180" max="180" step="1" value="25"></div>
+        <div class="control"><label>shear k <span id="shVal"></span></label><input id="shear" type="range" min="-3" max="3" step="0.05" value="0.8"></div>
+        <div class="control"><label>scale x <span id="sxVal"></span></label><input id="sx" type="range" min="0.1" max="3" step="0.05" value="1.6"></div>
+        <div class="control"><label>scale y <span id="syVal"></span></label><input id="sy" type="range" min="0.1" max="3" step="0.05" value="0.8"></div>
+      </div>
+      <pre class="readout" id="builtInfo"></pre>
+    </div>
+    <canvas id="composeCanvas" width="620" height="620"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>4. Data cloud transformation</h2>
+  <div class="grid">
+    <div>
+      <p>A dataset with two features is a cloud of points. Applying a matrix reshapes the cloud. This is a preview of linear algebra in data science.</p>
+      <p class="mini">The same matrix from Panel 1 is applied to the data cloud.</p>
+      <div class="task"><strong>Try this.</strong> Use the Collapse preset above. Notice how a two-dimensional cloud becomes almost one-dimensional.</div>
+    </div>
+    <canvas id="dataCanvas" width="620" height="620"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>5. Transform a simple picture</h2>
+  <div class="grid">
+    <div>
+      <p>A picture can be represented by points and line segments. Matrix transformations are the language behind many operations in computer graphics.</p>
+      <p>The same matrix from Panel 1 transforms this small house drawing.</p>
+      <p class="note">Question: which transformations preserve the house's shape? Which ones distort it?</p>
+    </div>
+    <canvas id="houseCanvas" width="620" height="620"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>Reflection prompts</h2>
+  <ol>
+    <li>Why do the columns of a matrix determine the whole transformation?</li>
+    <li>What geometric information does the determinant give?</li>
+    <li>How can a matrix preserve area but still distort angles?</li>
+    <li>Why is matrix multiplication the correct operation for doing transformations in sequence?</li>
+  </ol>
+</section>
+
+</main>
+<script>
+const ids=['a','b','c','d'];
+const els=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+function val(id){return parseFloat(document.getElementById(id).value)}
+function fmt(x){return (Math.abs(x)<1e-10?0:x).toFixed(2)}
+function mat(){return [[val('a'),val('b')],[val('c'),val('d')]]}
+function mul(A,p){return [A[0][0]*p[0]+A[0][1]*p[1], A[1][0]*p[0]+A[1][1]*p[1]]}
+function det(A){return A[0][0]*A[1][1]-A[0][1]*A[1][0]}
+function preset(a,b,c,d){els.a.value=a;els.b.value=b;els.c.value=c;els.d.value=d; drawAll()}
+function setupCanvas(canvas,lim=5){
+ const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+ const W=canvas.width,H=canvas.height; const scale=W/(2*lim);
+ function toPix(p){return [W/2+p[0]*scale,H/2-p[1]*scale]}
+ ctx.lineWidth=1; ctx.strokeStyle='#e5e9f2';
+ for(let x=-lim;x<=lim;x++){let p1=toPix([x,-lim]),p2=toPix([x,lim]); ctx.beginPath();ctx.moveTo(...p1);ctx.lineTo(...p2);ctx.stroke();}
+ for(let y=-lim;y<=lim;y++){let p1=toPix([-lim,y]),p2=toPix([lim,y]); ctx.beginPath();ctx.moveTo(...p1);ctx.lineTo(...p2);ctx.stroke();}
+ ctx.strokeStyle='#6b7280'; ctx.lineWidth=1.5;
+ let p1=toPix([-lim,0]),p2=toPix([lim,0]); ctx.beginPath();ctx.moveTo(...p1);ctx.lineTo(...p2);ctx.stroke();
+ p1=toPix([0,-lim]);p2=toPix([0,lim]); ctx.beginPath();ctx.moveTo(...p1);ctx.lineTo(...p2);ctx.stroke();
+ return {ctx,toPix,lim,scale};
+}
+function drawArrow(ctx,toPix,v,color,label){
+ const [x0,y0]=toPix([0,0]); const [x1,y1]=toPix(v); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4;
+ ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+ const ang=Math.atan2(y1-y0,x1-x0), len=12;
+ ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-len*Math.cos(ang-.45),y1-len*Math.sin(ang-.45));ctx.lineTo(x1-len*Math.cos(ang+.45),y1-len*Math.sin(ang+.45));ctx.closePath();ctx.fill();
+ ctx.font='16px system-ui'; ctx.fillText(label,x1+8,y1-8);
+}
+function drawGridTransformed(canvas,A){
+ const {ctx,toPix}=setupCanvas(canvas,5); ctx.lineWidth=1.1; ctx.strokeStyle='rgba(50,89,217,.55)';
+ const lim=3;
+ for(let v=-lim;v<=lim;v+=0.5){
+   let first=true; ctx.beginPath();
+   for(let i=0;i<=160;i++){let x=-lim+2*lim*i/160; let p=toPix(mul(A,[x,v])); if(first){ctx.moveTo(...p);first=false}else ctx.lineTo(...p)} ctx.stroke();
+   first=true; ctx.beginPath();
+   for(let i=0;i<=160;i++){let y=-lim+2*lim*i/160; let p=toPix(mul(A,[v,y])); if(first){ctx.moveTo(...p);first=false}else ctx.lineTo(...p)} ctx.stroke();
+ }
+ drawArrow(ctx,toPix,mul(A,[1,0]),'#d92f4c','Ae1'); drawArrow(ctx,toPix,mul(A,[0,1]),'#0f8b8d','Ae2');
+}
+function drawPolyline(ctx,toPix,pts,color,width=3,closed=false){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();pts.forEach((p,i)=>{let q=toPix(p); if(i==0)ctx.moveTo(...q); else ctx.lineTo(...q)}); if(closed)ctx.closePath(); ctx.stroke();}
+function drawShapes(canvas,A){
+ const {ctx,toPix}=setupCanvas(canvas,4);
+ const square=[[0,0],[1,0],[1,1],[0,1],[0,0]];
+ let circ=[]; for(let i=0;i<=240;i++){let t=2*Math.PI*i/240; circ.push([Math.cos(t),Math.sin(t)])}
+ drawPolyline(ctx,toPix,square,'#9ca3af',2); drawPolyline(ctx,toPix,circ,'#9ca3af',2);
+ drawPolyline(ctx,toPix,square.map(p=>mul(A,p)),'#3259d9',4); drawPolyline(ctx,toPix,circ.map(p=>mul(A,p)),'#0f8b8d',3);
+}
+function buildMatrix(){
+ const angle=val('angle')*Math.PI/180, k=val('shear'), sx=val('sx'), sy=val('sy');
+ const R=[[Math.cos(angle),-Math.sin(angle)],[Math.sin(angle),Math.cos(angle)]];
+ const Sh=[[1,k],[0,1]], Sc=[[sx,0],[0,sy]];
+ function mm(A,B){return [[A[0][0]*B[0][0]+A[0][1]*B[1][0],A[0][0]*B[0][1]+A[0][1]*B[1][1]],[A[1][0]*B[0][0]+A[1][1]*B[1][0],A[1][0]*B[0][1]+A[1][1]*B[1][1]]]}
+ return mm(R,mm(Sh,Sc));
+}
+let data=[]; function initData(){let seed=2; function rnd(){seed=(seed*9301+49297)%233280; return seed/233280} function norm(){let u=rnd(),v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)} for(let i=0;i<260;i++)data.push([norm()*0.75,norm()*0.45]);}
+initData();
+function drawData(canvas,A){const {ctx,toPix}=setupCanvas(canvas,5); data.forEach(p=>{let q=mul(A,p), pix=toPix(q); ctx.fillStyle='rgba(50,89,217,.42)'; ctx.beginPath();ctx.arc(pix[0],pix[1],3,0,2*Math.PI);ctx.fill();});}
+function drawHouse(canvas,A){const {ctx,toPix}=setupCanvas(canvas,4); const house=[[-1,-1],[1,-1],[1,.5],[0,1.4],[-1,.5],[-1,-1],[1,.5],[-1,.5],[-.35,-1],[-.35,-.1],[.35,-.1],[.35,-1]]; drawPolyline(ctx,toPix,house,'#9ca3af',2); drawPolyline(ctx,toPix,house.map(p=>mul(A,p)),'#3259d9',4);}
+function updateLabels(){ids.forEach(id=>document.getElementById(id+'Val').textContent=fmt(val(id))); ['angle','shear','sx','sy'].forEach((id)=>{let map={angle:'angVal',shear:'shVal',sx:'sxVal',sy:'syVal'};document.getElementById(map[id]).textContent=fmt(val(id));});}
+function drawAll(){
+ updateLabels(); const A=mat();
+ document.getElementById('matrixInfo').textContent=`A = [[${fmt(A[0][0])}, ${fmt(A[0][1])}],\n     [${fmt(A[1][0])}, ${fmt(A[1][1])}]]\n\nAe1 = (${fmt(A[0][0])}, ${fmt(A[1][0])})\nAe2 = (${fmt(A[0][1])}, ${fmt(A[1][1])})\n\ndet(A) = ${fmt(det(A))}\narea scale = ${fmt(Math.abs(det(A)))}`;
+ drawGridTransformed(document.getElementById('gridCanvas'),A); drawShapes(document.getElementById('shapeCanvas'),A); drawData(document.getElementById('dataCanvas'),A); drawHouse(document.getElementById('houseCanvas'),A);
+ const B=buildMatrix(); document.getElementById('builtInfo').textContent=`A = Rotation × Shear × Scale\n\n[[${fmt(B[0][0])}, ${fmt(B[0][1])}],\n [${fmt(B[1][0])}, ${fmt(B[1][1])}]]\n\ndet(A) = ${fmt(det(B))}`; drawGridTransformed(document.getElementById('composeCanvas'),B);
+}
+[...ids,'angle','shear','sx','sy'].forEach(id=>document.getElementById(id).addEventListener('input',drawAll));
+drawAll();
+</script>
+</body>
+</html>

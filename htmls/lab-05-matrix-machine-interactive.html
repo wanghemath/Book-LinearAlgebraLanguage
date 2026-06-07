@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 05 Interactive — The Matrix Machine</title>
+<style>
+:root{
+  --bg:#f7fafc; --card:#ffffff; --ink:#102033; --muted:#5c6b7a; --accent:#2563eb; --line:#d9e2ec;
+  --soft:#eef4ff; --good:#0f766e; --warn:#b45309;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#eef4ff 0%,#f7fafc 45%,#ffffff 100%);color:var(--ink);}
+header{padding:54px 22px 34px;text-align:center;background:radial-gradient(circle at top left,#dbeafe,transparent 35%),radial-gradient(circle at top right,#e0e7ff,transparent 35%);} 
+header h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 12px;font-weight:850;letter-spacing:-.04em}
+header p{max-width:850px;margin:0 auto;color:var(--muted);font-size:1.15rem;line-height:1.65}
+main{max-width:1180px;margin:0 auto;padding:24px}
+.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:24px;padding:24px;margin:22px 0;box-shadow:0 15px 35px rgba(15,23,42,.08)}
+h2{margin:0 0 10px;font-size:1.7rem;letter-spacing:-.02em}
+p{line-height:1.65}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}.controls{background:var(--soft);padding:16px;border-radius:18px;border:1px solid #c7d7fe}.control{margin:12px 0}.control label{display:flex;justify-content:space-between;font-size:.95rem;color:#334155;margin-bottom:5px}input[type=range]{width:100%}canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:#fff}.matrix{font-family:"SFMono-Regular",Consolas,monospace;background:#0f172a;color:#e5edff;border-radius:16px;padding:14px;line-height:1.7;white-space:pre;overflow:auto}.pill{display:inline-block;background:#e0f2fe;color:#075985;border:1px solid #bae6fd;padding:4px 10px;border-radius:999px;font-size:.85rem;margin:4px}.note{border-left:5px solid var(--accent);padding:14px 16px;background:#eff6ff;border-radius:14px;color:#1e3a8a}.task{border-left:5px solid var(--good);background:#ecfdf5;padding:14px 16px;border-radius:14px;color:#064e3b}.formula{font-family:Georgia,serif;font-size:1.15rem;text-align:center;margin:14px 0;color:#1e293b}.small{color:var(--muted);font-size:.95rem}.button{border:0;border-radius:14px;padding:10px 14px;background:var(--accent);color:white;font-weight:700;cursor:pointer}.button.secondary{background:#475569}.output{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;font-family:"SFMono-Regular",Consolas,monospace;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header>
+  <h1>The Matrix Machine</h1>
+  <p>A matrix is not only a table of numbers. It is a machine that takes an input vector, mixes its coordinates, and produces a new vector. Use this page to see matrices move vectors, grids, data, and images.</p>
+</header>
+<main>
+<section class="card">
+  <span class="pill">Chapter 5</span><span class="pill">Matrix-vector multiplication</span><span class="pill">Geometry</span><span class="pill">Data science</span>
+  <h2>Central idea</h2>
+  <div class="formula">input vector → matrix machine → output vector</div>
+  <p>If <strong>A</strong> is an m × n matrix, then it maps vectors from n-dimensional input space to m-dimensional output space.</p>
+  <div class="note">Rows describe output recipes. Columns describe building blocks. The product Ax is a linear combination of the columns of A.</div>
+</section>
+
+<section class="card">
+  <h2>1. Build a matrix and transform one vector</h2>
+  <div class="grid">
+    <div class="controls">
+      <div class="control"><label>a <span id="aVal"></span></label><input id="a" type="range" min="-3" max="3" step="0.1" value="1.4"></div>
+      <div class="control"><label>b <span id="bVal"></span></label><input id="b" type="range" min="-3" max="3" step="0.1" value="0.8"></div>
+      <div class="control"><label>c <span id="cVal"></span></label><input id="c" type="range" min="-3" max="3" step="0.1" value="0.2"></div>
+      <div class="control"><label>d <span id="dVal"></span></label><input id="d" type="range" min="-3" max="3" step="0.1" value="1.1"></div>
+      <hr>
+      <div class="control"><label>x₁ <span id="xVal"></span></label><input id="x" type="range" min="-4" max="4" step="0.1" value="2"></div>
+      <div class="control"><label>x₂ <span id="yVal"></span></label><input id="y" type="range" min="-4" max="4" step="0.1" value="1"></div>
+      <div class="matrix" id="matrixReadout"></div>
+    </div>
+    <canvas id="vectorCanvas" width="600" height="600"></canvas>
+  </div>
+  <p class="small">Blue is the input vector. The second vector is the output Ax. The transformed basis directions Ae₁ and Ae₂ are also shown from the origin.</p>
+</section>
+
+<section class="card">
+  <h2>2. The grid test</h2>
+  <p>A matrix transforms the whole plane, not only one vector. Move the sliders above and watch the grid change.</p>
+  <canvas id="gridCanvas" width="900" height="520"></canvas>
+  <div class="task"><strong>Try this:</strong> set b = 0 and c = 0. You get pure coordinate scaling. Then set a = 1, d = 1, c = 0, and move b. You get a shear.</div>
+</section>
+
+<section class="card">
+  <h2>3. Standard matrix machines</h2>
+  <div class="grid">
+    <div>
+      <button class="button" onclick="preset('identity')">Identity</button>
+      <button class="button" onclick="preset('scale')">Scaling</button>
+      <button class="button" onclick="preset('reflect')">Reflection</button>
+      <button class="button" onclick="preset('shear')">Shear</button>
+      <button class="button" onclick="preset('rotate')">Rotation</button>
+      <button class="button secondary" onclick="preset('project')">Projection</button>
+    </div>
+    <div class="output" id="presetText"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>4. Feature mixer</h2>
+  <p>This small data machine turns three raw features into two summary features.</p>
+  <div class="grid">
+    <div class="controls">
+      <p><strong>Raw student vector</strong>: [study hours, sleep hours, practice problems]</p>
+      <div class="control"><label>study <span id="studyVal"></span></label><input id="study" type="range" min="0" max="12" step="0.5" value="6"></div>
+      <div class="control"><label>sleep <span id="sleepVal"></span></label><input id="sleep" type="range" min="0" max="10" step="0.5" value="7"></div>
+      <div class="control"><label>practice <span id="practiceVal"></span></label><input id="practice" type="range" min="0" max="50" step="1" value="25"></div>
+      <div class="matrix" id="featureOut"></div>
+    </div>
+    <canvas id="featureCanvas" width="600" height="420"></canvas>
+  </div>
+  <div class="note">A warning: if one feature has a much larger scale, it can dominate the output. This is why scaling and standardization matter in data science.</div>
+</section>
+
+<section class="card">
+  <h2>5. Information loss</h2>
+  <p>A projection matrix can collapse a whole plane onto a line. Once this happens, many different inputs have the same output.</p>
+  <canvas id="projectionCanvas" width="900" height="460"></canvas>
+  <div class="task">Question: after projection onto the x-axis, can you recover the original y-coordinate? Why not?</div>
+</section>
+
+<section class="card">
+  <h2>6. Image as points, matrix as visual transformer</h2>
+  <p>The letter below is a cloud of points. The same matrix sliders from Section 1 transform it.</p>
+  <canvas id="letterCanvas" width="900" height="460"></canvas>
+</section>
+
+<section class="card">
+  <h2>7. Reflection prompts</h2>
+  <ol>
+    <li>What is the difference between the row view and the column view of matrix-vector multiplication?</li>
+    <li>Why do the columns of a matrix tell us where the standard basis vectors go?</li>
+    <li>Give one example where a matrix preserves information and one example where it loses information.</li>
+    <li>How is a neural network layer related to the matrix machine idea?</li>
+  </ol>
+</section>
+</main>
+<script>
+const ids = ['a','b','c','d','x','y','study','sleep','practice'];
+const $ = id => document.getElementById(id);
+function val(id){ return parseFloat($(id).value); }
+function mat(){ return [[val('a'), val('b')],[val('c'), val('d')]]; }
+function mul(A,p){ return [A[0][0]*p[0]+A[0][1]*p[1], A[1][0]*p[0]+A[1][1]*p[1]]; }
+function fmt(z){ return (Math.round(z*100)/100).toFixed(2); }
+function drawAxes(ctx,W,H,scale,ox,oy){ ctx.clearRect(0,0,W,H); ctx.lineWidth=1; ctx.strokeStyle='#d9e2ec'; for(let i=-10;i<=10;i++){ ctx.beginPath(); ctx.moveTo(ox+i*scale,0); ctx.lineTo(ox+i*scale,H); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,oy-i*scale); ctx.lineTo(W,oy-i*scale); ctx.stroke(); } ctx.strokeStyle='#64748b'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke(); ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke(); }
+function pt(p,scale,ox,oy){ return [ox+p[0]*scale, oy-p[1]*scale]; }
+function arrow(ctx,p,q,color,label,scale,ox,oy){ const P=pt(p,scale,ox,oy), Q=pt(q,scale,ox,oy); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(P[0],P[1]); ctx.lineTo(Q[0],Q[1]); ctx.stroke(); const ang=Math.atan2(Q[1]-P[1],Q[0]-P[0]); ctx.beginPath(); ctx.moveTo(Q[0],Q[1]); ctx.lineTo(Q[0]-12*Math.cos(ang-.4), Q[1]-12*Math.sin(ang-.4)); ctx.lineTo(Q[0]-12*Math.cos(ang+.4), Q[1]-12*Math.sin(ang+.4)); ctx.closePath(); ctx.fill(); ctx.font='15px system-ui'; ctx.fillText(label,Q[0]+8,Q[1]-8); }
+function updateVector(){ const A=mat(), x=[val('x'),val('y')], y=mul(A,x); ['a','b','c','d','x','y'].forEach(id=>$(id+'Val').textContent=fmt(val(id))); $('matrixReadout').textContent=`A = [[${fmt(A[0][0])}, ${fmt(A[0][1])}],\n     [${fmt(A[1][0])}, ${fmt(A[1][1])}]]\n\nx = [${fmt(x[0])}, ${fmt(x[1])}]\nAx = [${fmt(y[0])}, ${fmt(y[1])}]`; const canvas=$('vectorCanvas'), ctx=canvas.getContext('2d'), W=canvas.width,H=canvas.height,scale=55,ox=W/2,oy=H/2; drawAxes(ctx,W,H,scale,ox,oy); arrow(ctx,[0,0],x,'#2563eb','x',scale,ox,oy); arrow(ctx,[0,0],y,'#dc2626','Ax',scale,ox,oy); arrow(ctx,[0,0],mul(A,[1,0]),'#0f766e','Ae₁',scale,ox,oy); arrow(ctx,[0,0],mul(A,[0,1]),'#b45309','Ae₂',scale,ox,oy); }
+function drawGrid(){ const A=mat(), canvas=$('gridCanvas'), ctx=canvas.getContext('2d'), W=canvas.width,H=canvas.height,scale=45,ox=W/2,oy=H/2; drawAxes(ctx,W,H,scale,ox,oy); ctx.strokeStyle='#2563eb'; ctx.lineWidth=1.4; for(let k=-5;k<=5;k++){ for(const vertical of [true,false]){ ctx.beginPath(); for(let t=-5;t<=5;t+=0.05){ const p=vertical?[k,t]:[t,k]; const q=mul(A,p); const P=pt(q,scale,ox,oy); if(t===-5)ctx.moveTo(P[0],P[1]); else ctx.lineTo(P[0],P[1]); } ctx.stroke(); } } }
+function preset(name){ const presets={ identity:[1,0,0,1,'Identity: every vector stays the same.'], scale:[2,0,0,0.6,'Scaling: horizontal and vertical directions are stretched by different factors.'], reflect:[1,0,0,-1,'Reflection: the y-coordinate changes sign.'], shear:[1,1.4,0,1,'Shear: horizontal position changes depending on height.'], rotate:[0,-1,1,0,'Rotation: every vector rotates 90 degrees counterclockwise.'], project:[1,0,0,0,'Projection: all vertical information is lost.']}; const p=presets[name]; ['a','b','c','d'].forEach((id,i)=>$(id).value=p[i]); $('presetText').textContent=p[4]; updateAll(); }
+function updateFeature(){ ['study','sleep','practice'].forEach(id=>$(id+'Val').textContent=fmt(val(id))); const x=[val('study'),val('sleep'),val('practice')]; const prep=.35*x[0]+.15*x[1]+.50*x[2]; const bal=.20*x[0]+.60*x[1]+.20*x[2]; $('featureOut').textContent=`M = [[0.35, 0.15, 0.50],\n     [0.20, 0.60, 0.20]]\n\nx = [${fmt(x[0])}, ${fmt(x[1])}, ${fmt(x[2])}]\nMx = [${fmt(prep)}, ${fmt(bal)}]`; const canvas=$('featureCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,W,H); ctx.strokeStyle='#d9e2ec'; for(let i=0;i<10;i++){ctx.beginPath();ctx.moveTo(60+i*50,40);ctx.lineTo(60+i*50,H-60);ctx.stroke();ctx.beginPath();ctx.moveTo(60,40+i*32);ctx.lineTo(W-40,40+i*32);ctx.stroke()} ctx.fillStyle='#102033'; ctx.font='15px system-ui'; ctx.fillText('preparedness',W/2-40,H-20); ctx.save();ctx.translate(18,H/2+40);ctx.rotate(-Math.PI/2);ctx.fillText('balance',0,0);ctx.restore(); const px=60+prep/30*(W-110); const py=H-60-bal/20*(H-100); ctx.fillStyle='#2563eb'; ctx.beginPath();ctx.arc(px,py,10,0,Math.PI*2);ctx.fill(); ctx.fillText('student',px+14,py-8); }
+function drawProjection(){ const canvas=$('projectionCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,scale=45,ox=W/2,oy=H/2; drawAxes(ctx,W,H,scale,ox,oy); const pts=[[2,3],[2,1],[2,-2],[-2,2],[-2,-3],[0.5,4]]; pts.forEach(p=>{ const q=[p[0],0]; const P=pt(p,scale,ox,oy), Q=pt(q,scale,ox,oy); ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(Q[0],Q[1]);ctx.stroke(); ctx.fillStyle='#2563eb';ctx.beginPath();ctx.arc(P[0],P[1],6,0,Math.PI*2);ctx.fill(); ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(Q[0],Q[1],6,0,Math.PI*2);ctx.fill(); }); ctx.fillStyle='#102033';ctx.font='16px system-ui';ctx.fillText('Projection P = [[1,0],[0,0]] sends (x,y) to (x,0).',30,35); }
+function drawLetter(){ const A=mat(),canvas=$('letterCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,scale=55,ox=W/2,oy=H/2+70; drawAxes(ctx,W,H,scale,ox,oy); let pts=[]; for(let t=0;t<=4;t+=.12)pts.push([0,t]); for(let t=0;t<=3;t+=.12)pts.push([t,0]); pts.forEach(p=>{ let P=pt(p,scale,ox-160,oy); ctx.fillStyle='#94a3b8'; ctx.beginPath();ctx.arc(P[0],P[1],4,0,Math.PI*2);ctx.fill(); let q=mul(A,p), Q=pt(q,scale,ox+80,oy); ctx.fillStyle='#2563eb'; ctx.beginPath();ctx.arc(Q[0],Q[1],4,0,Math.PI*2);ctx.fill(); }); ctx.fillStyle='#102033';ctx.font='16px system-ui';ctx.fillText('gray: original point-image',40,35);ctx.fillText('blue: transformed by A',40,58); }
+function updateAll(){ updateVector(); drawGrid(); updateFeature(); drawProjection(); drawLetter(); }
+ids.forEach(id=>$(id).addEventListener('input',updateAll));
+updateAll();
+</script>
+</body>
+</html>

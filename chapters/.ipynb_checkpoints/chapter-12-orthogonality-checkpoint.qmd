@@ -1,0 +1,828 @@
+---
+title: "Chapter 12: Orthogonality"
+subtitle: "Clean directions, stable coordinates, and the geometry of independent information"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+jupyter: python3
+---
+ 
+
+## Opening story: when information stops interfering
+
+Imagine listening to a recording made in a busy room. Several sounds arrive at once: a voice, a piano note, a hum from a machine, and footsteps. The microphone records only one long list of numbers. At first the sounds seem mixed beyond recognition.
+
+But some patterns do not interfere much with others. A low-frequency hum is different from a sharp clap. A vertical edge in an image is different from a horizontal edge. A trend in a dataset is different from random fluctuation. When two patterns do not overlap in the language of the dot product, linear algebra calls them **orthogonal**.
+
+Orthogonality is the geometry of clean separation.
+
+In Chapter 10, the dot product measured angle and similarity. In Chapter 11, projection found the best shadow of a vector on a line or subspace. In this chapter, we put these ideas together. Orthogonal directions allow us to decompose a complicated object into independent pieces, measure length by adding squares, build stable coordinate systems, and solve least-squares problems reliably.
+
+The guiding sentence is:
+
+> Orthogonality turns a complicated mixture into clean independent coordinates.
+
+This is why orthogonality appears everywhere: in regression, PCA, Fourier analysis, image compression, QR factorization, numerical linear algebra, machine learning, signal processing, and statistics.
+
+## Learning goals
+
+After this chapter, you should be able to:
+
+1. Explain orthogonality using the dot product.
+2. Recognize orthogonal and orthonormal sets of vectors.
+3. Decompose vectors into orthogonal components.
+4. Use the Pythagorean theorem in vector spaces.
+5. Understand why orthonormal bases make coordinates simple.
+6. Apply the Gram--Schmidt process to create orthogonal directions.
+7. Interpret QR factorization as a stable coordinate-building method.
+8. Explain why orthogonality is central to least squares, data analysis, and AI.
+
+## 12.1 Orthogonality revisited
+
+For vectors $u,v \in \mathbb{R}^n$, the dot product is
+
+$$
+u \cdot v = u^T v = u_1v_1 + u_2v_2 + \cdots + u_nv_n.
+$$
+
+Two vectors are **orthogonal** if
+
+$$
+u \cdot v = 0.
+$$
+
+Geometrically, this means they meet at a right angle. Informationally, it means one vector has no component in the direction of the other.
+
+::: {.callout-note}
+## Meaning
+
+Orthogonal does not mean unrelated in every possible sense. It means unrelated according to the dot product currently being used.
+:::
+
+### Example: two perpendicular directions
+
+Let
+
+$$
+u = \begin{bmatrix}2\\1\end{bmatrix},
+\qquad
+v = \begin{bmatrix}-1\\2\end{bmatrix}.
+$$
+
+Then
+
+$$
+u \cdot v = 2(-1)+1(2)=0.
+$$
+
+So $u$ and $v$ are orthogonal.
+
+### Example: orthogonality in data
+
+Suppose one vector records a general increase over time, while another records alternating positive and negative fluctuations around zero. Their dot product may be near zero. This means the fluctuation pattern is not aligned with the trend.
+
+Orthogonality is a way to say:
+
+> This part of the data is not explained by that direction.
+
+## 12.2 Orthogonal sets
+
+A set of nonzero vectors $v_1,\dots,v_k$ is called **orthogonal** if every pair is orthogonal:
+
+$$
+v_i \cdot v_j = 0 \quad \text{whenever } i \ne j.
+$$
+
+It is called **orthonormal** if the vectors are orthogonal and each has length $1$:
+
+$$
+v_i \cdot v_j =
+\begin{cases}
+1, & i=j,\\
+0, & i\ne j.
+\end{cases}
+$$
+
+Equivalently,
+
+$$
+v_i^T v_j = \delta_{ij},
+$$
+
+where $\delta_{ij}$ is $1$ when $i=j$ and $0$ otherwise.
+
+### Why orthogonal sets are automatically independent
+
+Orthogonal nonzero vectors cannot be redundant.
+
+::: {.callout-theorem}
+## Orthogonal nonzero vectors are linearly independent
+
+If $v_1,\dots,v_k$ are nonzero and mutually orthogonal, then they are linearly independent.
+:::
+
+::: {.callout-tip collapse="true"}
+## Proof
+
+Assume
+
+$$
+c_1v_1+c_2v_2+\cdots+c_kv_k=0.
+$$
+
+Take the dot product with $v_j$:
+
+$$
+(c_1v_1+\cdots+c_kv_k)\cdot v_j = 0\cdot v_j.
+$$
+
+Because all cross terms are zero,
+
+$$
+c_j(v_j\cdot v_j)=0.
+$$
+
+Since $v_j\ne 0$, we have $v_j\cdot v_j=\|v_j\|^2>0$. Therefore $c_j=0$. This is true for every $j$, so all coefficients are zero.
+:::
+
+This theorem explains why orthogonal directions are powerful. They give us a clean language with no hidden redundancy.
+
+## 12.3 The Pythagorean theorem in vector form
+
+If $u$ and $v$ are orthogonal, then
+
+$$
+\|u+v\|^2 = \|u\|^2 + \|v\|^2.
+$$
+
+Indeed,
+
+$$
+\|u+v\|^2 = (u+v)\cdot(u+v)
+= u\cdot u + 2u\cdot v + v\cdot v.
+$$
+
+If $u\cdot v=0$, the middle term disappears.
+
+::: {.callout-important}
+## The key cancellation
+
+Orthogonality makes cross terms vanish.
+
+That is the algebraic reason orthogonality simplifies computation.
+:::
+
+For multiple mutually orthogonal vectors,
+
+$$
+\left\|\sum_{j=1}^k v_j\right\|^2
+=
+\sum_{j=1}^k \|v_j\|^2.
+$$
+
+This is not only geometry. It is also the basis of energy decompositions in signals, variance decompositions in statistics, and squared-error decompositions in least squares.
+
+## 12.4 Coordinates in an orthonormal basis
+
+Suppose $q_1,\dots,q_n$ is an orthonormal basis for $\mathbb{R}^n$. Then every vector $x$ can be written as
+
+$$
+x = c_1q_1+c_2q_2+\cdots+c_nq_n.
+$$
+
+The coefficients are extremely simple:
+
+$$
+c_j = q_j^T x.
+$$
+
+Why? Take the dot product of both sides with $q_j$:
+
+$$
+q_j^Tx
+=
+c_1q_j^Tq_1+\cdots+c_jq_j^Tq_j+\cdots+c_nq_j^Tq_n
+=
+c_j.
+$$
+
+So in an orthonormal basis, coordinates are obtained by dot products.
+
+::: {.callout-note}
+## Ordinary basis versus orthonormal basis
+
+In an arbitrary basis, finding coordinates requires solving a system.
+
+In an orthonormal basis, finding coordinates requires only dot products.
+:::
+
+### Matrix form
+
+Put the orthonormal basis vectors into a matrix
+
+$$
+Q = \begin{bmatrix} q_1 & q_2 & \cdots & q_n \end{bmatrix}.
+$$
+
+Then
+
+$$
+Q^TQ=I.
+$$
+
+The coordinate vector of $x$ in the $Q$-basis is
+
+$$
+c = Q^Tx.
+$$
+
+To reconstruct $x$,
+
+$$
+x=Qc.
+$$
+
+Therefore,
+
+$$
+x = QQ^Tx.
+$$
+
+When $Q$ is square and orthonormal, $QQ^T=I$ too.
+
+## 12.5 Orthogonal matrices
+
+A square matrix $Q$ is called an **orthogonal matrix** if
+
+$$
+Q^TQ=I.
+$$
+
+This means the columns of $Q$ form an orthonormal basis.
+
+Because $Q^TQ=I$, we have
+
+$$
+Q^{-1}=Q^T.
+$$
+
+Orthogonal matrices are special because they preserve lengths and dot products:
+
+$$
+\|Qx\|=\|x\|,
+$$
+
+and
+
+$$
+(Qx)^T(Qy)=x^Ty.
+$$
+
+::: {.callout-theorem}
+## Orthogonal transformations preserve geometry
+
+If $Q^TQ=I$, then $Q$ preserves lengths, distances, and angles.
+:::
+
+::: {.callout-tip collapse="true"}
+## Proof
+
+For length,
+
+$$
+\|Qx\|^2=(Qx)^T(Qx)=x^TQ^TQx=x^Tx=\|x\|^2.
+$$
+
+For dot products,
+
+$$
+(Qx)^T(Qy)=x^TQ^TQy=x^Ty.
+$$
+
+Since distances and angles are determined by lengths and dot products, they are preserved.
+:::
+
+Rotations and reflections are the basic examples. They move vectors without stretching them.
+
+## 12.6 Projection onto an orthonormal subspace
+
+Suppose $q_1,\dots,q_k$ are orthonormal vectors. Let
+
+$$
+Q = \begin{bmatrix}q_1 & \cdots & q_k\end{bmatrix}.
+$$
+
+The projection of $x$ onto the subspace spanned by these vectors is
+
+$$
+\operatorname{proj}_{\operatorname{Col}(Q)}(x)=QQ^Tx.
+$$
+
+The coordinates of the projection are
+
+$$
+Q^Tx.
+$$
+
+The projection itself is
+
+$$
+Q(Q^Tx).
+$$
+
+This formula is one of the most important computational advantages of orthonormal bases.
+
+### Why this is the best shadow
+
+The residual
+
+$$
+r = x-QQ^Tx
+$$
+
+is orthogonal to every column of $Q$:
+
+$$
+Q^Tr=Q^T(x-QQ^Tx)=Q^Tx-Q^TQQ^Tx=Q^Tx-Q^Tx=0.
+$$
+
+So the error is perpendicular to the subspace. That is exactly the closest-point condition from Chapter 11.
+
+## 12.7 Gram--Schmidt: turning a messy basis into a clean basis
+
+Real data rarely comes with orthogonal directions. We often start with vectors that are useful but not cleanly separated. The **Gram--Schmidt process** turns linearly independent vectors into an orthonormal basis for the same span.
+
+Start with independent vectors $a_1,\dots,a_k$.
+
+First normalize $a_1$:
+
+$$
+q_1 = \frac{a_1}{\|a_1\|}.
+$$
+
+Then remove from $a_2$ the part already explained by $q_1$:
+
+$$
+u_2 = a_2 - (q_1^Ta_2)q_1.
+$$
+
+Normalize:
+
+$$
+q_2 = \frac{u_2}{\|u_2\|}.
+$$
+
+For the general step, remove all earlier directions:
+
+$$
+u_j = a_j - \sum_{i=1}^{j-1}(q_i^Ta_j)q_i,
+$$
+
+then normalize:
+
+$$
+q_j = \frac{u_j}{\|u_j\|}.
+$$
+
+::: {.callout-important}
+## Gram--Schmidt idea
+
+For each new vector:
+
+1. subtract what old directions already explain;
+2. keep the new leftover direction;
+3. normalize it.
+:::
+
+This is a repeated version of projection and residuals.
+
+## 12.8 QR factorization
+
+Gram--Schmidt leads to one of the most useful matrix factorizations.
+
+Let $A$ be an $m\times n$ matrix with independent columns. QR factorization writes
+
+$$
+A=QR,
+$$
+
+where:
+
+- $Q$ has orthonormal columns;
+- $R$ is upper triangular.
+
+The columns of $Q$ form a clean orthonormal basis for the column space of $A$.
+
+The matrix $R$ records how the original columns of $A$ are built from the clean columns of $Q$.
+
+### Why QR matters
+
+QR factorization is central because it separates two tasks:
+
+1. $Q$ gives the geometry: a stable orthonormal coordinate system.
+2. $R$ gives the coefficients: how the original columns are represented in that coordinate system.
+
+In least squares, instead of solving
+
+$$
+A^TAx=A^Tb,
+$$
+
+we can use $A=QR$ and solve
+
+$$
+Rx = Q^Tb.
+$$
+
+This is often more numerically stable.
+
+## 12.9 Orthogonality and least squares
+
+Recall that the least-squares problem asks for $\hat{x}$ minimizing
+
+$$
+\|Ax-b\|^2.
+$$
+
+If $A=QR$ with orthonormal columns in $Q$, then
+
+$$
+Ax = QRx.
+$$
+
+The closest point in $\operatorname{Col}(A)=\operatorname{Col}(Q)$ is the projection of $b$ onto that column space:
+
+$$
+\hat{b}=QQ^Tb.
+$$
+
+The coefficient vector satisfies
+
+$$
+R\hat{x}=Q^Tb.
+$$
+
+This gives a cleaner computational route:
+
+1. build an orthonormal coordinate system $Q$ for the columns of $A$;
+2. project $b$ using $Q^Tb$;
+3. solve the triangular system $R\hat{x}=Q^Tb$.
+
+## 12.10 Orthogonality in data and AI
+
+Orthogonality is not only a classroom idea. It is one of the main organizing principles of modern computation.
+
+### Independent features
+
+If two feature directions are nearly orthogonal, then they carry different kinds of information. If they are nearly parallel, they are redundant.
+
+### PCA
+
+Principal component analysis finds orthogonal directions of maximum variance. The first principal component captures the strongest direction of variation. The second is forced to be orthogonal to the first, so it captures a new kind of variation.
+
+### Fourier and wavelets
+
+Fourier bases and Haar bases use orthogonal patterns to decompose signals and images. A signal becomes a sum of independent waves or blocks.
+
+### Neural networks
+
+In high-dimensional learning, orthogonality helps with stable initialization, nonredundant representations, and preserving signal size through layers.
+
+### Recommendation systems and embeddings
+
+In embedding spaces, orthogonal directions can represent different latent factors, such as genre, price sensitivity, style, or topic.
+
+## 12.11 Worked examples
+
+### Example 1: checking orthogonality
+
+Let
+
+$$
+a=\begin{bmatrix}1\\2\\-1\end{bmatrix},
+\qquad
+b=\begin{bmatrix}2\\-1\\0\end{bmatrix}.
+$$
+
+Then
+
+$$
+a\cdot b = 1(2)+2(-1)+(-1)(0)=0.
+$$
+
+So $a$ and $b$ are orthogonal.
+
+### Example 2: projection onto an orthonormal pair
+
+Let
+
+$$
+q_1=\frac{1}{\sqrt{2}}\begin{bmatrix}1\\1\\0\end{bmatrix},
+\qquad
+q_2=\begin{bmatrix}0\\0\\1\end{bmatrix},
+\qquad
+x=\begin{bmatrix}3\\1\\4\end{bmatrix}.
+$$
+
+Then
+
+$$
+q_1^Tx=\frac{4}{\sqrt{2}}=2\sqrt{2},
+\qquad
+q_2^Tx=4.
+$$
+
+The projection is
+
+$$
+(q_1^Tx)q_1+(q_2^Tx)q_2
+=
+2\sqrt{2}\cdot \frac{1}{\sqrt{2}}\begin{bmatrix}1\\1\\0\end{bmatrix}
++4\begin{bmatrix}0\\0\\1\end{bmatrix}
+=
+\begin{bmatrix}2\\2\\4\end{bmatrix}.
+$$
+
+The residual is
+
+$$
+r=x-\hat{x}=\begin{bmatrix}1\\-1\\0\end{bmatrix}.
+$$
+
+It is orthogonal to both $q_1$ and $q_2$.
+
+### Example 3: one step of Gram--Schmidt
+
+Let
+
+$$
+a_1=\begin{bmatrix}1\\1\end{bmatrix},
+\qquad
+a_2=\begin{bmatrix}2\\0\end{bmatrix}.
+$$
+
+First,
+
+$$
+q_1=\frac{1}{\sqrt{2}}\begin{bmatrix}1\\1\end{bmatrix}.
+$$
+
+Remove the part of $a_2$ in the $q_1$ direction:
+
+$$
+u_2=a_2-(q_1^Ta_2)q_1.
+$$
+
+Since
+
+$$
+q_1^Ta_2=\sqrt{2},
+$$
+
+we get
+
+$$
+u_2=\begin{bmatrix}2\\0\end{bmatrix}
+-
+\sqrt{2}\cdot \frac{1}{\sqrt{2}}\begin{bmatrix}1\\1\end{bmatrix}
+=
+\begin{bmatrix}1\\-1\end{bmatrix}.
+$$
+
+Normalize:
+
+$$
+q_2=\frac{1}{\sqrt{2}}\begin{bmatrix}1\\-1\end{bmatrix}.
+$$
+
+Now $q_1$ and $q_2$ are orthonormal.
+
+## 12.12 Python: orthogonality in computation
+
+```{python}
+import numpy as np
+
+u = np.array([2, 1])
+v = np.array([-1, 2])
+
+print("dot product:", u @ v)
+print("norm u:", np.linalg.norm(u))
+print("norm v:", np.linalg.norm(v))
+```
+
+### Checking an orthonormal matrix
+
+```{python}
+Q = np.array([[1/np.sqrt(2), 1/np.sqrt(2)],
+              [1/np.sqrt(2),-1/np.sqrt(2)]])
+
+print(Q.T @ Q)
+```
+
+### QR factorization
+
+```{python}
+A = np.array([[1, 1],
+              [1, 2],
+              [1, 3]], dtype=float)
+
+Q, R = np.linalg.qr(A)
+
+print("Q^T Q =")
+print(Q.T @ Q)
+print("R =")
+print(R)
+print("Reconstruction error:", np.linalg.norm(A - Q @ R))
+```
+
+## 12.13 Practice problems
+
+### Problem 1
+
+Check whether the vectors
+
+$$
+u=\begin{bmatrix}1\\-2\\1\end{bmatrix},
+\qquad
+v=\begin{bmatrix}2\\1\\0\end{bmatrix}
+$$
+
+are orthogonal.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Compute
+
+$$
+u\cdot v = 1(2)+(-2)(1)+1(0)=0.
+$$
+
+They are orthogonal.
+:::
+
+### Problem 2
+
+Normalize the vector
+
+$$
+w=\begin{bmatrix}3\\4\end{bmatrix}.
+$$
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The length is
+
+$$
+\|w\|=\sqrt{3^2+4^2}=5.
+$$
+
+So the unit vector is
+
+$$
+\frac{w}{\|w\|}=\begin{bmatrix}3/5\\4/5\end{bmatrix}.
+$$
+:::
+
+### Problem 3
+
+Let
+
+$$
+q_1=\begin{bmatrix}1\\0\\0\end{bmatrix},
+\qquad
+q_2=\begin{bmatrix}0\\1\\0\end{bmatrix},
+\qquad
+x=\begin{bmatrix}2\\-1\\5\end{bmatrix}.
+$$
+
+Find the projection of $x$ onto $\operatorname{span}\{q_1,q_2\}$.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The projection keeps the first two coordinates and removes the third:
+
+$$
+\hat{x}=\begin{bmatrix}2\\-1\\0\end{bmatrix}.
+$$
+
+The residual is
+
+$$
+r=\begin{bmatrix}0\\0\\5\end{bmatrix}.
+$$
+:::
+
+### Problem 4
+
+Use Gram--Schmidt on
+
+$$
+a_1=\begin{bmatrix}1\\0\\1\end{bmatrix},
+\qquad
+a_2=\begin{bmatrix}1\\1\\0\end{bmatrix}.
+$$
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+First,
+
+$$
+q_1=\frac{1}{\sqrt{2}}\begin{bmatrix}1\\0\\1\end{bmatrix}.
+$$
+
+Compute
+
+$$
+q_1^Ta_2=\frac{1}{\sqrt{2}}.
+$$
+
+So
+
+$$
+u_2=a_2-(q_1^Ta_2)q_1
+=
+\begin{bmatrix}1\\1\\0\end{bmatrix}
+-
+\frac{1}{2}\begin{bmatrix}1\\0\\1\end{bmatrix}
+=
+\begin{bmatrix}1/2\\1\\-1/2\end{bmatrix}.
+$$
+
+Its norm is
+
+$$
+\sqrt{1/4+1+1/4}=\sqrt{3/2}.
+$$
+
+Thus
+
+$$
+q_2=\frac{1}{\sqrt{3/2}}\begin{bmatrix}1/2\\1\\-1/2\end{bmatrix}.
+$$
+:::
+
+## 12.14 Challenge questions
+
+1. Why does orthogonality make least squares easier?
+2. Why are orthogonal vectors automatically linearly independent?
+3. What does $Q^TQ=I$ say about the columns of $Q$?
+4. What is the difference between an orthogonal set and an orthonormal set?
+5. Why is QR usually better than directly solving normal equations?
+6. Explain Gram--Schmidt using the phrase "remove what has already been explained."
+7. In PCA, why do we require later principal components to be orthogonal to earlier ones?
+
+## 12.15 AI companion activities
+
+Use an AI assistant as a study partner, but always verify the mathematics yourself.
+
+### Activity 1: explain orthogonality in three languages
+
+Ask:
+
+> Explain orthogonality geometrically, algebraically, and in terms of information.
+
+Then improve the answer by adding an example from data analysis.
+
+### Activity 2: debug Gram--Schmidt
+
+Ask the AI to perform Gram--Schmidt on two simple vectors. Check every dot product and every norm by hand or with Python.
+
+### Activity 3: compare coordinate systems
+
+Ask:
+
+> Why are coordinates easier in an orthonormal basis than in a non-orthogonal basis?
+
+Then summarize the answer in your own words.
+
+### Activity 4: connect to machine learning
+
+Ask:
+
+> Where does orthogonality appear in PCA, least squares, and neural networks?
+
+Make a three-column table: topic, role of orthogonality, and why it matters.
+
+## Chapter summary
+
+Orthogonality is the language of clean separation.
+
+- Two vectors are orthogonal if their dot product is zero.
+- Orthogonal nonzero vectors are automatically linearly independent.
+- Orthogonality makes cross terms disappear.
+- Orthonormal bases make coordinates simple: coefficients are dot products.
+- Orthogonal matrices preserve lengths, distances, and angles.
+- Projection onto an orthonormal subspace has the simple formula $QQ^Tx$.
+- Gram--Schmidt turns a messy independent set into a clean orthonormal set.
+- QR factorization writes a matrix as $A=QR$, separating geometry from coefficients.
+- Orthogonality supports stable computation in least squares, PCA, Fourier analysis, and machine learning.
+
+The next chapter moves from clean directions to special directions: eigenvectors. Orthogonality helps us understand independent coordinate systems; eigenvectors reveal directions that a matrix preserves.

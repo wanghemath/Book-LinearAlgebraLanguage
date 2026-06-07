@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 08 — When Information Is Lost</title>
+<style>
+:root{--bg:#f8fafc;--panel:#ffffff;--ink:#0f172a;--muted:#475569;--line:#cbd5e1;--accent:#2563eb;--accent2:#7c3aed;--soft:#e0f2fe;--warn:#fff7ed;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f8fafc,#eef2ff);color:var(--ink);line-height:1.6}
+header{padding:56px 22px 34px;text-align:center;background:radial-gradient(circle at top left,#dbeafe,transparent 35%),radial-gradient(circle at top right,#ede9fe,transparent 35%)}
+header h1{font-size:clamp(2rem,4vw,4rem);margin:0 0 8px;font-weight:850;letter-spacing:-.04em} header p{max-width:850px;margin:0 auto;color:var(--muted);font-size:1.13rem}
+main{max-width:1180px;margin:0 auto;padding:24px}
+.card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:22px;padding:22px;margin:20px 0;box-shadow:0 18px 50px rgba(15,23,42,.08)}
+h2{margin-top:0;font-size:1.55rem} h3{margin-bottom:6px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.grid,.grid3{grid-template-columns:1fr}}
+canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:18px;background:white}.control{margin:10px 0}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:650}.control input{width:100%}
+.value{font-variant-numeric:tabular-nums;color:var(--accent)}.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--soft);color:#075985;font-weight:700;font-size:.9rem}.note{background:#f1f5f9;border-left:5px solid var(--accent);padding:14px 16px;border-radius:14px;color:var(--muted)}
+button{border:0;background:var(--accent);color:white;border-radius:12px;padding:10px 14px;font-weight:750;cursor:pointer}button.secondary{background:#334155}.readout{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f172a;color:#e2e8f0;border-radius:14px;padding:14px;white-space:pre-wrap;min-height:72px}.small{font-size:.92rem;color:var(--muted)}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:left} .warning{background:var(--warn);border-left:5px solid #f97316;padding:14px 16px;border-radius:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>Lab 08 — When Information Is Lost</h1>
+<p>Explore rank, null space, column space, invertibility, collapse, and controlled information loss through interactive matrix machines.</p>
+</header>
+<main>
+<section class="card">
+<h2>1. Matrix machine with adjustable collapse</h2>
+<p>Use the sliders to define a matrix. Watch how a grid of input points transforms. When the transformed grid collapses toward a line, information is being lost.</p>
+<div class="grid">
+<div>
+<div class="control"><label>a <span id="va" class="value"></span></label><input id="a" type="range" min="-2" max="2" value="1" step="0.05"></div>
+<div class="control"><label>b <span id="vb" class="value"></span></label><input id="b" type="range" min="-2" max="2" value="0.5" step="0.05"></div>
+<div class="control"><label>c <span id="vc" class="value"></span></label><input id="c" type="range" min="-2" max="2" value="0.5" step="0.05"></div>
+<div class="control"><label>d <span id="vd" class="value"></span></label><input id="d" type="range" min="-2" max="2" value="0.25" step="0.05"></div>
+<p><button onclick="preset('identity')">Identity</button> <button onclick="preset('projection')">Projection</button> <button onclick="preset('rank1')">Rank 1</button> <button onclick="preset('full')">Full rank</button></p>
+<div id="matrixRead" class="readout"></div>
+</div>
+<canvas id="gridCanvas" width="620" height="620"></canvas>
+</div>
+</section>
+<section class="card">
+<h2>2. Column space: reachable targets</h2>
+<p>The two columns of a matrix are output directions. Move the target point. The page checks whether the target is reachable for the rank-one matrix below.</p>
+<div class="grid">
+<div>
+<p><span class="pill">A = [[1, 2], [2, 4]]</span></p>
+<div class="control"><label>target x <span id="vtx" class="value"></span></label><input id="tx" type="range" min="-6" max="6" value="3" step="0.1"></div>
+<div class="control"><label>target y <span id="vty" class="value"></span></label><input id="ty" type="range" min="-6" max="6" value="5" step="0.1"></div>
+<div id="reachRead" class="readout"></div>
+</div>
+<canvas id="colCanvas" width="620" height="620"></canvas>
+</div>
+</section>
+<section class="card">
+<h2>3. Null space: invisible directions</h2>
+<p>For the same rank-one matrix, moving along the null direction changes the input but keeps the output unchanged.</p>
+<div class="grid">
+<div>
+<div class="control"><label>t in x = x₀ + t v <span id="vt" class="value"></span></label><input id="t" type="range" min="-4" max="4" value="0" step="0.1"></div>
+<div id="nullRead" class="readout"></div>
+<p class="note">Here x₀ = (1,0) and v = (-2,1). Since Av = 0, all inputs x₀ + tv have the same output.</p>
+</div>
+<canvas id="nullCanvas" width="620" height="620"></canvas>
+</div>
+</section>
+<section class="card">
+<h2>4. Rank-nullity calculator</h2>
+<p>Choose the input and output dimensions and an intended rank. The calculator shows how many input directions must disappear.</p>
+<div class="grid3">
+<div class="control"><label>output dimension m <span id="vm" class="value"></span></label><input id="mDim" type="range" min="1" max="8" value="3" step="1"></div>
+<div class="control"><label>input dimension n <span id="vn" class="value"></span></label><input id="nDim" type="range" min="1" max="8" value="5" step="1"></div>
+<div class="control"><label>rank r <span id="vr" class="value"></span></label><input id="rankDim" type="range" min="0" max="8" value="3" step="1"></div>
+</div>
+<div id="rnRead" class="readout"></div>
+</section>
+<section class="card">
+<h2>5. Near information loss</h2>
+<p>The matrix Aε = [[1,1],[1,1+ε]] is invertible when ε ≠ 0, but as ε becomes small its columns become almost dependent.</p>
+<div class="grid">
+<div>
+<div class="control"><label>log10(ε) <span id="veps" class="value"></span></label><input id="eps" type="range" min="-8" max="-1" value="-3" step="0.1"></div>
+<div id="epsRead" class="readout"></div>
+<p class="warning">A matrix can have full rank and still be dangerous numerically. Near information loss creates large sensitivity.</p>
+</div>
+<canvas id="epsCanvas" width="620" height="420"></canvas>
+</div>
+</section>
+<section class="card">
+<h2>6. Image compression preview</h2>
+<p>This toy image is a matrix. A rank-k approximation keeps only k directions. Smaller k means more compression and more information loss.</p>
+<div class="grid">
+<div>
+<div class="control"><label>rank k <span id="vk" class="value"></span></label><input id="kRank" type="range" min="1" max="20" value="4" step="1"></div>
+<div id="imgRead" class="readout"></div>
+</div>
+<canvas id="imgCanvas" width="520" height="520"></canvas>
+</div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const scale=60, center=310;
+function toC(x,y){return [center+x*scale, center-y*scale];}
+function drawAxes(ctx,w,h){ctx.clearRect(0,0,w,h);ctx.lineWidth=1;ctx.strokeStyle='#cbd5e1';for(let i=-5;i<=5;i++){let [x1,y1]=toC(i,-5),[x2,y2]=toC(i,5);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();let [u1,v1]=toC(-5,i),[u2,v2]=toC(5,i);ctx.beginPath();ctx.moveTo(u1,v1);ctx.lineTo(u2,v2);ctx.stroke();}ctx.strokeStyle='#0f172a';ctx.lineWidth=1.5;let [x0,y0]=toC(-5,0),[x3,y3]=toC(5,0);ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x3,y3);ctx.stroke();let [x4,y4]=toC(0,-5),[x5,y5]=toC(0,5);ctx.beginPath();ctx.moveTo(x4,y4);ctx.lineTo(x5,y5);ctx.stroke();}
+function det2(a,b,c,d){return a*d-b*c;} function approxRank(a,b,c,d){let det=Math.abs(det2(a,b,c,d));let norm=Math.hypot(a,b,c,d); if(norm<1e-8) return 0; return det<0.02?1:2;}
+function drawArrow(ctx,x,y,u,v,color){let [x1,y1]=toC(x,y),[x2,y2]=toC(x+u,y+v);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();let ang=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(ang-.45),y2-10*Math.sin(ang-.45));ctx.lineTo(x2-10*Math.cos(ang+.45),y2-10*Math.sin(ang+.45));ctx.closePath();ctx.fill();}
+function redrawGrid(){let a=+$('a').value,b=+$('b').value,c=+$('c').value,d=+$('d').value;['a','b','c','d'].forEach(id=>$('v'+id).textContent=(+$ (id).value).toFixed(2));let ctx=$('gridCanvas').getContext('2d');drawAxes(ctx,620,620);ctx.fillStyle='rgba(37,99,235,.45)';for(let x=-4;x<=4;x++){for(let y=-4;y<=4;y++){let u=a*x+b*y, v=c*x+d*y;let [cx,cy]=toC(u,v);ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);ctx.fill();}}drawArrow(ctx,0,0,a,c,'#dc2626');drawArrow(ctx,0,0,b,d,'#16a34a');let det=det2(a,b,c,d);let r=approxRank(a,b,c,d);$('matrixRead').textContent=`A = [[${a.toFixed(2)}, ${b.toFixed(2)}], [${c.toFixed(2)}, ${d.toFixed(2)}]]\ndet(A) = ${det.toFixed(4)}\napproximate rank = ${r}\nInterpretation: ${r===2?'the plane is preserved as a plane':'the plane collapses; information is lost'}`;}
+function preset(p){let vals={identity:[1,0,0,1],projection:[1,0,0,0],rank1:[1,2,.5,1],full:[1,.4,-.3,1.2]}[p];['a','b','c','d'].forEach((id,i)=>$(id).value=vals[i]);redrawGrid();}
+function redrawCol(){let tx=+$('tx').value,ty=+$('ty').value;$('vtx').textContent=tx.toFixed(1);$('vty').textContent=ty.toFixed(1);let ctx=$('colCanvas').getContext('2d');drawAxes(ctx,620,620);ctx.strokeStyle='#2563eb';ctx.lineWidth=4;let [x1,y1]=toC(-3,-6),[x2,y2]=toC(3,6);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();drawArrow(ctx,0,0,1,2,'#dc2626');drawArrow(ctx,0,0,2,4,'#16a34a');let [cx,cy]=toC(tx,ty);ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fill();let residual=Math.abs(ty-2*tx)/Math.sqrt(5);$('reachRead').textContent=`Target b = (${tx.toFixed(2)}, ${ty.toFixed(2)})\nDistance from column space line y=2x: ${residual.toFixed(3)}\n${residual<0.05?'Reachable: Ax=b has solutions.':'Not reachable: Ax=b has no exact solution.'}`;}
+function redrawNull(){let t=+$('t').value;$('vt').textContent=t.toFixed(1);let x=1-2*t,y=t;let outx=x+2*y,outy=2*x+4*y;let ctx=$('nullCanvas').getContext('2d');drawAxes(ctx,620,620);ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.beginPath();for(let s=-4;s<=4;s+=.1){let px=1-2*s,py=s;let [cx,cy]=toC(px,py);if(s===-4)ctx.moveTo(cx,cy);else ctx.lineTo(cx,cy);}ctx.stroke();let [cx,cy]=toC(x,y);ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fill();let [ox,oy]=toC(outx,outy);ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(ox,oy,8,0,Math.PI*2);ctx.fill();$('nullRead').textContent=`x = (${x.toFixed(2)}, ${y.toFixed(2)})\nA x = (${outx.toFixed(2)}, ${outy.toFixed(2)})\nAll points on this blue line have the same output.`;}
+function redrawRN(){let m=+$('mDim').value,n=+$('nDim').value,r=+$('rankDim').value;let maxr=Math.min(m,n);if(r>maxr){r=maxr;$('rankDim').value=r}$('rankDim').max=maxr;$('vm').textContent=m;$('vn').textContent=n;$('vr').textContent=r;let nul=n-r;$('rnRead').textContent=`A maps R^${n} to R^${m}.\nrank(A) = ${r}\nnullity(A) = input dimension - rank = ${n} - ${r} = ${nul}\n${nul===0?'No input direction disappears: possible one-to-one map.':'At least '+nul+' independent input direction(s) disappear: information is lost.'}`;}
+function redrawEps(){let leps=+$('eps').value;let eps=Math.pow(10,leps);$('veps').textContent=leps.toFixed(1);let tr=2+eps,det=eps;let disc=tr*tr-4*det;let l1=(tr+Math.sqrt(disc))/2,l2=(tr-Math.sqrt(disc))/2;let cond=Math.abs(l1/l2);$('epsRead').textContent=`ε = ${eps.toExponential(2)}\ndet(Aε) = ε\nrough condition number ≈ ${cond.toExponential(2)}\nAs ε → 0, columns become almost identical.`;let ctx=$('epsCanvas').getContext('2d');ctx.clearRect(0,0,620,420);ctx.strokeStyle='#cbd5e1';for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(60+i*50,30);ctx.lineTo(60+i*50,360);ctx.stroke();ctx.beginPath();ctx.moveTo(60,30+i*33);ctx.lineTo(560,30+i*33);ctx.stroke();}ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<100;i++){let x=-8+i*7/99;let e=Math.pow(10,x);let tr=2+e,det=e,disc=tr*tr-4*det;let l1=(tr+Math.sqrt(disc))/2,l2=(tr-Math.sqrt(disc))/2;let y=Math.log10(Math.abs(l1/l2));let px=60+(x+8)/7*500,py=360-y/9*330;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();let px=60+(leps+8)/7*500;ctx.strokeStyle='#dc2626';ctx.beginPath();ctx.moveTo(px,30);ctx.lineTo(px,360);ctx.stroke();}
+function makeToy(k){let n=40;let arr=[];for(let i=0;i<n;i++){arr[i]=[];for(let j=0;j<n;j++){let x=(j-n/2)/(n/2),y=(i-n/2)/(n/2);let val=Math.exp(-5*(x*x+y*y))+.7*Math.exp(-25*((x-.35)**2+(y+.2)**2))+.18*Math.sin(12*x)*Math.cos(8*y);let quant=Math.round(val*k)/k;arr[i][j]=Math.max(0,Math.min(1,quant));}}return arr;}
+function redrawImg(){let k=+$('kRank').value;$('vk').textContent=k;let data=makeToy(k);let ctx=$('imgCanvas').getContext('2d');let cell=13;ctx.clearRect(0,0,520,520);for(let i=0;i<40;i++){for(let j=0;j<40;j++){let g=Math.round(255*(1-data[i][j]));ctx.fillStyle=`rgb(${g},${g},${g})`;ctx.fillRect(j*cell,i*cell,cell,cell);}}let loss=(1/k).toFixed(3);$('imgRead').textContent=`Toy rank/compression control k = ${k}\nSmaller k: smoother image, more information discarded.\nLarger k: more detail preserved.\nThis is a visual preview of low-rank approximation.`;}
+['a','b','c','d'].forEach(id=>$(id).addEventListener('input',redrawGrid));['tx','ty'].forEach(id=>$(id).addEventListener('input',redrawCol));$('t').addEventListener('input',redrawNull);['mDim','nDim','rankDim'].forEach(id=>$(id).addEventListener('input',redrawRN));$('eps').addEventListener('input',redrawEps);$('kRank').addEventListener('input',redrawImg);
+redrawGrid();redrawCol();redrawNull();redrawRN();redrawEps();redrawImg();
+</script>
+</body>
+</html>

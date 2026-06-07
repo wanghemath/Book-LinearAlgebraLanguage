@@ -1,0 +1,262 @@
+# Welcome {.unnumbered}
+
+::: {.callout-note appearance="simple"}
+## Linear Algebra Language in the AI Age  
+
+A visual, story-driven first introduction to vectors, matrices, data, and AI.
+
+This book teaches linear algebra as a language for describing the world: how information is represented, transformed, compared, approximated, compressed, and learned from. 
+:::
+
+Most people first meet linear algebra as a page full of symbols.
+
+Rows of numbers.  
+Rules for matrix multiplication.  
+Systems of equations.  
+Determinants.  
+Eigenvalues.
+
+Those tools matter. But they are not the beginning of the story.
+
+The beginning is much simpler:
+
+> The world produces information, and linear algebra gives us a language for organizing it.
+
+A vector can describe a person, an image, a document, a song, a gene, a customer, a sensor reading, or a word. A matrix can rotate a shape, solve a system, filter an image, rank webpages, compress data, or act as one layer of a neural network. A basis can be a coordinate system, a dictionary, or a language for expressing the same object in different ways.
+
+This book is built around one guiding idea:
+
+> Linear algebra is not only a collection of formulas.  
+> It is a way of seeing.
+
+## The Story in One Page
+
+Linear algebra begins with numbers that have meaning.
+
+A list of numbers becomes a **vector**.  
+A vector becomes a **point** in data space.  
+Many vectors become a **dataset**.  
+A matrix becomes a **machine** that moves, changes, filters, combines, or compresses those vectors.
+
+Then geometry enters.
+
+Length tells us how large something is.  
+Distance tells us how far apart two objects are.  
+Angle tells us whether two objects point in similar directions.  
+Orthogonality tells us when two pieces of information are independent.  
+Projection tells us the best shadow of one object on another.
+
+Then hidden structure appears.
+
+Eigenvectors reveal directions that survive a transformation.  
+Eigenvalues measure how strongly those directions stretch or shrink.  
+The singular value decomposition reveals the most important patterns inside a matrix.  
+Fourier and Haar ideas show how signals and images can be built from simpler pieces.  
+Modern AI uses these same ideas to represent images, text, recommendations, and neural networks.
+
+The story moves from ordinary numbers to the mathematical grammar of data and intelligence.
+
+## Who This Book Is For
+
+This book is written for readers who want to understand linear algebra before they are buried under notation.
+
+It is especially suitable for:
+
+- first-year college students learning linear algebra for the first time, (or high school students with curiosity about data and AI,)
+- data science and machine learning beginners,
+- students in biology, business, engineering, social science, and computer science,
+- teachers who want a more visual and story-driven path into the subject,
+- general readers who want to understand the mathematics behind modern technology.
+
+**No prior linear algebra is assumed.** The reader should be comfortable with algebra, graphs, and basic functions. Python is used as a tool for exploration, but the central ideas are explained before computation. 
+
+A follow-up book on advanced linear algebra is available: [Linear Algebra in the AI Age: Geometry, Computation, and Data](https://wanghemath.github.io/MATH5110Book/).
+
+## What Makes This Book Different
+
+Many linear algebra books begin with definitions and procedures. This book begins with meaning.
+
+Each chapter tries to answer three questions:
+
+1. What problem is this idea trying to solve?
+2. What does the idea look like geometrically or visually?
+3. Where does the idea appear in data, computation, or AI?
+
+The style is:
+
+| Feature | What it means in this book |
+|---|---|
+| Concept-first | Ideas are introduced through meaning before formal notation. |
+| Visual-first | Geometry, pictures, and intuition guide the algebra. |
+| Story-driven | Each topic grows naturally from the previous one. |
+| Computation-supported | Python helps readers experiment and see ideas in action. |
+| AI-era friendly | Examples connect vectors and matrices to images, text, recommendation systems, and neural networks. |
+
+The guiding principle is:
+
+> Do not introduce a formula before the reader understands the question the formula is answering.
+
+## The Six Big Ideas
+
+The entire book is organized around six recurring ideas.
+
+### 1. Representation
+
+Before we can compute with something, we must represent it.
+
+A house, word, image, user, product, medical record, or signal can become a vector. Linear algebra begins when meaningful objects become numerical objects.
+
+### 2. Transformation
+
+A matrix is a machine for changing vectors.
+
+It can stretch, rotate, reflect, shear, project, filter, combine, compress, rank, and learn.
+
+### 3. Similarity
+
+The dot product, length, distance, angle, and cosine similarity help us compare objects.
+
+This is the beginning of search, clustering, recommendation systems, and semantic comparison.
+
+### 4. Approximation
+
+Real data is noisy, incomplete, or inconsistent.
+
+Projection and least squares help us find the best possible answer when an exact answer does not exist.
+
+### 5. Compression
+
+Many complicated objects contain simpler structure.
+
+Linear algebra helps us keep the important part and remove the less important part.
+
+### 6. Hidden Structure
+
+Eigenvectors, eigenvalues, singular values, and singular vectors reveal patterns that are not obvious from the raw data.
+
+These ideas are the foundation of PCA, ranking, stability, denoising, image compression, and many machine learning methods.
+
+## Roadmap of the Book
+
+### Part I. Seeing Data as Geometry
+
+This part introduces numbers, vectors, combinations, and data points.
+
+Main question:
+
+> How can objects in the world become points in space?
+
+Suggested chapters:
+
+- [Chapter 1: The World as Numbers](chapters/chapter-01-world-as-numbers.qmd)
+- [Chapter 2: Vectors: Numbers with Meaning](chapters/chapter-02-vectors-numbers-with-meaning.qmd)
+- [Chapter 3: Combining Ideas](chapters/chapter-03-combining-ideas.qmd)
+- [Chapter 4: Data as Points](chapters/chapter-04-data-as-points.qmd)
+
+### Part II. Matrices as Machines
+
+This part treats matrices as actions, not just tables.
+
+Main question:
+
+> How does information change?
+
+Suggested chapters:
+
+- [Chapter 5: The Matrix Machine](chapters/chapter-05-matrix-machine.qmd)
+- [Chapter 6: Stretching, Rotating, and Shearing](chapters/chapter-06-stretching-rotating-shearing.qmd)
+- [Chapter 7: Solving Backwards](chapters/chapter-07-solving-backwards.qmd)
+- [Chapter 8: When Information Is Lost](chapters/chapter-08-when-information-is-lost.qmd)
+
+### Part III. The Geometry of Similarity and Approximation
+
+This part develops the geometry of length, angle, projection, and orthogonality.
+
+Main question:
+
+> How do we compare and approximate information?
+
+Suggested chapters:
+
+- [Chapter 9: Length and Distance](chapters/chapter-09-length-and-distance.qmd)
+- [Chapter 10: Angles and Similarity](chapters/chapter-10-angles-and-similarity.qmd)
+- [Chapter 11: Projection: The Best Shadow](chapters/chapter-11-projection-best-shadow.qmd)
+- [Chapter 12: Orthogonality](chapters/chapter-12-orthogonality.qmd)
+
+### Part IV. Hidden Directions
+
+This part studies eigenvectors, stability, ranking, and energy.
+
+Main question:
+
+> What directions reveal the structure of a transformation?
+
+Suggested chapters:
+
+- [Chapter 13: Eigenvectors](chapters/chapter-13-eigenvectors.qmd)
+- [Chapter 14: Stability, Ranking, and Iteration](chapters/chapter-14-stability-ranking-iteration.qmd)
+- [Chapter 15: Energy Landscapes](chapters/chapter-15-energy-landscapes.qmd)
+
+### Part V. The Matrix Microscope
+
+This part introduces SVD, compression, PCA, Fourier ideas, and Haar ideas.
+
+Main question:
+
+> How can simple structure be found inside complex data?
+
+Suggested chapters:
+
+- [Chapter 16: SVD: The Matrix Microscope](chapters/chapter-16-svd-matrix-microscope.qmd)
+- [Chapter 17: Image Compression](chapters/chapter-17-image-compression.qmd)
+- [Chapter 18: Principal Component Analysis](chapters/chapter-18-pca.qmd)
+- [Chapter 19: Fourier Ideas](chapters/chapter-19-fourier.qmd)
+- [Chapter 20: Haar Ideas](chapters/chapter-20-haar.qmd)
+
+### Part VI. Linear Algebra and AI
+
+This part connects the language of linear algebra to images, text, neural networks, recommendation systems, and modern AI.
+
+Main question:
+
+> Why is linear algebra one of the main languages of artificial intelligence?
+
+Suggested chapters:
+
+- [Chapter 21: Images as Matrices](chapters/chapter-21-images-as-matrices.qmd)
+- [Chapter 22: Text as Vectors](chapters/chapter-22-text-as-vectors.qmd)
+- [Chapter 23: Neural Networks as Matrix Machines](chapters/chapter-23-neural-networks-as-matrix-machines.qmd)
+- [Chapter 24: Recommendation Systems](chapters/chapter-24-recommendation-systems.qmd)
+- [Chapter 25: The Grammar of AI](chapters/chapter-25-grammar-of-ai.qmd)
+
+## How to Use This Book
+
+Read slowly. Draw pictures. Try small examples by hand. Run the Python code when it appears. Ask what each symbol means in the story.
+
+When you see a vector, ask:
+
+> What does this vector represent?
+
+When you see a matrix, ask:
+
+> What does this matrix do?
+
+When you see a dot product, ask:
+
+> What kind of similarity is being measured?
+
+When you see a projection, ask:
+
+> What is being approximated?
+
+When you see a decomposition, ask:
+
+> What structure is being revealed?
+
+Use AI as a companion for explanation, examples, and reflection, but not as a replacement for thinking. The goal is not to finish pages quickly. The goal is to build a new way of seeing.
+
+## Start Reading
+
+Begin here:
+
+[Introduction and Overview](introduction-overview.qmd)

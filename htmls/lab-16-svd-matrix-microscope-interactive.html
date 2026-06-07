@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 16 — SVD: The Matrix Microscope</title>
+<style>
+:root{
+  --bg:#f7f8fb; --card:#ffffff; --ink:#172033; --muted:#5d6b82; --accent:#334bc8; --accent2:#1d8f7a; --line:#dfe5f2;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{padding:56px 24px 38px;background:linear-gradient(135deg,#141b41,#334bc8 55%,#1d8f7a);color:white}
+header .wrap{max-width:1120px;margin:auto}
+h1{font-size:clamp(2rem,4vw,4rem);margin:0 0 12px;font-weight:850;letter-spacing:-.04em}
+.subtitle{font-size:1.25rem;max-width:850px;opacity:.95}
+main{max-width:1120px;margin:28px auto;padding:0 20px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin:22px 0;box-shadow:0 12px 30px rgba(16,24,40,.06)}
+h2{margin-top:0;font-size:1.65rem;letter-spacing:-.02em}
+h3{margin-bottom:.35rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;align-items:start}
+.control{background:#f2f5fb;border:1px solid var(--line);padding:14px;border-radius:16px;margin:10px 0}
+label{display:flex;justify-content:space-between;gap:10px;font-weight:700;color:#2a3550}
+input[type=range]{width:100%}
+canvas{width:100%;height:auto;background:white;border:1px solid var(--line);border-radius:16px}
+.output{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0f172a;color:#e5edff;padding:14px;border-radius:14px;overflow:auto;white-space:pre-wrap}
+.pill{display:inline-block;background:#eef2ff;color:#2538a8;border:1px solid #cbd5ff;border-radius:999px;padding:4px 10px;font-weight:700;margin:4px 4px 4px 0}
+.note{border-left:5px solid var(--accent2);padding:10px 14px;background:#effaf7;border-radius:10px;color:#21463f}
+button{border:0;border-radius:12px;padding:10px 14px;font-weight:800;background:var(--accent);color:white;cursor:pointer}
+button.secondary{background:#e9eefb;color:#1f2a44}
+.matrix{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.05rem;background:#f7f9fc;padding:12px;border-radius:12px;border:1px solid var(--line)}
+.footer{color:var(--muted);text-align:center;margin:40px 0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>Lab 16 — SVD: The Matrix Microscope</h1>
+<div class="subtitle">Explore singular values, singular vectors, rank-one layers, low-rank approximation, compression, denoising, PCA intuition, and hidden factors.</div>
+</div></header>
+<main>
+<section class="card">
+<h2>Big idea</h2>
+<p>The singular value decomposition writes a matrix as <strong>A = UΣVᵀ</strong>. It says that every matrix has important input directions, output directions, and strengths. It also writes a matrix as a sum of rank-one layers ordered from strongest to weakest.</p>
+<span class="pill">input directions</span><span class="pill">output directions</span><span class="pill">singular values</span><span class="pill">rank-one layers</span><span class="pill">low-rank approximation</span>
+</section>
+
+<section class="card">
+<h2>1. A 2D matrix sends the unit circle to an ellipse</h2>
+<p>Move the matrix sliders. The unit circle maps to an ellipse or collapses to a line. The semi-axis lengths are the singular values.</p>
+<div class="grid">
+<div>
+<div class="control"><label>a <span id="aVal"></span></label><input id="a" type="range" min="-3" max="3" step="0.1" value="2"></div>
+<div class="control"><label>b <span id="bVal"></span></label><input id="b" type="range" min="-3" max="3" step="0.1" value="1"></div>
+<div class="control"><label>c <span id="cVal"></span></label><input id="c" type="range" min="-3" max="3" step="0.1" value="0.5"></div>
+<div class="control"><label>d <span id="dVal"></span></label><input id="d" type="range" min="-3" max="3" step="0.1" value="1.5"></div>
+<div class="matrix" id="matBox"></div>
+<div class="output" id="svBox"></div>
+</div>
+<canvas id="ellipse" width="560" height="560"></canvas>
+</div>
+</section>
+
+<section class="card">
+<h2>2. Rank-one layers build a matrix</h2>
+<p>A rank-one layer is a simple outer product pattern. Here a synthetic image-like matrix is built from three layers. Turn layers on and off.</p>
+<div class="grid">
+<div>
+<div class="control"><label>Layer 1 strength <span id="l1Val"></span></label><input id="l1" type="range" min="0" max="3" step="0.05" value="2.4"></div>
+<div class="control"><label>Layer 2 strength <span id="l2Val"></span></label><input id="l2" type="range" min="0" max="3" step="0.05" value="1.2"></div>
+<div class="control"><label>Layer 3 strength <span id="l3Val"></span></label><input id="l3" type="range" min="0" max="3" step="0.05" value="0.6"></div>
+<p class="note">The first layer usually captures broad structure. Later layers add detail.</p>
+</div>
+<canvas id="layers" width="360" height="360"></canvas>
+</div>
+</section>
+
+<section class="card">
+<h2>3. Low-rank approximation</h2>
+<p>The original matrix below has several hidden layers plus noise. Choose how many layers to keep.</p>
+<div class="grid">
+<div>
+<div class="control"><label>Rank k <span id="kVal"></span></label><input id="k" type="range" min="1" max="12" step="1" value="3"></div>
+<div class="output" id="energyBox"></div>
+</div>
+<canvas id="approx" width="720" height="320"></canvas>
+</div>
+</section>
+
+<section class="card">
+<h2>4. Denoising intuition</h2>
+<p>When signal is concentrated in the top layers and noise is spread out, truncated SVD can improve the image. But if k is too small, important details disappear.</p>
+<div class="grid">
+<div>
+<div class="control"><label>Noise level <span id="noiseVal"></span></label><input id="noise" type="range" min="0" max="1.2" step="0.05" value="0.45"></div>
+<div class="control"><label>Keep k layers <span id="denoiseKVal"></span></label><input id="denoiseK" type="range" min="1" max="12" step="1" value="4"></div>
+<button id="newNoise">new noise</button>
+</div>
+<canvas id="denoise" width="720" height="320"></canvas>
+</div>
+</section>
+
+<section class="card">
+<h2>5. PCA intuition from SVD</h2>
+<p>For centered data, SVD finds principal directions. Adjust the spread and rotation of the cloud.</p>
+<div class="grid">
+<div>
+<div class="control"><label>Main spread <span id="spread1Val"></span></label><input id="spread1" type="range" min="0.5" max="4" step="0.1" value="3"></div>
+<div class="control"><label>Small spread <span id="spread2Val"></span></label><input id="spread2" type="range" min="0.1" max="2" step="0.1" value="0.7"></div>
+<div class="control"><label>Rotation <span id="rotVal"></span></label><input id="rot" type="range" min="0" max="180" step="1" value="35"></div>
+<div class="output" id="pcaBox"></div>
+</div>
+<canvas id="pca" width="560" height="560"></canvas>
+</div>
+</section>
+
+<section class="card">
+<h2>Reflection prompts</h2>
+<ol>
+<li>Why is the SVD a “microscope” rather than just a formula?</li>
+<li>What does a large singular value mean in an image? In a rating matrix?</li>
+<li>Why can small singular values make inverse problems unstable?</li>
+<li>How does PCA use SVD?</li>
+<li>When might low-rank approximation remove meaningful information?</li>
+</ol>
+</section>
+<div class="footer">Chapter 16 interactive lab — SVD: The Matrix Microscope</div>
+</main>
+<script>
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id).value)}
+function clear(ctx,w,h){ctx.clearRect(0,0,w,h)}
+function line(ctx,x1,y1,x2,y2,color,width=2){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function dot(ctx,x,y,color,r=3){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function eigSym2(a,b,d){ // [[a,b],[b,d]] eigenvalues descending
+  const tr=a+d, det=a*d-b*b, disc=Math.sqrt(Math.max(0,tr*tr/4-det));
+  let l1=tr/2+disc, l2=tr/2-disc;
+  return [l1,l2];
+}
+function singular2(a,b,c,d){
+  // eigenvalues of A^T A
+  const x=a*a+c*c, y=a*b+c*d, z=b*b+d*d;
+  const e=eigSym2(x,y,z);
+  return [Math.sqrt(Math.max(0,e[0])), Math.sqrt(Math.max(0,e[1]))];
+}
+function drawEllipse(){
+  const a=val('a'), b=val('b'), c=val('c'), d=val('d');
+  ['a','b','c','d'].forEach(id=>$(id+'Val').textContent=val(id).toFixed(1));
+  $('matBox').innerHTML=`A = [[${a.toFixed(1)}, ${b.toFixed(1)}], [${c.toFixed(1)}, ${d.toFixed(1)}]]`;
+  const s=singular2(a,b,c,d);
+  $('svBox').textContent=`Approx singular values:\nσ1 = ${s[0].toFixed(3)}\nσ2 = ${s[1].toFixed(3)}\ncondition σ1/σ2 = ${(s[1]>1e-8?s[0]/s[1]:Infinity).toFixed(3)}`;
+  const cnv=$('ellipse'), ctx=cnv.getContext('2d'), W=cnv.width,H=cnv.height; clear(ctx,W,H);
+  const cx=W/2, cy=H/2, scale=70;
+  line(ctx,0,cy,W,cy,'#e2e8f0'); line(ctx,cx,0,cx,H,'#e2e8f0');
+  ctx.beginPath();
+  for(let i=0;i<=360;i++){
+    const t=i*Math.PI/180, x=Math.cos(t), y=Math.sin(t);
+    const px=cx+scale*x, py=cy-scale*y;
+    if(i==0)ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();
+  for(let i=0;i<=360;i++){
+    const t=i*Math.PI/180, x=Math.cos(t), y=Math.sin(t);
+    const X=a*x+b*y, Y=c*x+d*y;
+    const px=cx+scale*X, py=cy-scale*Y;
+    if(i==0)ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.strokeStyle='#334bc8';ctx.lineWidth=4;ctx.stroke();
+  // sample radial points
+  for(let i=0;i<24;i++){
+    const t=i*2*Math.PI/24, x=Math.cos(t), y=Math.sin(t);
+    const X=a*x+b*y, Y=c*x+d*y;
+    line(ctx,cx,cy,cx+scale*X,cy-scale*Y,'rgba(29,143,122,.25)',1);
+    dot(ctx,cx+scale*X,cy-scale*Y,'#1d8f7a',3);
+  }
+}
+
+function makeLayerMatrix(n,l1,l2,l3){
+  const M=[];
+  for(let i=0;i<n;i++){
+    const row=[];
+    for(let j=0;j<n;j++){
+      const x=(j-n/2)/(n/2), y=(i-n/2)/(n/2);
+      const A=l1*(0.5+0.5*Math.cos(Math.PI*x))*(0.5+0.5*Math.cos(Math.PI*y));
+      const B=l2*Math.sin(8*x+2*y);
+      const C=l3*((x+0.25)*(x+0.25)+(y-0.2)*(y-0.2)<0.16?1:0);
+      row.push(A+B+C);
+    }
+    M.push(row);
+  }
+  return M;
+}
+function drawHeat(canvasId,M,title){
+  const cnv=$(canvasId), ctx=cnv.getContext('2d'), W=cnv.width,H=cnv.height; clear(ctx,W,H);
+  const n=M.length, m=M[0].length, cw=W/m, ch=H/n;
+  let lo=Infinity, hi=-Infinity;
+  for(const r of M)for(const z of r){lo=Math.min(lo,z);hi=Math.max(hi,z)}
+  for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+    let t=(M[i][j]-lo)/(hi-lo+1e-9);
+    const g=Math.round(255*t);
+    ctx.fillStyle=`rgb(${g},${g},${g})`;
+    ctx.fillRect(j*cw,i*ch,Math.ceil(cw),Math.ceil(ch));
+  }
+  ctx.fillStyle='rgba(15,23,42,.75)';ctx.fillRect(8,8,ctx.measureText(title).width+24,28);
+  ctx.fillStyle='white';ctx.font='15px system-ui';ctx.fillText(title,20,28);
+}
+function drawLayers(){
+  ['l1','l2','l3'].forEach(id=>$(id+'Val').textContent=val(id).toFixed(2));
+  drawHeat('layers',makeLayerMatrix(60,val('l1'),val('l2'),val('l3')),'sum of rank-one-like layers');
+}
+
+// small deterministic pseudo-random and matrix basis for approximations
+function rand(seed){let x=Math.sin(seed)*10000;return x-Math.floor(x)}
+const nA=48;
+const baseLayers=[];
+for(let layer=0;layer<12;layer++){
+  const M=[];
+  for(let i=0;i<nA;i++){
+    const row=[];
+    for(let j=0;j<nA;j++){
+      const x=i/nA, y=j/nA;
+      row.push(Math.sin((layer+1)*Math.PI*x+0.7*layer)*Math.cos((layer+1)*Math.PI*y-0.3*layer));
+    }
+    M.push(row);
+  }
+  baseLayers.push(M);
+}
+const strengths=[3,2.1,1.5,1.0,.75,.55,.4,.32,.25,.2,.16,.12];
+function combineLayers(k,noise=0){
+  const M=[];
+  for(let i=0;i<nA;i++){
+    const row=[];
+    for(let j=0;j<nA;j++){
+      let z=0;
+      for(let L=0;L<k;L++) z += strengths[L]*baseLayers[L][i][j];
+      if(noise>0) z+= noise*(rand((i+1)*17+(j+1)*31)-0.5)*2;
+      row.push(z);
+    }
+    M.push(row);
+  }
+  return M;
+}
+function drawTwoHeat(canvasId,M1,M2,t1,t2){
+  const cnv=$(canvasId), ctx=cnv.getContext('2d'), W=cnv.width,H=cnv.height; clear(ctx,W,H);
+  function drawAt(M,x0,w,title){
+    const n=M.length,m=M[0].length,cw=w/m,ch=H/n;
+    let lo=Infinity,hi=-Infinity; for(const r of M)for(const z of r){lo=Math.min(lo,z);hi=Math.max(hi,z)}
+    for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+      let t=(M[i][j]-lo)/(hi-lo+1e-9); const g=Math.round(255*t);
+      ctx.fillStyle=`rgb(${g},${g},${g})`;ctx.fillRect(x0+j*cw,i*ch,Math.ceil(cw),Math.ceil(ch));
+    }
+    ctx.fillStyle='rgba(15,23,42,.75)';ctx.fillRect(x0+8,8,ctx.measureText(title).width+24,28);
+    ctx.fillStyle='white';ctx.font='15px system-ui';ctx.fillText(title,x0+20,28);
+  }
+  drawAt(M1,0,W/2-8,t1); drawAt(M2,W/2+8,W/2-8,t2);
+}
+function drawApprox(){
+  const k=parseInt($('k').value); $('kVal').textContent=k;
+  const orig=combineLayers(12,0.05), approx=combineLayers(k,0);
+  const total=strengths.reduce((a,b)=>a+b*b,0), kept=strengths.slice(0,k).reduce((a,b)=>a+b*b,0);
+  $('energyBox').textContent=`Energy captured by first ${k} layers (model): ${(kept/total*100).toFixed(1)}%`;
+  drawTwoHeat('approx',orig,approx,'full matrix','rank-k approximation');
+}
+let noiseSeed=0;
+function drawDenoise(){
+  const noise=val('noise'), k=parseInt($('denoiseK').value);
+  $('noiseVal').textContent=noise.toFixed(2); $('denoiseKVal').textContent=k;
+  // use deterministic noise by offsetting rand formula with seed via modified matrix
+  const clean=combineLayers(4,0);
+  const noisy=[];
+  for(let i=0;i<nA;i++){
+    const row=[];for(let j=0;j<nA;j++) row.push(clean[i][j]+noise*(rand((i+1)*19+(j+1)*37+noiseSeed*101)-0.5)*2);
+    noisy.push(row);
+  }
+  const den=combineLayers(k,0); // conceptual: keeping top layers
+  drawTwoHeat('denoise',noisy,den,'noisy matrix','truncated reconstruction');
+}
+function drawPCA(){
+  const s1=val('spread1'), s2=val('spread2'), deg=val('rot');
+  $('spread1Val').textContent=s1.toFixed(1); $('spread2Val').textContent=s2.toFixed(1); $('rotVal').textContent=deg+'°';
+  const th=deg*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+  const cnv=$('pca'), ctx=cnv.getContext('2d'), W=cnv.width,H=cnv.height; clear(ctx,W,H);
+  const cx=W/2, cy=H/2, scale=42;
+  line(ctx,0,cy,W,cy,'#e2e8f0'); line(ctx,cx,0,cx,H,'#e2e8f0');
+  for(let i=0;i<260;i++){
+    const z1=(rand(i*11+3)+rand(i*17+7)+rand(i*23+5)-1.5)*1.6;
+    const z2=(rand(i*13+2)+rand(i*19+4)+rand(i*29+8)-1.5)*1.6;
+    const x=s1*z1*ct - s2*z2*st;
+    const y=s1*z1*st + s2*z2*ct;
+    dot(ctx,cx+scale*x,cy-scale*y,'rgba(51,75,200,.45)',3);
+  }
+  line(ctx,cx,cy,cx+scale*s1*ct*1.3,cy-scale*s1*st*1.3,'#e11d48',4);
+  line(ctx,cx,cy,cx-scale*s1*ct*1.3,cy+scale*s1*st*1.3,'#e11d48',4);
+  line(ctx,cx,cy,cx-scale*s2*st*1.3,cy-scale*s2*ct*1.3,'#1d8f7a',4);
+  line(ctx,cx,cy,cx+scale*s2*st*1.3,cy+scale*s2*ct*1.3,'#1d8f7a',4);
+  const e1=s1*s1, e2=s2*s2;
+  $('pcaBox').textContent=`PC1 energy share ≈ ${(e1/(e1+e2)*100).toFixed(1)}%\nPC2 energy share ≈ ${(e2/(e1+e2)*100).toFixed(1)}%`;
+}
+function updateAll(){drawEllipse();drawLayers();drawApprox();drawDenoise();drawPCA()}
+['a','b','c','d'].forEach(id=>$(id).addEventListener('input',drawEllipse));
+['l1','l2','l3'].forEach(id=>$(id).addEventListener('input',drawLayers));
+$('k').addEventListener('input',drawApprox);
+['noise','denoiseK'].forEach(id=>$(id).addEventListener('input',drawDenoise));
+$('newNoise').addEventListener('click',()=>{noiseSeed++;drawDenoise()});
+['spread1','spread2','rot'].forEach(id=>$(id).addEventListener('input',drawPCA));
+updateAll();
+</script>
+</body>
+</html>

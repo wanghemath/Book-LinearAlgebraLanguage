@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 12 Interactive: Orthogonality</title>
+<style>
+:root{--bg:#f7f8fc;--card:#ffffff;--ink:#172033;--muted:#5b6475;--accent:#4257f5;--accent2:#00a67e;--line:#dce1ec;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f8fbff,#f6f3ff);color:var(--ink);}
+header{padding:44px 24px 28px;text-align:center;background:radial-gradient(circle at top left,#e9efff,#ffffff 42%,#f7f2ff);border-bottom:1px solid var(--line)}
+h1{font-size:clamp(2rem,4vw,3.4rem);margin:.2rem 0}.subtitle{color:var(--muted);font-size:1.15rem;max-width:850px;margin:0 auto;line-height:1.55}.wrap{max-width:1150px;margin:0 auto;padding:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 16px 35px rgba(25,35,80,.08)}
+h2{margin-top:0}.controls{display:grid;gap:10px;margin:12px 0}.control{display:grid;grid-template-columns:80px 1fr 56px;gap:10px;align-items:center;font-size:.93rem}.control input{width:100%}.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#2f3bbd;font-weight:700;font-size:.82rem}.result{background:#f6f8ff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px;line-height:1.5}canvas{width:100%;height:330px;border:1px solid var(--line);border-radius:16px;background:white}.wide{grid-column:1/-1}.small{font-size:.92rem;color:var(--muted)}button{border:0;background:var(--accent);color:white;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}button:hover{filter:brightness(.96)}
+</style>
+</head>
+<body>
+<header>
+<div class="pill">Chapter 12 Interactive Lab</div>
+<h1>Orthogonality</h1>
+<p class="subtitle">Explore clean directions, projections, Gram--Schmidt, QR intuition, signals, and the surprising near-orthogonality of high-dimensional random vectors.</p>
+</header>
+<main class="wrap">
+<section class="grid">
+<div class="card">
+<h2>1. Dot product as overlap</h2>
+<canvas id="angleCanvas" width="600" height="330"></canvas>
+<div class="controls">
+<div class="control"><label>u₁</label><input id="u1" type="range" min="-4" max="4" step="0.1" value="2"><span id="u1v"></span></div>
+<div class="control"><label>u₂</label><input id="u2" type="range" min="-4" max="4" step="0.1" value="1"><span id="u2v"></span></div>
+<div class="control"><label>v₁</label><input id="v1" type="range" min="-4" max="4" step="0.1" value="-1"><span id="v1v"></span></div>
+<div class="control"><label>v₂</label><input id="v2" type="range" min="-4" max="4" step="0.1" value="2"><span id="v2v"></span></div>
+</div>
+<div class="result" id="angleResult"></div>
+</div>
+<div class="card">
+<h2>2. Projection onto a line</h2>
+<canvas id="projCanvas" width="600" height="330"></canvas>
+<div class="controls">
+<div class="control"><label>x₁</label><input id="x1" type="range" min="-4" max="4" step="0.1" value="3"><span id="x1v"></span></div>
+<div class="control"><label>x₂</label><input id="x2" type="range" min="-4" max="4" step="0.1" value="2"><span id="x2v"></span></div>
+<div class="control"><label>a₁</label><input id="a1" type="range" min="-4" max="4" step="0.1" value="2"><span id="a1v"></span></div>
+<div class="control"><label>a₂</label><input id="a2" type="range" min="-4" max="4" step="0.1" value="1"><span id="a2v"></span></div>
+</div>
+<div class="result" id="projResult"></div>
+</div>
+<div class="card wide">
+<h2>3. Gram--Schmidt: remove what was already explained</h2>
+<p class="small">Drag the second vector. The app builds q₁ from a, subtracts the projection of b on q₁, and normalizes the leftover into q₂.</p>
+<canvas id="gsCanvas" width="1000" height="360"></canvas>
+<div class="controls" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));">
+<div class="control"><label>b₁</label><input id="b1" type="range" min="-4" max="4" step="0.1" value="2"><span id="b1v"></span></div>
+<div class="control"><label>b₂</label><input id="b2" type="range" min="-4" max="4" step="0.1" value="3"><span id="b2v"></span></div>
+</div>
+<div class="result" id="gsResult"></div>
+</div>
+<div class="card">
+<h2>4. Orthogonal signals</h2>
+<canvas id="sigCanvas" width="600" height="330"></canvas>
+<div class="controls">
+<div class="control"><label>sin x</label><input id="c1" type="range" min="-3" max="3" step="0.1" value="1.8"><span id="c1v"></span></div>
+<div class="control"><label>cos x</label><input id="c2" type="range" min="-3" max="3" step="0.1" value="-1"><span id="c2v"></span></div>
+<div class="control"><label>sin 2x</label><input id="c3" type="range" min="-3" max="3" step="0.1" value="1.2"><span id="c3v"></span></div>
+</div>
+<div class="result" id="sigResult"></div>
+</div>
+<div class="card">
+<h2>5. High-dimensional near-orthogonality</h2>
+<p class="small">Random unit vectors in high dimensions are usually almost perpendicular.</p>
+<canvas id="hdCanvas" width="600" height="330"></canvas>
+<div class="controls">
+<div class="control"><label>dimension</label><input id="dim" type="range" min="2" max="300" step="1" value="20"><span id="dimv"></span></div>
+</div>
+<button id="reroll">New random sample</button>
+<div class="result" id="hdResult"></div>
+</div>
+</section>
+</main>
+<script>
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id).value)}
+function setv(id){$(id+'v').textContent=val(id).toFixed(1)}
+function setupVals(ids){ids.forEach(id=>{$(id).addEventListener('input',drawAll);setv(id)})}
+function drawAxes(ctx,w,h,scale=42){ctx.clearRect(0,0,w,h);ctx.strokeStyle='#e5e7ef';ctx.lineWidth=1;for(let x=w/2%scale;x<w;x+=scale){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=h/2%scale;y<h;y+=scale){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.strokeStyle='#9aa3b8';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke()}
+function pt(w,h,p,s=42){return [w/2+p[0]*s,h/2-p[1]*s]}
+function arrow(ctx,w,h,p,color,label,s=42,origin=[0,0]){let [x0,y0]=pt(w,h,origin,s),[x1,y1]=pt(w,h,[origin[0]+p[0],origin[1]+p[1]],s);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();let ang=Math.atan2(y1-y0,x1-x0);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-10*Math.cos(ang-.35),y1-10*Math.sin(ang-.35));ctx.lineTo(x1-10*Math.cos(ang+.35),y1-10*Math.sin(ang+.35));ctx.closePath();ctx.fill();ctx.font='14px system-ui';ctx.fillText(label,x1+6,y1-6)}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]}function norm(a){return Math.hypot(a[0],a[1])}
+function drawAngle(){['u1','u2','v1','v2'].forEach(setv);let c=$('angleCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;drawAxes(ctx,w,h);let u=[val('u1'),val('u2')],v=[val('v1'),val('v2')];arrow(ctx,w,h,u,'#4257f5','u');arrow(ctx,w,h,v,'#00a67e','v');let d=dot(u,v),cos=d/(norm(u)*norm(v)||1),ang=Math.acos(Math.max(-1,Math.min(1,cos)))*180/Math.PI;$('angleResult').innerHTML=`u · v = <b>${d.toFixed(3)}</b><br>angle ≈ <b>${ang.toFixed(1)}°</b><br>${Math.abs(d)<.05?'The vectors are approximately orthogonal.':'The dot product is not zero, so the vectors overlap.'}`}
+function drawProj(){['x1','x2','a1','a2'].forEach(setv);let c=$('projCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;drawAxes(ctx,w,h);let x=[val('x1'),val('x2')],a=[val('a1'),val('a2')];let aa=dot(a,a)||1,t=dot(x,a)/aa,p=[t*a[0],t*a[1]],r=[x[0]-p[0],x[1]-p[1]];ctx.strokeStyle='#d3d8e8';ctx.lineWidth=4;let p1=pt(w,h,[-5*a[0],-5*a[1]]),p2=pt(w,h,[5*a[0],5*a[1]]);ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();arrow(ctx,w,h,x,'#4257f5','x');arrow(ctx,w,h,p,'#00a67e','proj');arrow(ctx,w,h,r,'#f59e0b','residual',42,p);$('projResult').innerHTML=`coefficient t = (x·a)/(a·a) = <b>${t.toFixed(3)}</b><br>projection = (${p[0].toFixed(2)}, ${p[1].toFixed(2)})<br>residual · a = <b>${dot(r,a).toFixed(3)}</b>`}
+function drawGS(){['b1','b2'].forEach(setv);let c=$('gsCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;drawAxes(ctx,w,h,40);let a=[2,1],b=[val('b1'),val('b2')];let q1=[a[0]/norm(a),a[1]/norm(a)];let coeff=dot(b,q1);let explained=[coeff*q1[0],coeff*q1[1]];let left=[b[0]-explained[0],b[1]-explained[1]];let nl=norm(left);let q2=nl<1e-6?[0,0]:[left[0]/nl,left[1]/nl];arrow(ctx,w,h,a,'#4257f5','a');arrow(ctx,w,h,b,'#111827','b');arrow(ctx,w,h,explained,'#00a67e','explained');arrow(ctx,w,h,left,'#f59e0b','leftover',40,explained);arrow(ctx,w,h,[q1[0]*2,q1[1]*2],'#7c3aed','q1*2');if(nl>1e-6)arrow(ctx,w,h,[q2[0]*2,q2[1]*2],'#e11d48','q2*2');$('gsResult').innerHTML=`q₁ = (${q1[0].toFixed(3)}, ${q1[1].toFixed(3)})<br>leftover norm = ${nl.toFixed(3)}<br>q₁ · q₂ = <b>${(q1[0]*q2[0]+q1[1]*q2[1]).toFixed(3)}</b>`}
+function drawSignal(){['c1','c2','c3'].forEach(setv);let c=$('sigCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.strokeStyle='#e5e7ef';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();let co=[val('c1'),val('c2'),val('c3')];ctx.strokeStyle='#4257f5';ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<w;i++){let x=2*Math.PI*i/w;let y=co[0]*Math.sin(x)+co[1]*Math.cos(x)+co[2]*Math.sin(2*x);let py=h/2-y*42;if(i==0)ctx.moveTo(i,py);else ctx.lineTo(i,py)}ctx.stroke();let energy=co.reduce((s,z)=>s+z*z,0);$('sigResult').innerHTML=`Signal = c₁ sin(x) + c₂ cos(x) + c₃ sin(2x)<br>Coefficient energy c₁²+c₂²+c₃² = <b>${energy.toFixed(2)}</b>`}
+let hdData=[];function sampleNormal(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}function reroll(){let d=val('dim'),N=600;hdData=[];for(let k=0;k<N;k++){let x=[],y=[],nx=0,ny=0;for(let j=0;j<d;j++){let a=sampleNormal(),b=sampleNormal();x.push(a);y.push(b);nx+=a*a;ny+=b*b}nx=Math.sqrt(nx);ny=Math.sqrt(ny);let s=0;for(let j=0;j<d;j++)s+=x[j]*y[j]/(nx*ny);hdData.push(s)}}
+function drawHD(){setv('dim');let c=$('hdCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);let bins=31,counts=Array(bins).fill(0);hdData.forEach(z=>{let idx=Math.max(0,Math.min(bins-1,Math.floor((z+1)/2*bins)));counts[idx]++});let mx=Math.max(...counts,1);for(let i=0;i<bins;i++){let bh=counts[i]/mx*(h-50);ctx.fillStyle='#4257f5';ctx.fillRect(20+i*(w-40)/bins,h-25-bh,(w-45)/bins,bh)}ctx.strokeStyle='#111827';ctx.beginPath();ctx.moveTo(w/2,15);ctx.lineTo(w/2,h-25);ctx.stroke();let meanAbs=hdData.reduce((s,z)=>s+Math.abs(z),0)/hdData.length;$('hdResult').innerHTML=`Mean |cosine| ≈ <b>${meanAbs.toFixed(3)}</b><br>As dimension increases, random directions cluster near cosine 0, meaning near-orthogonal.`}
+function drawAll(){drawAngle();drawProj();drawGS();drawSignal();if(!hdData.length)reroll();drawHD()}
+setupVals(['u1','u2','v1','v2','x1','x2','a1','a2','b1','b2','c1','c2','c3','dim']);$('dim').addEventListener('input',()=>{reroll();drawAll()});$('reroll').addEventListener('click',()=>{reroll();drawAll()});drawAll();
+</script>
+</body>
+</html>

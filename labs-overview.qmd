@@ -1,0 +1,147 @@
+ 
+# Lab Overview {.unnumbered}
+
+Linear algebra is not only a list of definitions and theorems. It is a language for turning the world into numbers, transforming those numbers, measuring similarity, discovering hidden structure, and building intelligent systems.
+
+The labs in this book are designed to help students **learn by doing**. Each chapter has two companion lab formats:
+
+1. **Jupyter notebook lab**: a guided Python notebook with explanations, computations, visualizations, experiments, and student tasks.
+2. **Interactive HTML lab**: a standalone visual activity page with sliders, buttons, dynamic graphics, and conceptual experiments.
+
+The notebooks are best for deeper computation and coding practice. The interactive HTML labs are best for quick exploration, classroom demonstration, and intuition building. 
+[Lab and Interactive HTML page](labs-interactive.html)
+
+::: {.callout-tip}
+## How to use these labs
+
+For each chapter, first read the story and main mathematical ideas. Then open the interactive HTML lab to build intuition. Finally, work through the Jupyter notebook to compute, visualize, and extend the ideas in Python.
+:::
+
+# The lab sequence
+
+The labs follow the same story arc as the book:
+
+- **Chapters 1--4:** how the world becomes vectors, points, and data clouds.
+- **Chapters 5--8:** how matrices transform information, solve systems, and lose information.
+- **Chapters 9--12:** how geometry enters through distance, angles, projection, and orthogonality.
+- **Chapters 13--18:** how hidden structure appears through eigenvectors, iteration, optimization, SVD, images, and PCA.
+- **Chapters 19--22:** how signals, images, and text become linear-algebraic objects.
+- **Chapters 23--25:** how linear algebra becomes the grammar of modern AI.
+
+# Complete lab list
+
+| Chapter | Lab theme | Jupyter notebook | Interactive HTML |
+|---:|---|---|---|
+| 1 | The world as numbers | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-01-world-as-numbers.ipynb) | [Interactive](htmls/lab-01-world-as-numbers-interactive.html) |
+| 2 | Vectors: numbers with meaning | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-02-vectors-numbers-with-meaning.ipynb) | [Interactive](htmls/lab-02-vectors-numbers-with-meaning-interactive.html) |
+| 3 | Combining ideas | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-03-combining-ideas.ipynb) | [Interactive](htmls/lab-03-combining-ideas-interactive.html) |
+| 4 | Data as points | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-04-data-as-points.ipynb) | [Interactive](htmls/lab-04-data-as-points-interactive.html) |
+| 5 | Matrix machines | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-05-matrix-machine.ipynb) | [Interactive](htmls/lab-05-matrix-machine-interactive.html) |
+| 6 | Stretching, rotating, shearing | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-06-stretching-rotating-shearing.ipynb) | [Interactive](htmls/lab-06-stretching-rotating-shearing-interactive.html) |
+| 7 | Solving backwards | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-07-solving-backwards.ipynb) | [Interactive](htmls/lab-07-solving-backwards-interactive.html) |
+| 8 | When information is lost | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-08-when-information-is-lost.ipynb) | [Interactive](htmls/lab-08-when-information-is-lost-interactive.html) |
+| 9 | Length and distance | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-09-length-and-distance.ipynb) | [Interactive](htmls/lab-09-length-and-distance-interactive.html) |
+| 10 | Angles and similarity | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-10-angles-and-similarity.ipynb) | [Interactive](htmls/lab-10-angles-and-similarity-interactive.html) |
+| 11 | Projection: the best shadow | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-11-projection-best-shadow.ipynb) | [Interactive](htmls/lab-11-projection-best-shadow-interactive.html) |
+| 12 | Orthogonality | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-12-orthogonality.ipynb) | [Interactive](htmls/lab-12-orthogonality-interactive.html) |
+| 13 | Eigenvectors | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-13-eigenvectors.ipynb) | [Interactive](htmls/lab-13-eigenvectors-interactive.html) |
+| 14 | Stability, ranking, and iteration | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-14-stability-ranking-iteration.ipynb) | [Interactive](htmls/lab-14-stability-ranking-iteration-interactive.html) |
+| 15 | Energy landscapes | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-15-energy-landscapes.ipynb) | [Interactive](htmls/lab-15-energy-landscapes-interactive.html) |
+| 16 | SVD: the matrix microscope | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-16-svd-matrix-microscope.ipynb) | [Interactive](htmls/lab-16-svd-matrix-microscope-interactive.html) |
+| 17 | Image compression | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-17-image-compression.ipynb) | [Interactive](htmls/lab-17-image-compression-interactive.html) |
+| 18 | PCA | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-18-pca.ipynb) | [Interactive](htmls/lab-18-pca-interactive.html) |
+| 19 | Fourier analysis | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-19-fourier.ipynb) | [Interactive](htmls/lab-19-fourier-interactive.html) |
+| 20 | Haar wavelets | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-20-haar.ipynb) | [Interactive](htmls/lab-20-haar-interactive.html) |
+| 21 | Images as matrices | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-21-images-as-matrices.ipynb) | [Interactive](htmls/lab-21-images-as-matrices-interactive.html) |
+| 22 | Text as vectors | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-22-text-as-vectors.ipynb) | [Interactive](htmls/lab-22-text-as-vectors-interactive.html) |
+| 23 | Neural networks as matrix machines | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-23-neural-networks-as-matrix-machines.ipynb) | [Interactive](htmls/lab-23-neural-networks-as-matrix-machines-interactive.html) |
+| 24 | Recommendation systems | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-24-recommendation-systems.ipynb) | [Interactive](htmls/lab-24-recommendation-systems-interactive.html) |
+| 25 | The grammar of AI | [Google Colab](https://colab.research.google.com/github/wanghemath/MATH2331/blob/main/labs/lab-25-grammar-of-ai.ipynb) | [Interactive](htmls/lab-25-grammar-of-ai-interactive.html) |
+
+# Lab map by learning goal
+
+## Foundations: representing the world
+
+Chapters 1--4 teach how to translate real objects into vectors, features, tables, and point clouds. These labs emphasize representation, scaling, visualization, and the first geometric view of data.
+
+Recommended classroom use:
+
+- Use the interactive pages for live discussion.
+- Use the notebooks for short coding assignments.
+- Bring a small dataset and explain the meaning of each coordinate.
+
+## Matrix thinking: machines, systems, and information
+
+Chapters 5--8 show matrices as machines. Learn to transform vectors, solve systems, understand invertibility, and diagnose what information is preserved or lost.
+
+Recommended classroom use:
+
+- Use Chapter 5 and Chapter 6 interactives to build geometric intuition.
+- Use Chapter 7 and Chapter 8 notebooks for computation, rank, pivots, residuals, and numerical sensitivity.
+
+## Geometry of comparison and approximation
+
+Chapters 9--12 build the geometric foundation of applied linear algebra: length, distance, angle, similarity, projection, and orthogonality.
+
+Recommended classroom use:
+
+- Assign Chapter 9 and Chapter 10 labs before nearest-neighbor, cosine similarity, or search applications.
+- Use Chapter 11 and Chapter 12 labs as preparation for least squares, QR, PCA, and SVD.
+
+## Hidden structure and dimension reduction
+
+Chapters 13--18 move from geometry to structure: eigenvectors, iteration, quadratic energy, SVD, image compression, and PCA.
+
+Recommended classroom use:
+
+- Use Chapter 13 and Chapter 14 to connect eigenvectors with repeated processes and ranking.
+- Use Chapter 15 to connect symmetric matrices with optimization.
+- Use Chapter 16--18 as a coherent mini-unit on low-rank structure, compression, denoising, and dimension reduction.
+
+## Signals, images, text, and AI
+
+Chapters 19--25 show how linear algebra becomes the infrastructure of modern data science and AI.
+
+Recommended classroom use:
+
+- Use Chapter 19 and Chapter 20 to compare global and local bases.
+- Use Chapter 21 and Chapter 22 to connect images and text with matrices and vectors.
+- Use Chapter 23--25 as an applied capstone sequence: neural networks, recommendation systems, and the grammar of AI.
+
+# Suggested assignment patterns
+
+## Short weekly lab
+
+Complete one notebook section and one reflection question. This works well when the lab supports a lecture topic.
+
+## Full computational lab
+
+Complete an entire notebook, including student tasks and extensions. This works well for Chapters 7, 11, 12, 15, 16, 18, 23, and 24.
+
+## Interactive pre-class exploration
+
+Open the HTML page before lecture, move sliders, and write down three observations. This works well for geometric chapters such as 5, 6, 9, 10, 11, 13, and 18.
+
+## Mini-project extension
+
+Modify a notebook by changing the dataset, image, signal, text corpus, or network. This works well for Chapters 17--25.
+
+# Suggested grading rubric
+
+| Component | Description | Points |
+|---|---|---:|
+| Conceptual understanding | Student explains what the computations mean, not only what the code returns. | 30 |
+| Python computation | Code runs correctly and uses appropriate linear algebra operations. | 25 |
+| Visualization | Graphs or images are clear, labeled, and interpreted. | 20 |
+| Reflection | Student connects the lab to the chapter story and real applications. | 15 |
+| Extension | Student modifies an example or explores a new case. | 10 |
+
+# Technical notes
+
+The notebook labs are written for Python with standard scientific libraries such as `numpy`, `matplotlib`, and, when useful, `pandas` or `scikit-learn`. The interactive HTML labs are standalone pages using browser-based JavaScript and do not require Python to run.
+
+::: {.callout-note}
+## For instructors
+
+A good rhythm is: **interactive intuition first, Python computation second, mathematical explanation third**.  
+:::

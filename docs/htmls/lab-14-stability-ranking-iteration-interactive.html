@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 14: Stability, Ranking, and Iteration</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --ink:#111827; --muted:#5b6472; --card:#ffffff;
+    --accent:#2563eb; --accent2:#7c3aed; --line:#d9e1ef; --soft:#eaf1ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);}
+  header{padding:48px 22px 34px;background:linear-gradient(135deg,#0f172a,#1d4ed8 55%,#7c3aed);color:white;}
+  header .wrap{max-width:1180px;margin:0 auto;}
+  h1{font-size:clamp(2.1rem,5vw,4.2rem);margin:0 0 12px;line-height:1.05;}
+  .subtitle{font-size:1.25rem;max-width:820px;line-height:1.55;opacity:.95;}
+  main{max-width:1180px;margin:0 auto;padding:24px;}
+  section{background:var(--card);border:1px solid var(--line);border-radius:22px;margin:22px 0;padding:24px;box-shadow:0 10px 25px rgba(15,23,42,.06);}
+  h2{margin-top:0;font-size:1.55rem;}
+  h3{margin-bottom:8px;}
+  p{line-height:1.65;color:#263142;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px;align-items:start;}
+  .panel{background:#fbfdff;border:1px solid var(--line);border-radius:18px;padding:16px;}
+  label{display:block;font-size:.9rem;color:var(--muted);margin:12px 0 4px;}
+  input[type=range]{width:100%;}
+  button{border:0;border-radius:12px;background:var(--accent);color:white;padding:10px 14px;font-weight:700;cursor:pointer;margin:4px 4px 4px 0;}
+  button.secondary{background:#475569;}
+  canvas, svg{width:100%;height:auto;background:white;border:1px solid var(--line);border-radius:16px;}
+  .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef3ff;border:1px solid #dbe7ff;padding:10px 12px;border-radius:12px;display:inline-block;}
+  .output{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f172a;color:#e5e7eb;padding:12px;border-radius:14px;white-space:pre-wrap;min-height:44px;}
+  .note{background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:14px;color:#7c2d12;}
+  .pill{display:inline-block;background:#e0e7ff;color:#3730a3;padding:4px 10px;border-radius:999px;font-size:.82rem;font-weight:700;margin:2px;}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Lab 14: Stability, Ranking, and Iteration</h1>
+  <div class="subtitle">Explore what happens when a matrix is applied again and again. Watch stable directions emerge, rankings settle, probabilities converge, and signals smooth out.</div>
+</div></header>
+<main>
+
+<section>
+  <h2>Big idea</h2>
+  <p>A matrix iteration has the form <span class="formula">x<sub>k+1</sub> = A x<sub>k</sub></span>. After many steps, eigenvectors often become visible because <span class="formula">A<sup>k</sup>v = λ<sup>k</sup>v</span>.</p>
+  <p><span class="pill">growth</span><span class="pill">decay</span><span class="pill">oscillation</span><span class="pill">ranking</span><span class="pill">Markov chains</span><span class="pill">power iteration</span></p>
+</section>
+
+<section>
+  <h2>1. Two-direction iteration</h2>
+  <p>Change the two eigenvalues of a diagonal matrix. One direction may grow while another decays.</p>
+  <div class="grid">
+    <div class="panel">
+      <label>λ₁: <span id="lam1v"></span></label><input id="lam1" type="range" min="-2" max="2" step="0.05" value="1.25">
+      <label>λ₂: <span id="lam2v"></span></label><input id="lam2" type="range" min="-2" max="2" step="0.05" value="0.55">
+      <label>Initial x-coordinate: <span id="x0v"></span></label><input id="x0" type="range" min="-3" max="3" step="0.1" value="1.3">
+      <label>Initial y-coordinate: <span id="y0v"></span></label><input id="y0" type="range" min="-3" max="3" step="0.1" value="2.2">
+      <div id="diagOut" class="output"></div>
+    </div>
+    <canvas id="diagCanvas" width="650" height="520"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>2. Power iteration</h2>
+  <p>Repeated multiplication plus normalization can find a dominant eigenvector. The matrix is symmetric: <span class="formula">A = [[a,b],[b,d]]</span>.</p>
+  <div class="grid">
+    <div class="panel">
+      <label>a: <span id="paV"></span></label><input id="pa" type="range" min="-3" max="5" step="0.1" value="2">
+      <label>b: <span id="pbV"></span></label><input id="pb" type="range" min="-3" max="3" step="0.1" value="1">
+      <label>d: <span id="pdV"></span></label><input id="pd" type="range" min="-3" max="5" step="0.1" value="2">
+      <label>Starting angle: <span id="pangV"></span>°</label><input id="pang" type="range" min="0" max="360" step="1" value="15">
+      <div id="powerOut" class="output"></div>
+    </div>
+    <canvas id="powerCanvas" width="650" height="520"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>3. Markov chain weather model</h2>
+  <p>Adjust transition probabilities. The columns represent today's weather; the entries describe tomorrow's distribution.</p>
+  <div class="grid">
+    <div class="panel">
+      <label>P(Sunny tomorrow | Sunny today): <span id="ssV"></span></label><input id="ss" type="range" min="0" max="1" step="0.01" value="0.8">
+      <label>P(Sunny tomorrow | Rainy today): <span id="srV"></span></label><input id="sr" type="range" min="0" max="1" step="0.01" value="0.3">
+      <label>Initial sunny probability: <span id="sun0V"></span></label><input id="sun0" type="range" min="0" max="1" step="0.01" value="1">
+      <div id="markovOut" class="output"></div>
+    </div>
+    <canvas id="markovCanvas" width="650" height="430"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>4. PageRank-style ranking</h2>
+  <p>Importance flows through links. Damping adds a chance of jumping randomly to any page.</p>
+  <div class="grid">
+    <div class="panel">
+      <label>Damping α: <span id="alphaV"></span></label><input id="alpha" type="range" min="0" max="1" step="0.01" value="0.85">
+      <button onclick="randomNetwork()">Randomize network</button>
+      <button class="secondary" onclick="resetNetwork()">Reset network</button>
+      <div id="rankOut" class="output"></div>
+      <p class="note">Columns are source pages; rows are destination pages. The rank vector is the stable distribution of importance.</p>
+    </div>
+    <canvas id="rankCanvas" width="650" height="520"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>5. Iteration as smoothing</h2>
+  <p>Repeated local averaging removes sharp details. This is a simple model of diffusion.</p>
+  <div class="grid">
+    <div class="panel">
+      <label>Smoothing strength: <span id="smoothV"></span></label><input id="smooth" type="range" min="0" max="0.49" step="0.01" value="0.22">
+      <label>Number of iterations: <span id="stepsV"></span></label><input id="steps" type="range" min="0" max="80" step="1" value="12">
+      <button onclick="newSignal()">New noisy signal</button>
+      <div id="smoothOut" class="output"></div>
+    </div>
+    <canvas id="smoothCanvas" width="650" height="430"></canvas>
+  </div>
+</section>
+
+<section>
+  <h2>Reflection</h2>
+  <p>Use the interactive tools above to answer these questions:</p>
+  <ol>
+    <li>When does iteration converge to zero?</li>
+    <li>When does it explode?</li>
+    <li>Why does normalization help power iteration?</li>
+    <li>What is the difference between one-step movement and long-run behavior?</li>
+    <li>How are ranking and Markov chains both eigenvector problems?</li>
+  </ol>
+</section>
+
+</main>
+<script>
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id).value)}
+function fmt(x){return Number(x).toFixed(3)}
+function clear(ctx,w,h){ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h)}
+function axes(ctx,w,h,scale=70){ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1;for(let x=w/2%scale;x<w;x+=scale){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=h/2%scale;y<h;y+=scale){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.strokeStyle='#94a3b8';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke()}
+function pt(x,y,w,h,s){return [w/2+s*x,h/2-s*y]}
+function line(ctx,x1,y1,x2,y2,color,width=2){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function circle(ctx,x,y,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function arrow(ctx,x1,y1,x2,y2,color){line(ctx,x1,y1,x2,y2,color,3);let ang=Math.atan2(y2-y1,x2-x1);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(ang-0.4),y2-12*Math.sin(ang-0.4));ctx.lineTo(x2-12*Math.cos(ang+0.4),y2-12*Math.sin(ang+0.4));ctx.closePath();ctx.fill()}
+
+function drawDiag(){
+  let l1=val('lam1'), l2=val('lam2'), x=val('x0'), y=val('y0');
+  $('lam1v').textContent=fmt(l1); $('lam2v').textContent=fmt(l2); $('x0v').textContent=fmt(x); $('y0v').textContent=fmt(y);
+  let c=$('diagCanvas'), ctx=c.getContext('2d'), w=c.width,h=c.height,s=55; clear(ctx,w,h); axes(ctx,w,h,s);
+  let arr=[]; for(let k=0;k<24;k++){arr.push([x,y]); x=l1*x; y=l2*y;}
+  for(let k=0;k<arr.length-1;k++){let p=pt(arr[k][0],arr[k][1],w,h,s), q=pt(arr[k+1][0],arr[k+1][1],w,h,s); line(ctx,p[0],p[1],q[0],q[1],'#2563eb',2); circle(ctx,p[0],p[1],3,'#7c3aed')}
+  let last=arr[arr.length-1], lp=pt(last[0],last[1],w,h,s); circle(ctx,lp[0],lp[1],5,'#ef4444');
+  let behavior = Math.max(Math.abs(l1),Math.abs(l2))<1 ? 'converges toward zero' : Math.max(Math.abs(l1),Math.abs(l2))>1 ? 'has a growing direction' : 'has neutral boundary behavior';
+  $('diagOut').textContent=`A = [[${fmt(l1)}, 0], [0, ${fmt(l2)}]]\nAfter 24 steps: (${fmt(last[0])}, ${fmt(last[1])})\nBehavior: ${behavior}`;
+}
+
+function eig2(a,b,d){let tr=a+d, det=a*d-b*b, disc=Math.sqrt(Math.max(0,tr*tr-4*det));return [(tr+disc)/2,(tr-disc)/2]}
+function drawPower(){
+  let a=val('pa'), b=val('pb'), d=val('pd'), ang=val('pang')*Math.PI/180;
+  $('paV').textContent=fmt(a); $('pbV').textContent=fmt(b); $('pdV').textContent=fmt(d); $('pangV').textContent=Math.round(val('pang'));
+  let c=$('powerCanvas'), ctx=c.getContext('2d'), w=c.width,h=c.height,s=95; clear(ctx,w,h); axes(ctx,w,h,s);
+  let x=Math.cos(ang), y=Math.sin(ang), hist=[];
+  for(let k=0;k<18;k++){hist.push([x,y]); let nx=a*x+b*y, ny=b*x+d*y; let norm=Math.hypot(nx,ny); if(norm>1e-9){x=nx/norm;y=ny/norm}}
+  for(let k=0;k<hist.length-1;k++){let p=pt(hist[k][0],hist[k][1],w,h,s), q=pt(hist[k+1][0],hist[k+1][1],w,h,s); line(ctx,p[0],p[1],q[0],q[1],'#2563eb',2); circle(ctx,p[0],p[1],4,'#7c3aed')}
+  for(let t=0;t<Math.PI*2;t+=0.04){let ux=Math.cos(t),uy=Math.sin(t); let vx=a*ux+b*uy, vy=b*ux+d*uy; let p=pt(vx,vy,w,h,s*.55); if(t===0)ctx.beginPath(); if(t===0)ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]);} ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2; ctx.stroke();
+  let ev=eig2(a,b,d).sort((x,y)=>Math.abs(y)-Math.abs(x));
+  $('powerOut').textContent=`A = [[${fmt(a)}, ${fmt(b)}], [${fmt(b)}, ${fmt(d)}]]\nEigenvalues ≈ ${fmt(ev[0])}, ${fmt(ev[1])}\nDominant magnitude ≈ ${fmt(Math.abs(ev[0]))}\nFinal direction ≈ (${fmt(hist.at(-1)[0])}, ${fmt(hist.at(-1)[1])})`;
+}
+
+function drawMarkov(){
+  let ss=val('ss'), sr=val('sr'), p0=val('sun0'); $('ssV').textContent=fmt(ss); $('srV').textContent=fmt(sr); $('sun0V').textContent=fmt(p0);
+  let P=[[ss,sr],[1-ss,1-sr]]; let p=[p0,1-p0], hist=[]; for(let k=0;k<50;k++){hist.push([...p]); p=[P[0][0]*p[0]+P[0][1]*p[1], P[1][0]*p[0]+P[1][1]*p[1]]}
+  let c=$('markovCanvas'), ctx=c.getContext('2d'), w=c.width,h=c.height; clear(ctx,w,h); let pad=45;
+  ctx.strokeStyle='#94a3b8'; ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.moveTo(pad,pad);ctx.lineTo(pad,h-pad);ctx.stroke();
+  function plot(idx,color){ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();hist.forEach((v,k)=>{let x=pad+(w-2*pad)*k/(hist.length-1), y=h-pad-(h-2*pad)*v[idx]; if(k==0)ctx.moveTo(x,y); else ctx.lineTo(x,y)});ctx.stroke()}
+  plot(0,'#2563eb'); plot(1,'#7c3aed');
+  let final=hist.at(-1); $('markovOut').textContent=`P = [[${fmt(P[0][0])}, ${fmt(P[0][1])}], [${fmt(P[1][0])}, ${fmt(P[1][1])}]]\nLong-run sunny ≈ ${fmt(final[0])}\nLong-run rainy ≈ ${fmt(final[1])}`;
+}
+
+let baseM;
+function resetNetwork(){baseM=[[0,.5,.5,0],[.5,0,.5,1/3],[.5,.5,0,1/3],[0,0,0,1/3]]; drawRank()}
+function randomNetwork(){let n=4; baseM=Array.from({length:n},()=>Array(n).fill(0)); for(let j=0;j<n;j++){let outs=[]; for(let i=0;i<n;i++) if(i!==j && Math.random()<.55) outs.push(i); if(outs.length===0) outs=[Math.floor(Math.random()*n)]; outs.forEach(i=>baseM[i][j]=1/outs.length)} drawRank()}
+function drawRank(){let alpha=val('alpha'); $('alphaV').textContent=fmt(alpha); let n=4; let G=Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>alpha*baseM[i][j]+(1-alpha)/n)); let r=Array(n).fill(1/n), hist=[]; for(let k=0;k<70;k++){hist.push([...r]); let nr=Array(n).fill(0); for(let i=0;i<n;i++)for(let j=0;j<n;j++)nr[i]+=G[i][j]*r[j]; r=nr}
+  let c=$('rankCanvas'), ctx=c.getContext('2d'), w=c.width,h=c.height; clear(ctx,w,h); let cx=w/2,cy=h/2,R=170,pos=[]; for(let i=0;i<n;i++){let t=-Math.PI/2+i*2*Math.PI/n; pos.push([cx+R*Math.cos(t),cy+R*Math.sin(t)])}
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++)if(baseM[i][j]>0 && i!==j){arrow(ctx,pos[j][0],pos[j][1],pos[i][0],pos[i][1],'rgba(37,99,235,.45)')}
+  let maxr=Math.max(...r); for(let i=0;i<n;i++){circle(ctx,pos[i][0],pos[i][1],32+35*r[i]/maxr,'#dbeafe'); circle(ctx,pos[i][0],pos[i][1],24,'#2563eb'); ctx.fillStyle='white'; ctx.font='bold 20px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(i+1,pos[i][0],pos[i][1]); ctx.fillStyle='#111827'; ctx.fillText(fmt(r[i]),pos[i][0],pos[i][1]+55)}
+  $('rankOut').textContent=`Damping α = ${fmt(alpha)}\nRanking after iteration:\nPage 1: ${fmt(r[0])}\nPage 2: ${fmt(r[1])}\nPage 3: ${fmt(r[2])}\nPage 4: ${fmt(r[3])}`;
+}
+
+let signal=[]; function newSignal(){signal=[]; for(let i=0;i<100;i++){let v=0.9*Math.exp(-Math.pow((i-25)/8,2))+1.2*Math.exp(-Math.pow((i-68)/6,2))+0.2*(Math.random()-.5); signal.push(v)} drawSmooth()}
+function drawSmooth(){let mu=val('smooth'), steps=Math.round(val('steps')); $('smoothV').textContent=fmt(mu); $('stepsV').textContent=steps; let y=[...signal]; for(let k=0;k<steps;k++){let z=[...y]; for(let i=0;i<y.length;i++){let left=y[Math.max(0,i-1)], right=y[Math.min(y.length-1,i+1)]; z[i]=(1-2*mu)*y[i]+mu*left+mu*right} y=z}
+  let c=$('smoothCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height; clear(ctx,w,h); function draw(arr,color){let mn=Math.min(...signal,...y), mx=Math.max(...signal,...y), pad=35; ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();arr.forEach((v,i)=>{let x=pad+(w-2*pad)*i/(arr.length-1), yy=h-pad-(h-2*pad)*(v-mn)/(mx-mn+1e-9); if(i===0)ctx.moveTo(x,yy); else ctx.lineTo(x,yy)});ctx.stroke()} draw(signal,'rgba(124,58,237,.45)'); draw(y,'#2563eb'); $('smoothOut').textContent=`Original signal shown in purple.\nSmoothed signal shown in blue.\nIterations: ${steps}\nSmoothing strength: ${fmt(mu)}`}
+
+['lam1','lam2','x0','y0'].forEach(id=>$(id).addEventListener('input',drawDiag));
+['pa','pb','pd','pang'].forEach(id=>$(id).addEventListener('input',drawPower));
+['ss','sr','sun0'].forEach(id=>$(id).addEventListener('input',drawMarkov));
+$('alpha').addEventListener('input',drawRank); ['smooth','steps'].forEach(id=>$(id).addEventListener('input',drawSmooth));
+resetNetwork(); newSignal(); drawDiag(); drawPower(); drawMarkov(); drawRank(); drawSmooth();
+</script>
+</body>
+</html>
