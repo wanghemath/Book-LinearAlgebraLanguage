@@ -7,8 +7,8 @@ book:
   subtitle: "How Vectors and Matrices Describe the World"
   author: "He Wang"
   date: "2026-06-06"
-  site-url: "https://wanghemath.github.io/Book-linear-algebra-language/"
-  repo-url: "https://github.com/wanghemath/Book-linear-algebra-language"
+  site-url: "https://wanghemath.github.io/Book-LinearAlgebraLanguage/"
+  repo-url: "https://github.com/wanghemath/Book-LinearAlgebraLanguage"
   repo-actions: [edit, issue]
   page-navigation: true
   search: true

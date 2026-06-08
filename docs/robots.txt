@@ -1,1 +1,1 @@
-Sitemap: https://wanghemath.github.io/Book-linear-algebra-language/sitemap.xml
+Sitemap: https://wanghemath.github.io/Book-LinearAlgebraLanguage/sitemap.xml
