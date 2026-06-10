@@ -145,6 +145,9 @@ The book therefore emphasizes:
 - applications without losing mathematical precision;
 - AI-era literacy rooted in real mathematics.
 
+A follow-up book on advanced linear algebra is available: [Linear Algebra in the AI Age: Geometry, Computation, and Data](https://wanghemath.github.io/Book-AdvancedLinearAlgebraAI/).
+
+
 ## Status
 
 This project is actively developing. Chapters, labs, examples, and interactive activities may be revised as the course and book evolve.

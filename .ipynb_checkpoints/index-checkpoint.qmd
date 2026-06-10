@@ -70,7 +70,7 @@ It is especially suitable for:
 
 **No prior linear algebra is assumed.** The reader should be comfortable with algebra, graphs, and basic functions. Python is used as a tool for exploration, but the central ideas are explained before computation. 
 
-A follow-up book on advanced linear algebra is available: [Linear Algebra in the AI Age: Geometry, Computation, and Data](https://wanghemath.github.io/MATH5110Book/).
+A follow-up book on advanced linear algebra is available: [Linear Algebra in the AI Age: Geometry, Computation, and Data](https://wanghemath.github.io/Book-AdvancedLinearAlgebraAI/).
 
 ## What Makes This Book Different
 
